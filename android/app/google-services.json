@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "966666011561",
+    "project_id": "cesenaremembers1945",
+    "storage_bucket": "cesenaremembers1945.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:966666011561:android:c7b3b729dac06879af3ab8",
+        "android_client_info": {
+          "package_name": "com.example.cesena_remembers"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBDO1gfGazsXDkDL_GXR1Vmfcj3LN6qpI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
