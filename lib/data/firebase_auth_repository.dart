@@ -6,9 +6,17 @@ import '../domain/entities/app_user.dart';
 import '../domain/repositories/auth_repository.dart';
 
 class FirebaseAuthRepository implements AuthRepository {
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _firebaseAuth;
+  final GoogleSignIn _googleSignIn;
+  final FirebaseFirestore _firestore;
+
+  FirebaseAuthRepository({
+    FirebaseAuth? firebaseAuth,
+    GoogleSignIn? googleSignIn,
+    FirebaseFirestore? firestore,
+  }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+       _googleSignIn = googleSignIn ?? GoogleSignIn(),
+       _firestore = firestore ?? FirebaseFirestore.instance;
 
   @override
   User? get currentUser => _firebaseAuth.currentUser;
@@ -33,7 +41,7 @@ class FirebaseAuthRepository implements AuthRepository {
   Future<void> signInWithEmail(String email, String password) async {
     try {
       await _firebaseAuth.signInWithEmailAndPassword(
-        email: email,
+        email: email.trim(),
         password: password,
       );
     } on FirebaseAuthException catch (e) {
@@ -45,13 +53,15 @@ class FirebaseAuthRepository implements AuthRepository {
   Future<void> register(String email, String password) async {
     try {
       final credential = await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
+        email: email.trim(),
         password: password,
       );
 
-      if (credential.user != null) {
-        await _firestore.collection('users').doc(credential.user!.uid).set({
-          'email': email,
+      final user = credential.user;
+      if (user != null) {
+        await _firestore.collection('users').doc(user.uid).set({
+          'email': user.email ?? email.trim(),
+          'displayName': user.displayName,
           'createdAt': FieldValue.serverTimestamp(),
           'role': 'user',
         });
@@ -64,14 +74,13 @@ class FirebaseAuthRepository implements AuthRepository {
   @override
   Future<void> signInWithGoogle() async {
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      final googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
-        return;
+        throw Exception('Accesso Google annullato.');
       }
 
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      final OAuthCredential credential = GoogleAuthProvider.credential(
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
@@ -79,22 +88,24 @@ class FirebaseAuthRepository implements AuthRepository {
       final userCredential = await _firebaseAuth.signInWithCredential(
         credential,
       );
-      if (userCredential.user != null) {
-        final userRef = _firestore
-            .collection('users')
-            .doc(userCredential.user!.uid);
+
+      final user = userCredential.user;
+      if (user != null) {
+        final userRef = _firestore.collection('users').doc(user.uid);
         final userDoc = await userRef.get();
         if (!userDoc.exists) {
           await userRef.set({
-            'email': userCredential.user!.email,
-            'displayName': userCredential.user!.displayName,
+            'email': user.email,
+            'displayName': user.displayName,
             'createdAt': FieldValue.serverTimestamp(),
             'role': 'user',
           });
         }
       }
+    } on FirebaseAuthException catch (e) {
+      throw Exception(_mapErrorMessage(e.code));
     } catch (e) {
-      throw Exception('Errore Login Google: $e');
+      rethrow;
     }
   }
 
@@ -102,13 +113,15 @@ class FirebaseAuthRepository implements AuthRepository {
   Future<void> updateDisplayName(String name) async {
     try {
       final user = _firebaseAuth.currentUser;
-      if (user != null) {
-        await user.updateDisplayName(name);
-        await _firestore.collection('users').doc(user.uid).update({
-          'displayName': name,
-        });
-        await user.reload();
+      if (user == null) {
+        throw Exception('Nessun utente autenticato.');
       }
+
+      await user.updateDisplayName(name.trim());
+      await _firestore.collection('users').doc(user.uid).set({
+        'displayName': name.trim(),
+      }, SetOptions(merge: true));
+      await user.reload();
     } catch (_) {
       throw Exception('Impossibile aggiornare il nome.');
     }
@@ -117,9 +130,9 @@ class FirebaseAuthRepository implements AuthRepository {
   @override
   Future<void> sendPasswordReset(String email) async {
     try {
-      await _firebaseAuth.sendPasswordResetEmail(email: email);
-    } catch (_) {
-      throw Exception('Errore reset password.');
+      await _firebaseAuth.sendPasswordResetEmail(email: email.trim());
+    } on FirebaseAuthException catch (e) {
+      throw Exception(_mapErrorMessage(e.code));
     }
   }
 
@@ -141,6 +154,8 @@ class FirebaseAuthRepository implements AuthRepository {
         return 'Password troppo debole.';
       case 'invalid-email':
         return 'Email non valida.';
+      case 'network-request-failed':
+        return 'Errore di rete. Controlla la connessione.';
       default:
         return 'Errore: $code';
     }

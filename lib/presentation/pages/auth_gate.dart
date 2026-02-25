@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../domain/entities/app_user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../injection_container.dart';
 import 'login_page.dart';
@@ -12,7 +13,7 @@ class AuthGate extends StatelessWidget {
   Widget build(BuildContext context) {
     final repository = sl<AuthRepository>();
 
-    return StreamBuilder(
+    return StreamBuilder<AppUser?>(
       stream: repository.userStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
