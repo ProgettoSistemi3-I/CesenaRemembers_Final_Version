@@ -8,6 +8,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../../domain/entities/poi.dart';
+import '../../domain/usecases/auth_use_cases.dart';
 import '../../domain/usecases/poi_usecases.dart'; // Assicurati che il nome import sia corretto
 import '../../injection_container.dart';
 
@@ -135,6 +136,20 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     });
   }
 
+
+  Future<void> _logout() async {
+    try {
+      await sl<LogoutUseCase>()();
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Errore logout: $e')),
+      );
+    }
+  }
+
   Widget _buildMapTypeSquare({required String title, required IconData icon, required Color bgColor, required String url}) {
     final isSelected = _currentMapUrl == url;
     return GestureDetector(
@@ -229,6 +244,15 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
           SafeArea(
             child: Stack(
               children: [
+                Positioned(
+                  top: 10,
+                  left: 20,
+                  child: FloatingActionButton.small(
+                    heroTag: 'logout_btn',
+                    onPressed: _logout,
+                    child: const Icon(Icons.logout),
+                  ),
+                ),
                 if (_currentRotation != 0)
                   Positioned(
                     top: 10, right: 20,
