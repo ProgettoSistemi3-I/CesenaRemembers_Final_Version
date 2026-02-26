@@ -12,7 +12,20 @@
           "package_name": "com.example.cesena_remembers"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "966666011561-2mjmdf97icp6f5chba669fj25sbhaj61.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cesena_remembers",
+            "certificate_hash": "2b951cfa3bf942229203f9d954853871cfe0c7e5"
+          }
+        },
+        {
+          "client_id": "966666011561-jg82mh4vbt29s6cggi0kij05d6h0coo4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDBDO1gfGazsXDkDL_GXR1Vmfcj3LN6qpI"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "966666011561-jg82mh4vbt29s6cggi0kij05d6h0coo4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "966666011561-2iovkjlf8f9faanpvf3r1328rre522mk.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.cesenaRemembers"
+              }
+            }
+          ]
         }
       }
     }
