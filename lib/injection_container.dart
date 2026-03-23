@@ -17,25 +17,10 @@ Future<void> init() async {
     sl.registerLazySingleton(() => GetPoisUseCase(sl()));
   }
 
-  if (!sl.isRegistered<AuthRepository>()) {
-    sl.registerLazySingleton<AuthRepository>(() => FirebaseAuthRepository());
-  }
-  if (!sl.isRegistered<LoginWithEmailUseCase>()) {
-    sl.registerLazySingleton(() => LoginWithEmailUseCase(sl()));
-  }
-  if (!sl.isRegistered<RegisterUseCase>()) {
-    sl.registerLazySingleton(() => RegisterUseCase(sl()));
-  }
-  if (!sl.isRegistered<GoogleLoginUseCase>()) {
-    sl.registerLazySingleton(() => GoogleLoginUseCase(sl()));
-  }
-  if (!sl.isRegistered<UpdateProfileUseCase>()) {
-    sl.registerLazySingleton(() => UpdateProfileUseCase(sl()));
-  }
-  if (!sl.isRegistered<LogoutUseCase>()) {
-    sl.registerLazySingleton(() => LogoutUseCase(sl()));
-  }
-  if (!sl.isRegistered<ResetPasswordUseCase>()) {
-    sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
-  }
+  // Registra i use case
+  sl.registerLazySingleton(() => SignInWithGoogleUseCase(sl()));
+  sl.registerLazySingleton(() => SignOutUseCase(sl()));
+
+  // Assicurati che il repository usi il nuovo impl
+  sl.registerLazySingleton<AuthRepository>(() => FirebaseAuthRepository());
 }
