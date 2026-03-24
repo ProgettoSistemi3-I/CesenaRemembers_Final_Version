@@ -16,10 +16,26 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _notifiche = true;
   bool _modalitaNotte = false;
   bool _posizione = true;
+  bool _isLoggingOut = false;
 
   Future<void> _handleLogout() async {
-    await _signOut();
-    // AuthGate reagisce automaticamente allo stream
+    setState(() => _isLoggingOut = true);
+    try {
+      await _signOut();
+      // AuthGate reagisce automaticamente allo stream
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Logout fallito: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoggingOut = false);
+      }
+    }
   }
 
   @override
@@ -119,11 +135,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 width: double.infinity,
                 margin: const EdgeInsets.only(bottom: 15),
                 child: OutlinedButton.icon(
-                  onPressed: _handleLogout,
-                  icon: const Icon(Icons.logout, color: Colors.red),
-                  label: const Text(
-                    'Logout',
-                    style: TextStyle(color: Colors.red, fontSize: 16),
+                  onPressed: _isLoggingOut ? null : _handleLogout,
+                  icon: _isLoggingOut
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.logout, color: Colors.red),
+                  label: Text(
+                    _isLoggingOut ? 'Uscita in corso...' : 'Logout',
+                    style: const TextStyle(color: Colors.red, fontSize: 16),
                   ),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Colors.red, width: 2),

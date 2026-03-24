@@ -7,9 +7,10 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../../domain/entities/poi.dart';
-import '../../domain/usecases/poi_use_cases.dart'; // Assicurati che il nome import sia corretto
+import '../../domain/usecases/poi_use_cases.dart';
 import '../../injection_container.dart';
+import '../services/location_permission_service.dart';
+import '../services/poi_marker_factory.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -20,8 +21,9 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   final MapController _mapController = MapController();
+  final _locationPermissionService = const LocationPermissionService();
+  final _poiMarkerFactory = const PoiMarkerFactory();
 
-  // FIX: Sostituito FollowOnLocationUpdate con AlignOnUpdate
   AlignOnUpdate _alignPositionOnUpdate = AlignOnUpdate.always;
 
   StreamSubscription<ServiceStatus>? _serviceStatusStreamSubscription;
@@ -38,6 +40,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
 
   List<Marker> _markers = [];
   bool _isLoading = true;
+  String? _loadError;
 
   @override
   void initState() {
@@ -50,56 +53,30 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   }
 
   Future<void> _loadPois() async {
-    final getPois = sl<GetPoisUseCase>();
-    final pois = await getPois();
+    try {
+      final getPois = sl<GetPoisUseCase>();
+      final pois = await getPois();
 
-    setState(() {
-      _markers = pois.map((poi) => _buildMarkerFromPoi(poi)).toList();
-      _isLoading = false;
-    });
-  }
-
-  Marker _buildMarkerFromPoi(Poi poi) {
-    Color iconColor;
-    switch (poi.type) {
-      case 'school':
-        iconColor = Colors.red;
-        break;
-      case 'bridge':
-        iconColor = Colors.green;
-        break;
-      case 'library':
-        iconColor = Colors.orange;
-        break;
-      default:
-        iconColor = Colors.blue;
+      if (!mounted) return;
+      setState(() {
+        _markers = pois.map(_poiMarkerFactory.fromPoi).toList();
+        _loadError = null;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _markers = [];
+        _loadError = 'Errore nel caricamento dei punti di interesse.';
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Caricamento POI fallito: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
-
-    return Marker(
-      point: LatLng(poi.latitude, poi.longitude),
-      width: 120,
-      height: 80,
-      child: Column(
-        children: [
-          Icon(Icons.location_on, color: iconColor, size: 40),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
-              boxShadow: const [
-                BoxShadow(blurRadius: 2, color: Colors.black26),
-              ],
-            ),
-            child: Text(
-              poi.name,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -118,18 +95,9 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   }
 
   Future<void> _checkPermissionsAndInitialize() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      if (!kIsWeb) await Geolocator.openLocationSettings();
-      return;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) return;
-    }
-    if (permission == LocationPermission.deniedForever) return;
+    final hasPermission = await _locationPermissionService
+        .ensureLocationEnabledAndAuthorized();
+    if (!hasPermission) return;
 
     if (mounted) setState(() {});
   }
@@ -212,6 +180,36 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     return Scaffold(
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
+          : _loadError != null
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      color: Colors.red,
+                      size: 42,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      _loadError!,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() => _isLoading = true);
+                        _loadPois();
+                      },
+                      child: const Text('Riprova'),
+                    ),
+                  ],
+                ),
+              ),
+            )
           : Stack(
               children: [
                 FlutterMap(
@@ -238,7 +236,6 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                         setState(() => _isMapMenuOpen = false);
                       }
                     },
-                    // FIX: Sostituito MapPosition con MapCamera
                     onPositionChanged: (MapCamera camera, bool hasGesture) {
                       if (hasGesture &&
                           _alignPositionOnUpdate != AlignOnUpdate.never) {
@@ -256,7 +253,6 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                       maxZoom: 19,
                     ),
                     CurrentLocationLayer(
-                      // FIX: Aggiornati i parametri per le nuove versioni
                       alignPositionOnUpdate: _alignPositionOnUpdate,
                       alignDirectionOnUpdate: AlignOnUpdate.never,
                       style: LocationMarkerStyle(
