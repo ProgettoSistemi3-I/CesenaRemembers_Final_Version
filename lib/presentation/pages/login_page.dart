@@ -1,10 +1,10 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../domain/usecases/auth_use_cases.dart';
 import '../../injection_container.dart';
 
-// SVG ufficiale del logo Google (inline, nessuna richiesta di rete)
 const String _googleLogoSvg = '''
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
   <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -22,18 +22,49 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage>
+    with SingleTickerProviderStateMixin {
   final _signInWithGoogle = sl<SignInWithGoogleUseCase>();
 
   bool _isLoading = false;
   String? _error;
+
+  late AnimationController _animController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeOut));
+
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero).animate(
+          CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
+        );
+
+    _animController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
 
   Future<void> _handleSignIn() async {
     setState(() {
       _isLoading = true;
       _error = null;
     });
-
     try {
       await _signInWithGoogle();
     } catch (e) {
@@ -45,57 +76,167 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final double sh = size.height;
+    final double sw = size.width;
+
+    // Scala basata sull'altezza per mantenere le proporzioni verticali
+    final double scale = (sh / 844).clamp(0.7, 1.2);
+
+    final double titleSize = 48 * scale;
+    final double iconSize = 42 * scale;
+    final double spacingLg = 50 * scale;
+    final double hPadding =
+        sw * 0.12; // Padding laterale proporzionale alla larghezza
+
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text("CESENA REMEMBERS '45"),
-        backgroundColor: Colors.grey,
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          // 1. IMMAGINE DI SFONDO FULL SCREEN
+          Positioned.fill(
+            child: Image.network(
+              'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1200&auto=format&fit=crop',
+              fit: BoxFit.cover,
+              color: Colors.black.withOpacity(0.65),
+              colorBlendMode: BlendMode.darken,
+              errorBuilder: (_, __, ___) =>
+                  Container(color: const Color(0xFF1A1A1A)),
+            ),
+          ),
+
+          // 2. GRADIENTE VIGNETTE (Migliora la leggibilità)
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  colors: [Colors.transparent, Colors.black.withOpacity(0.9)],
+                  radius: 1.2,
+                  center: Alignment.center,
+                ),
+              ),
+            ),
+          ),
+
+          // 3. CONTENUTO ADATTIVO
+          SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: hPadding),
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: Column(
+                    children: [
+                      const Spacer(
+                        flex: 3,
+                      ), // Spinge il contenuto verso il centro/alto
+                      // Emblema
+                      Container(
+                        padding: EdgeInsets.all(16 * scale),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xFFD32F2F),
+                            width: 1.5,
+                          ),
+                          color: Colors.black.withOpacity(0.4),
+                        ),
+                        child: Icon(
+                          Icons.military_tech,
+                          size: iconSize,
+                          color: const Color(0xFFD32F2F),
+                        ),
+                      ),
+
+                      SizedBox(height: 20 * scale),
+
+                      // Titolo
+                      Text(
+                        "CESENA\n1945",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: titleSize,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 6.0,
+                          color: Colors.white,
+                          height: 0.9,
+                        ),
+                      ),
+
+                      const Spacer(flex: 2),
+
+                      // Bottone Google
+                      if (_isLoading)
+                        const CircularProgressIndicator(
+                          color: Color(0xFFD32F2F),
+                        )
+                      else
+                        _buildGoogleButton(scale, sw),
+
+                      // Messaggio di Errore
+                      if (_error != null) _buildErrorWidget(scale),
+
+                      const Spacer(flex: 1),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
-      body: Center(
-        child: Column(
+    );
+  }
+
+  Widget _buildGoogleButton(double scale, double sw) {
+    return Container(
+      width: double.infinity,
+      height: 55 * scale,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8), // Look più "militare"/serio
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          elevation: 0,
+        ),
+        onPressed: _handleSignIn,
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (_isLoading)
-              const CircularProgressIndicator()
-            else
-              OutlinedButton(
-                onPressed: _handleSignIn,
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  side: const BorderSide(color: Colors.grey),
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SvgPicture.string(_googleLogoSvg, height: 24, width: 24),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'Accedi con Google',
-                      style: TextStyle(fontSize: 16, color: Colors.black87),
-                    ),
-                  ],
-                ),
+            SvgPicture.string(_googleLogoSvg, height: 22 * scale),
+            const SizedBox(width: 12),
+            Text(
+              "ACCEDI CON GOOGLE",
+              style: TextStyle(
+                fontSize: 14 * scale,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.5,
               ),
-            if (_error != null) ...[
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Text(
-                  _error!,
-                  style: const TextStyle(color: Colors.red),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildErrorWidget(double scale) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Text(
+        _error!,
+        textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.redAccent, fontSize: 12 * scale),
       ),
     );
   }
