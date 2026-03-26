@@ -15,6 +15,18 @@ const String _googleLogoSvg = '''
 </svg>
 ''';
 
+// ─────────────────────────────────────────────
+//  Palette coerente con il resto dell'app
+// ─────────────────────────────────────────────
+const _cream = Color(0xFFF7F3EE);
+const _warmWhite = Color(0xFFFFFFFF);
+const _olive = Color(0xFF5C6B3A);
+const _moss = Color(0xFF8A9E5B);
+const _tan = Color(0xFFB5885A);
+const _tanLight = Color(0xFFE8D4BE);
+const _textDark = Color(0xFF2C2C2C);
+const _textMid = Color(0xFF7A7A7A);
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -36,6 +48,7 @@ class _LoginPageState extends State<LoginPage>
   @override
   void initState() {
     super.initState();
+
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
@@ -47,7 +60,7 @@ class _LoginPageState extends State<LoginPage>
     ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeOut));
 
     _slideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero).animate(
+        Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
           CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
         );
 
@@ -68,6 +81,7 @@ class _LoginPageState extends State<LoginPage>
     try {
       await _signInWithGoogle();
     } catch (e) {
+      if (!mounted) return;
       setState(() => _error = 'Errore durante il login: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -80,45 +94,54 @@ class _LoginPageState extends State<LoginPage>
     final double sh = size.height;
     final double sw = size.width;
 
-    // Scala basata sull'altezza per mantenere le proporzioni verticali
-    final double scale = (sh / 844).clamp(0.7, 1.2);
+    final double scale = (sh / 844).clamp(0.75, 1.3);
 
-    final double titleSize = 48 * scale;
-    final double iconSize = 42 * scale;
-    final double spacingLg = 50 * scale;
-    final double hPadding =
-        sw * 0.12; // Padding laterale proporzionale alla larghezza
+    final double titleSize = 52 * scale;
+    final double iconSize = 48 * scale;
+    final double iconPad = 16 * scale;
+    final double spacingLg = 60 * scale;
+    final double spacingMd = 24 * scale;
+    final double spacingSm = 16 * scale;
+    final double hPadding = (sw * 0.08).clamp(20.0, 48.0);
+    final double btnVertPad = 14 * scale;
+    final double btnFontSize = 15 * scale;
+    final double logoSize = 24 * scale;
 
     return Scaffold(
       backgroundColor: Colors.black,
+      resizeToAvoidBottomInset: false,
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          // 1. IMMAGINE DI SFONDO FULL SCREEN
-          Positioned.fill(
-            child: Image.network(
-              'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1200&auto=format&fit=crop',
-              fit: BoxFit.cover,
-              color: Colors.black.withOpacity(0.65),
-              colorBlendMode: BlendMode.darken,
-              errorBuilder: (_, __, ___) =>
-                  Container(color: const Color(0xFF1A1A1A)),
-            ),
-          ),
-
-          // 2. GRADIENTE VIGNETTE (Migliora la leggibilità)
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  colors: [Colors.transparent, Colors.black.withOpacity(0.9)],
-                  radius: 1.2,
-                  center: Alignment.center,
+          // Sfondo mappa d'epoca
+          Image.network(
+            'https://images.unsplash.com/photo-1524661135-423995f22d0b'
+            '?q=80&w=1000&auto=format&fit=crop',
+            fit: BoxFit.cover,
+            color: Colors.black.withOpacity(0.62),
+            colorBlendMode: BlendMode.darken,
+            errorBuilder: (_, __, ___) => Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF2B2B2B), Color(0xFF000000)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                 ),
               ),
             ),
           ),
 
-          // 3. CONTENUTO ADATTIVO
+          // Vignettatura
+          Container(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                colors: [Colors.transparent, Colors.black.withOpacity(0.78)],
+                radius: 1.0,
+              ),
+            ),
+          ),
+
+          // Contenuto centrato
           SafeArea(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: hPadding),
@@ -127,57 +150,92 @@ class _LoginPageState extends State<LoginPage>
                 child: SlideTransition(
                   position: _slideAnimation,
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Spacer(
-                        flex: 3,
-                      ), // Spinge il contenuto verso il centro/alto
-                      // Emblema
+                      // Emblema militare
                       Container(
-                        padding: EdgeInsets.all(16 * scale),
+                        padding: EdgeInsets.all(iconPad),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(
-                            color: const Color(0xFFD32F2F),
-                            width: 1.5,
-                          ),
-                          color: Colors.black.withOpacity(0.4),
+                          border: Border.all(color: _olive, width: 2),
+                          color: Colors.black.withOpacity(0.45),
                         ),
                         child: Icon(
                           Icons.military_tech,
                           size: iconSize,
-                          color: const Color(0xFFD32F2F),
+                          color: _olive,
                         ),
                       ),
-
-                      SizedBox(height: 20 * scale),
+                      SizedBox(height: spacingMd),
 
                       // Titolo
                       Text(
-                        "CESENA\n1945",
-                        textAlign: TextAlign.center,
+                        "CESENA",
                         style: TextStyle(
                           fontSize: titleSize,
                           fontWeight: FontWeight.w900,
-                          letterSpacing: 6.0,
+                          letterSpacing: 4.0,
                           color: Colors.white,
-                          height: 0.9,
+                          height: 1.0,
                         ),
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        "1945",
+                        style: TextStyle(
+                          fontSize: titleSize,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 4.0,
+                          color: _tan,
+                          height: 1.0,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
 
-                      const Spacer(flex: 2),
+                      SizedBox(height: spacingLg),
 
-                      // Bottone Google
+                      // Bottone / loader
                       if (_isLoading)
-                        const CircularProgressIndicator(
-                          color: Color(0xFFD32F2F),
-                        )
+                        const CircularProgressIndicator(color: _olive)
                       else
-                        _buildGoogleButton(scale, sw),
+                        _buildGoogleButton(
+                          btnVertPad: btnVertPad,
+                          btnFontSize: btnFontSize,
+                          logoSize: logoSize,
+                        ),
 
-                      // Messaggio di Errore
-                      if (_error != null) _buildErrorWidget(scale),
-
-                      const Spacer(flex: 1),
+                      // Errore
+                      if (_error != null) ...[
+                        SizedBox(height: spacingSm),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: spacingSm,
+                                vertical: spacingSm * 0.75,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _tan.withOpacity(0.16),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: _tan.withOpacity(0.35),
+                                ),
+                              ),
+                              child: Text(
+                                _error!,
+                                style: TextStyle(
+                                  color: const Color(0xFFB84F4F),
+                                  fontSize: 13 * scale,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -189,54 +247,55 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  Widget _buildGoogleButton(double scale, double sw) {
+  Widget _buildGoogleButton({
+    required double btnVertPad,
+    required double btnFontSize,
+    required double logoSize,
+  }) {
     return Container(
       width: double.infinity,
-      height: 55 * scale,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8), // Look più "militare"/serio
+        borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: _olive.withOpacity(0.22),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          backgroundColor: _cream,
+          foregroundColor: _textDark,
+          padding: EdgeInsets.symmetric(vertical: btnVertPad),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+            side: BorderSide(color: _olive.withOpacity(0.28), width: 1),
+          ),
           elevation: 0,
         ),
         onPressed: _handleSignIn,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.string(_googleLogoSvg, height: 22 * scale),
-            const SizedBox(width: 12),
+            SvgPicture.string(
+              _googleLogoSvg,
+              height: logoSize,
+              width: logoSize,
+            ),
+            SizedBox(width: logoSize * 0.5),
             Text(
               "ACCEDI CON GOOGLE",
               style: TextStyle(
-                fontSize: 14 * scale,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.5,
+                fontSize: btnFontSize,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.0,
+                color: _textDark,
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildErrorWidget(double scale) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
-      child: Text(
-        _error!,
-        textAlign: TextAlign.center,
-        style: TextStyle(color: Colors.redAccent, fontSize: 12 * scale),
       ),
     );
   }
