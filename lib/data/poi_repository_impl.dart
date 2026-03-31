@@ -3,15 +3,32 @@ import '../domain/repositories/i_poi_repository.dart';
 import '../models/poi_model.dart';
 
 class PoiRepositoryImpl implements IPoiRepository {
+  static final List<PoiModel> _seedPois = [
+    PoiModel(
+      id: '1',
+      name: 'BlaisePascal',
+      latitude: 44.143043,
+      longitude: 12.253486,
+      type: 'school',
+    ),
+    PoiModel(
+      id: '2',
+      name: 'Ponte di Ruffio',
+      latitude: 44.150864,
+      longitude: 12.309236,
+      type: 'bridge',
+    ),
+    PoiModel(
+      id: '3',
+      name: 'Malatestiana',
+      latitude: 44.136194,
+      longitude: 12.239886,
+      type: 'library',
+    ),
+  ];
+
   @override
   Future<List<Poi>> getPois() async {
-    // Simula una chiamata di rete o query al DB
-    await Future.delayed(const Duration(milliseconds: 500));
-    
-    return [
-      PoiModel(id: '1', name: 'BlaisePascal', latitude: 44.143043, longitude: 12.253486, type: 'school'),
-      PoiModel(id: '2', name: 'Ponte di Ruffio', latitude: 44.150864, longitude: 12.309236, type: 'bridge'),
-      PoiModel(id: '3', name: 'Malatestiana', latitude: 44.136194, longitude: 12.239886, type: 'library'),
-    ];
+    return List<Poi>.unmodifiable(_seedPois);
   }
 }
