@@ -1,35 +1,27 @@
-# Imposta la piattaforma minima
+# Piattaforma minima supportata
 platform :ios, '13.0'
 
-# --- INIZIO BLOCCO CRUCIALE ---
-# Questo script permette al Podfile di "capire" i comandi Flutter
-target_custom_path = File.expand_path(File.join('..', '..', 'flutter', 'bin', 'cache', 'artifacts', 'engine', 'ios', 'Frameworks'), __FILE__)
-# In ambiente Codemagic/Mac, Flutter inietta automaticamente questo file:
-prepare_command = "ruby -e \"require File.join(File.dirname(File.realpath('#{__FILE__}')), '.symlinks', 'plugins', 'flutter_export_environment.sh')\""
+# Importante: Carica l'helper di Flutter
+# Questo file viene generato da Flutter durante la build su Mac/Codemagic
+flutter_install_display_name_ruby = File.join('..', '..', 'flutter', 'packages', 'flutter_tools', 'bin', 'xcode_backend.sh')
 
-# Righe standard che caricano il motore Flutter
+# Carica le configurazioni di Flutter
 load File.join(File.dirname(File.realpath(__FILE__)), '.symlinks', 'plugins', 'flutter_export_environment.rb') if File.exist?(File.join(File.dirname(File.realpath(__FILE__)), '.symlinks', 'plugins', 'flutter_export_environment.rb'))
-# --- FINE BLOCCO CRUCIALE ---
-
-project 'Runner', {
-  'Debug' => :debug,
-  'Release' => :release,
-  'Profile' => :profile,
-}
 
 target 'Runner' do
   use_frameworks!
   use_modular_headers!
 
-  # Questo è il comando che falliva prima
+  # Questa riga dice a CocoaPods di installare i plugin di Flutter
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 end
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+    
+    # Risolve problemi comuni di compatibilità con le architetture
     target.build_configurations.each do |config|
-      # Forza l'architettura e la versione minima se necessario
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
     end
   end
