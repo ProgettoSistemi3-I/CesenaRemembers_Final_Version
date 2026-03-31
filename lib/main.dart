@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'firebase_options.dart';
 import 'injection_container.dart' as di;
@@ -11,6 +13,7 @@ Future<void> main() async {
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await di.init();
+  await _requestLocationPermissionOnFirstOpen();
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -20,6 +23,15 @@ Future<void> main() async {
   );
 
   runApp(const CesenaRemembersApp());
+}
+
+Future<void> _requestLocationPermissionOnFirstOpen() async {
+  if (kIsWeb) return;
+
+  final permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    await Geolocator.requestPermission();
+  }
 }
 
 class CesenaRemembersApp extends StatelessWidget {

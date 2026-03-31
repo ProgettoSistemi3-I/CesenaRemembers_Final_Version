@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+		<key>NSLocationWhenInUseUsageDescription</key>
+	<string>La tua posizione viene usata per centrarti sulla mappa e mostrarti dove ti trovi.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>La tua posizione viene usata per centrarti sulla mappa e mostrarti dove ti trovi.</string>
 </dict>
 </plist>

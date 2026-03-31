@@ -22,6 +22,9 @@ class LocationPermissionService {
     }
 
     if (permission == LocationPermission.deniedForever) {
+      if (!kIsWeb) {
+        await Geolocator.openAppSettings();
+      }
       return false;
     }
 
