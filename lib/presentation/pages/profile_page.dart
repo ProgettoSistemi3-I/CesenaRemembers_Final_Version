@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_palette.dart';
+
 // ─────────────────────────────────────────────
 //  Avatar options
 // ─────────────────────────────────────────────
@@ -21,18 +23,6 @@ class _AvatarOption {
   final Color background;
   const _AvatarOption(this.icon, this.background);
 }
-
-// ─────────────────────────────────────────────
-//  Design tokens
-// ─────────────────────────────────────────────
-const _cream = Color(0xFFF7F3EE); // sfondo principale
-const _warmWhite = Color(0xFFFFFFFF);
-const _olive = Color(0xFF5C6B3A); // verde oliva – accento primario
-const _moss = Color(0xFF8A9E5B); // verde chiaro
-const _tan = Color(0xFFB5885A); // marrone/arancione – accento secondario
-const _tanLight = Color(0xFFE8D4BE); // tan chiarissimo per superfici
-const _textDark = Color(0xFF2C2C2C);
-const _textMid = Color(0xFF7A7A7A);
 
 // ─────────────────────────────────────────────
 //  Page
@@ -89,7 +79,7 @@ class _ProfilePageState extends State<ProfilePage>
   void _showAvatarPicker() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: _warmWhite,
+      backgroundColor: AppPalette.warmWhite,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -105,7 +95,7 @@ class _ProfilePageState extends State<ProfilePage>
     final selected = _avatarOptions[_selectedAvatarIndex];
 
     return Scaffold(
-      backgroundColor: _cream,
+      backgroundColor: AppPalette.cream,
       body: FadeTransition(
         opacity: _fadeAnim,
         child: SlideTransition(
@@ -114,7 +104,7 @@ class _ProfilePageState extends State<ProfilePage>
             slivers: [
               // ── App bar
               SliverAppBar(
-                backgroundColor: _cream,
+                backgroundColor: AppPalette.cream,
                 elevation: 0,
                 expandedHeight: 0,
                 floating: true,
@@ -122,7 +112,7 @@ class _ProfilePageState extends State<ProfilePage>
                 title: const Text(
                   'Il mio profilo',
                   style: TextStyle(
-                    color: _textDark,
+                    color: AppPalette.textDark,
                     fontWeight: FontWeight.w700,
                     fontSize: 17,
                     letterSpacing: 0.3,
@@ -170,25 +160,25 @@ class _ProfilePageState extends State<ProfilePage>
                             icon: Icons.verified_user_outlined,
                             label: 'Traguardi',
                             value: '3 / 11',
-                            color: _olive,
+                            color: AppPalette.olive,
                           ),
                           _StatCard(
                             icon: Icons.emoji_events_outlined,
                             label: 'Classifica',
                             value: '# 1',
-                            color: _tan,
+                            color: AppPalette.tan,
                           ),
                           _StatCard(
                             icon: Icons.location_on_outlined,
                             label: 'Siti Visitati',
                             value: '67',
-                            color: _moss,
+                            color: AppPalette.moss,
                           ),
                           _StatCard(
                             icon: Icons.quiz_outlined,
                             label: 'Quiz Superati',
                             value: '34',
-                            color: _tan,
+                            color: AppPalette.tan,
                           ),
                         ],
                       ),
@@ -241,11 +231,11 @@ class _HeroCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
       decoration: BoxDecoration(
-        color: _warmWhite,
+        color: AppPalette.warmWhite,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: _tan.withOpacity(0.08),
+            color: AppPalette.tan.withOpacity(0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -264,7 +254,7 @@ class _HeroCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: const LinearGradient(
-                      colors: [_olive, _tan],
+                      colors: [AppPalette.olive, AppPalette.tan],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -283,7 +273,7 @@ class _HeroCard extends StatelessWidget {
                   padding: const EdgeInsets.all(5),
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    color: _tan,
+                    color: AppPalette.tan,
                   ),
                   child: const Icon(Icons.edit, size: 13, color: Colors.white),
                 ),
@@ -308,7 +298,7 @@ class _HeroCard extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
-                      color: _textDark,
+                      color: AppPalette.textDark,
                       letterSpacing: 0.2,
                     ),
                     decoration: InputDecoration(
@@ -316,10 +306,15 @@ class _HeroCard extends StatelessWidget {
                       contentPadding: EdgeInsets.zero,
                       border: InputBorder.none,
                       enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: _olive.withOpacity(0.4)),
+                        borderSide: BorderSide(
+                          color: AppPalette.olive.withOpacity(0.4),
+                        ),
                       ),
                       focusedBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide(color: _olive, width: 1.5),
+                        borderSide: BorderSide(
+                          color: AppPalette.olive,
+                          width: 1.5,
+                        ),
                       ),
                     ),
                   ),
@@ -330,7 +325,7 @@ class _HeroCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
-                    color: _textDark,
+                    color: AppPalette.textDark,
                     letterSpacing: 0.2,
                   ),
                 ),
@@ -340,7 +335,7 @@ class _HeroCard extends StatelessWidget {
                 child: Icon(
                   isEditingName ? Icons.check_circle : Icons.edit_outlined,
                   size: 18,
-                  color: isEditingName ? _olive : _textMid,
+                  color: isEditingName ? AppPalette.olive : AppPalette.textMid,
                 ),
               ),
             ],
@@ -353,7 +348,7 @@ class _HeroCard extends StatelessWidget {
             username,
             style: const TextStyle(
               fontSize: 13,
-              color: _textMid,
+              color: AppPalette.textMid,
               letterSpacing: 0.3,
             ),
           ),
@@ -361,7 +356,7 @@ class _HeroCard extends StatelessWidget {
           const SizedBox(height: 18),
 
           // Divisore
-          Container(height: 1, color: _tanLight),
+          Container(height: 1, color: AppPalette.tanLight),
 
           const SizedBox(height: 16),
 
@@ -396,7 +391,7 @@ class _MiniStat extends StatelessWidget {
           style: const TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w800,
-            color: _olive,
+            color: AppPalette.olive,
             letterSpacing: 0.2,
           ),
         ),
@@ -405,7 +400,7 @@ class _MiniStat extends StatelessWidget {
           label,
           style: const TextStyle(
             fontSize: 11,
-            color: _textMid,
+            color: AppPalette.textMid,
             letterSpacing: 0.3,
           ),
         ),
@@ -419,7 +414,7 @@ class _VerticalDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      Container(height: 28, width: 1, color: _tanLight);
+      Container(height: 28, width: 1, color: AppPalette.tanLight);
 }
 
 // ─────────────────────────────────────────────
@@ -443,7 +438,7 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: _warmWhite,
+        color: AppPalette.warmWhite,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
@@ -481,7 +476,7 @@ class _StatCard extends StatelessWidget {
                 label,
                 style: const TextStyle(
                   fontSize: 11.5,
-                  color: _textMid,
+                  color: AppPalette.textMid,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -498,10 +493,10 @@ class _StatCard extends StatelessWidget {
 // ─────────────────────────────────────────────
 class _BadgesRow extends StatelessWidget {
   final List<_BadgeData> badges = const [
-    _BadgeData(Icons.military_tech, 'Pioniere', _olive),
-    _BadgeData(Icons.explore, 'Esploratore', _tan),
-    _BadgeData(Icons.history_edu, 'Storico', _moss),
-    _BadgeData(Icons.lock_outline, '?', _textMid),
+    _BadgeData(Icons.military_tech, 'Pioniere', AppPalette.olive),
+    _BadgeData(Icons.explore, 'Esploratore', AppPalette.tan),
+    _BadgeData(Icons.history_edu, 'Storico', AppPalette.moss),
+    _BadgeData(Icons.lock_outline, '?', AppPalette.textMid),
   ];
 
   @override
@@ -541,7 +536,7 @@ class _BadgeTile extends StatelessWidget {
           width: 60,
           height: 60,
           decoration: BoxDecoration(
-            color: _warmWhite,
+            color: AppPalette.warmWhite,
             shape: BoxShape.circle,
             border: Border.all(color: data.color.withOpacity(0.35), width: 2),
             boxShadow: [
@@ -559,7 +554,7 @@ class _BadgeTile extends StatelessWidget {
           data.label,
           style: const TextStyle(
             fontSize: 10.5,
-            color: _textMid,
+            color: AppPalette.textMid,
             fontWeight: FontWeight.w500,
           ),
           textAlign: TextAlign.center,
@@ -587,7 +582,7 @@ class _SectionLabel extends StatelessWidget {
             height: 16,
             margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
-              color: _olive,
+              color: AppPalette.olive,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -596,7 +591,7 @@ class _SectionLabel extends StatelessWidget {
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: _textDark,
+              color: AppPalette.textDark,
               letterSpacing: 0.3,
             ),
           ),
@@ -641,7 +636,7 @@ class _AvatarPickerSheet extends StatelessWidget {
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w700,
-              color: _textDark,
+              color: AppPalette.textDark,
             ),
           ),
 
@@ -670,13 +665,13 @@ class _AvatarPickerSheet extends StatelessWidget {
                     shape: BoxShape.circle,
                     color: opt.background,
                     border: Border.all(
-                      color: isSel ? _olive : Colors.transparent,
+                      color: isSel ? AppPalette.olive : Colors.transparent,
                       width: 2.5,
                     ),
                     boxShadow: isSel
                         ? [
                             BoxShadow(
-                              color: _olive.withOpacity(0.25),
+                              color: AppPalette.olive.withOpacity(0.25),
                               blurRadius: 8,
                             ),
                           ]

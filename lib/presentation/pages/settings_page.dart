@@ -1,19 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../domain/usecases/auth_use_cases.dart';
 import '../../injection_container.dart';
-
-// ─────────────────────────────────────────────
-//  Design tokens
-// ─────────────────────────────────────────────
-const _cream = Color(0xFFF7F3EE); // sfondo principale
-const _warmWhite = Color(0xFFFFFFFF);
-const _olive = Color(0xFF5C6B3A); // verde oliva – accento primario
-const _moss = Color(0xFF8A9E5B); // verde chiaro
-const _tan = Color(0xFFB5885A); // marrone/arancione – accento secondario
-const _tanLight = Color(0xFFE8D4BE); // tan chiarissimo per superfici
-const _textDark = Color(0xFF2C2C2C);
-const _textMid = Color(0xFF7A7A7A);
-const _danger = Color(0xFF9C4B4B);
+import '../theme/app_palette.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -87,7 +75,7 @@ class _SettingsPageState extends State<SettingsPage>
   void _showInfoSheet({required String title, required String body}) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: _warmWhite,
+      backgroundColor: AppPalette.warmWhite,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -113,7 +101,7 @@ class _SettingsPageState extends State<SettingsPage>
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: _textDark,
+                color: AppPalette.textDark,
               ),
             ),
             const SizedBox(height: 12),
@@ -122,7 +110,7 @@ class _SettingsPageState extends State<SettingsPage>
               style: const TextStyle(
                 fontSize: 14.5,
                 height: 1.45,
-                color: _textMid,
+                color: AppPalette.textMid,
               ),
             ),
             const SizedBox(height: 18),
@@ -130,7 +118,7 @@ class _SettingsPageState extends State<SettingsPage>
               width: double.infinity,
               child: FilledButton(
                 style: FilledButton.styleFrom(
-                  backgroundColor: _olive,
+                  backgroundColor: AppPalette.olive,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
@@ -150,7 +138,7 @@ class _SettingsPageState extends State<SettingsPage>
   void _showLanguagePicker() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: _warmWhite,
+      backgroundColor: AppPalette.warmWhite,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -166,7 +154,7 @@ class _SettingsPageState extends State<SettingsPage>
   void _showThemePicker() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: _warmWhite,
+      backgroundColor: AppPalette.warmWhite,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -182,7 +170,7 @@ class _SettingsPageState extends State<SettingsPage>
   void _showNotificationTypes() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: _warmWhite,
+      backgroundColor: AppPalette.warmWhite,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -203,7 +191,7 @@ class _SettingsPageState extends State<SettingsPage>
   void _showConsentsPicker() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: _warmWhite,
+      backgroundColor: AppPalette.warmWhite,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -224,15 +212,18 @@ class _SettingsPageState extends State<SettingsPage>
     showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: _warmWhite,
+        backgroundColor: AppPalette.warmWhite,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
         title: const Text(
           'Eliminare account?',
-          style: TextStyle(fontWeight: FontWeight.w700, color: _textDark),
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            color: AppPalette.textDark,
+          ),
         ),
         content: const Text(
           'Questa operazione rimuoverà account, progressi e dati associati.',
-          style: TextStyle(color: _textMid, height: 1.4),
+          style: TextStyle(color: AppPalette.textMid, height: 1.4),
         ),
         actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
         actions: [
@@ -242,7 +233,7 @@ class _SettingsPageState extends State<SettingsPage>
           ),
           FilledButton(
             style: FilledButton.styleFrom(
-              backgroundColor: _danger,
+              backgroundColor: AppPalette.danger,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
@@ -264,7 +255,7 @@ class _SettingsPageState extends State<SettingsPage>
   void _showActionSheet(String title, String subtitle) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: _warmWhite,
+      backgroundColor: AppPalette.warmWhite,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -290,7 +281,7 @@ class _SettingsPageState extends State<SettingsPage>
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: _textDark,
+                color: AppPalette.textDark,
               ),
             ),
             const SizedBox(height: 8),
@@ -298,7 +289,7 @@ class _SettingsPageState extends State<SettingsPage>
               subtitle,
               style: const TextStyle(
                 fontSize: 14.5,
-                color: _textMid,
+                color: AppPalette.textMid,
                 height: 1.45,
               ),
             ),
@@ -307,7 +298,7 @@ class _SettingsPageState extends State<SettingsPage>
               width: double.infinity,
               child: FilledButton(
                 style: FilledButton.styleFrom(
-                  backgroundColor: _olive,
+                  backgroundColor: AppPalette.olive,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
@@ -327,7 +318,7 @@ class _SettingsPageState extends State<SettingsPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _cream,
+      backgroundColor: AppPalette.cream,
       body: FadeTransition(
         opacity: _fadeAnim,
         child: SlideTransition(
@@ -335,7 +326,7 @@ class _SettingsPageState extends State<SettingsPage>
           child: CustomScrollView(
             slivers: [
               SliverAppBar(
-                backgroundColor: _cream,
+                backgroundColor: AppPalette.cream,
                 elevation: 0,
                 expandedHeight: 0,
                 floating: true,
@@ -344,7 +335,7 @@ class _SettingsPageState extends State<SettingsPage>
                 title: const Text(
                   'Impostazioni',
                   style: TextStyle(
-                    color: _textDark,
+                    color: AppPalette.textDark,
                     fontWeight: FontWeight.w700,
                     fontSize: 17,
                     letterSpacing: 0.3,
@@ -376,7 +367,7 @@ class _SettingsPageState extends State<SettingsPage>
                             subtitle: _isLoggingOut
                                 ? 'Uscita in corso...'
                                 : 'Esci dall’account corrente',
-                            accent: _olive,
+                            accent: AppPalette.olive,
                             onTap: _isLoggingOut ? () {} : _handleLogout,
                           ),
                           const _ThinDivider(),
@@ -384,7 +375,7 @@ class _SettingsPageState extends State<SettingsPage>
                             icon: Icons.delete_outline,
                             title: 'Elimina account',
                             subtitle: 'Rimuovi profilo e dati associati',
-                            accent: _danger,
+                            accent: AppPalette.danger,
                             onTap: _confirmDeleteAccount,
                             destructive: true,
                           ),
@@ -399,7 +390,7 @@ class _SettingsPageState extends State<SettingsPage>
                             icon: Icons.privacy_tip_outlined,
                             title: 'Informativa privacy',
                             subtitle: 'Leggi come vengono trattati i dati',
-                            accent: _tan,
+                            accent: AppPalette.tan,
                             onTap: () => _showInfoSheet(
                               title: 'Informativa privacy',
                               body:
@@ -411,7 +402,7 @@ class _SettingsPageState extends State<SettingsPage>
                             icon: Icons.checklist_outlined,
                             title: 'Consensi',
                             subtitle: _consents,
-                            accent: _moss,
+                            accent: AppPalette.moss,
                             onTap: _showConsentsPicker,
                           ),
                           const _ThinDivider(),
@@ -421,7 +412,7 @@ class _SettingsPageState extends State<SettingsPage>
                             subtitle: _gpsEnabled
                                 ? 'GPS, notifiche e permessi attivi'
                                 : 'Permessi limitati',
-                            accent: _olive,
+                            accent: AppPalette.olive,
                             onTap: () => _showInfoSheet(
                               title: 'Autorizzazioni',
                               body:
@@ -440,7 +431,7 @@ class _SettingsPageState extends State<SettingsPage>
                             title: 'Attiva notifiche',
                             subtitle:
                                 'Ricevi avvisi su tappe, premi e missioni',
-                            accent: _tan,
+                            accent: AppPalette.tan,
                             value: _notificationsEnabled,
                             onChanged: (v) =>
                                 setState(() => _notificationsEnabled = v),
@@ -450,7 +441,7 @@ class _SettingsPageState extends State<SettingsPage>
                             icon: Icons.tune_outlined,
                             title: 'Tipi notifiche',
                             subtitle: _notificationType,
-                            accent: _moss,
+                            accent: AppPalette.moss,
                             onTap: _showNotificationTypes,
                           ),
                         ],
@@ -464,7 +455,7 @@ class _SettingsPageState extends State<SettingsPage>
                             icon: Icons.language,
                             title: 'Lingua',
                             subtitle: _selectedLanguage,
-                            accent: _olive,
+                            accent: AppPalette.olive,
                             onTap: _showLanguagePicker,
                           ),
                           const _ThinDivider(),
@@ -472,7 +463,7 @@ class _SettingsPageState extends State<SettingsPage>
                             icon: Icons.dark_mode_outlined,
                             title: 'Tema',
                             subtitle: _selectedTheme,
-                            accent: _tan,
+                            accent: AppPalette.tan,
                             onTap: _showThemePicker,
                           ),
                         ],
@@ -486,7 +477,7 @@ class _SettingsPageState extends State<SettingsPage>
                             icon: Icons.download_for_offline_outlined,
                             title: 'Download offline',
                             subtitle: 'Scarica mappe, testi e tappe',
-                            accent: _olive,
+                            accent: AppPalette.olive,
                             value: _offlineDownloadsEnabled,
                             onChanged: (v) =>
                                 setState(() => _offlineDownloadsEnabled = v),
@@ -496,7 +487,7 @@ class _SettingsPageState extends State<SettingsPage>
                             icon: Icons.cleaning_services_outlined,
                             title: 'Cancella cache',
                             subtitle: 'Libera spazio occupato temporaneamente',
-                            accent: _tan,
+                            accent: AppPalette.tan,
                             onTap: () => _showActionSheet(
                               'Cancella cache',
                               'Qui puoi eseguire la pulizia dei file temporanei, immagini e contenuti precari salvati localmente.',
@@ -513,7 +504,7 @@ class _SettingsPageState extends State<SettingsPage>
                             icon: Icons.info_outline,
                             title: 'Versione',
                             subtitle: '1.0.0',
-                            accent: _moss,
+                            accent: AppPalette.moss,
                             onTap: () => _showActionSheet(
                               'Versione app',
                               'Mostra qui build number, release notes o controlli aggiornamenti.',
@@ -524,7 +515,7 @@ class _SettingsPageState extends State<SettingsPage>
                             icon: Icons.description_outlined,
                             title: 'Termini di servizio',
                             subtitle: 'Regole d’uso e responsabilità',
-                            accent: _olive,
+                            accent: AppPalette.olive,
                             onTap: () => _showInfoSheet(
                               title: 'Termini di servizio',
                               body:
@@ -536,7 +527,7 @@ class _SettingsPageState extends State<SettingsPage>
                             icon: Icons.mail_outline,
                             title: 'Contatti',
                             subtitle: 'supporto@tuapp.it',
-                            accent: _tan,
+                            accent: AppPalette.tan,
                             onTap: () => _showActionSheet(
                               'Contatti',
                               'Qui puoi inserire email di supporto, sito web, social o modulo feedback.',
@@ -574,11 +565,11 @@ class _HeaderCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
       decoration: BoxDecoration(
-        color: _warmWhite,
+        color: AppPalette.warmWhite,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: _tan.withOpacity(0.08),
+            color: AppPalette.tan.withOpacity(0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -589,10 +580,10 @@ class _HeaderCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: _olive.withOpacity(0.10),
+              color: AppPalette.olive.withOpacity(0.10),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 28, color: _olive),
+            child: Icon(icon, size: 28, color: AppPalette.olive),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -604,7 +595,7 @@ class _HeaderCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: _textDark,
+                    color: AppPalette.textDark,
                     letterSpacing: 0.2,
                   ),
                 ),
@@ -614,7 +605,7 @@ class _HeaderCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 13.5,
                     height: 1.45,
-                    color: _textMid,
+                    color: AppPalette.textMid,
                   ),
                 ),
               ],
@@ -634,11 +625,11 @@ class _SettingsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: _warmWhite,
+        color: AppPalette.warmWhite,
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: _tan.withOpacity(0.06),
+            color: AppPalette.tan.withOpacity(0.06),
             blurRadius: 16,
             offset: const Offset(0, 5),
           ),
@@ -660,7 +651,7 @@ class _ThinDivider extends StatelessWidget {
     return Container(
       height: 1,
       margin: const EdgeInsets.only(left: 20),
-      color: _tanLight,
+      color: AppPalette.tanLight,
     );
   }
 }
@@ -680,7 +671,7 @@ class _SectionLabel extends StatelessWidget {
             height: 16,
             margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
-              color: _olive,
+              color: AppPalette.olive,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -689,7 +680,7 @@ class _SectionLabel extends StatelessWidget {
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: _textDark,
+              color: AppPalette.textDark,
               letterSpacing: 0.3,
             ),
           ),
@@ -718,7 +709,7 @@ class _ActionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = destructive ? _danger : _textDark;
+    final textColor = destructive ? AppPalette.danger : AppPalette.textDark;
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -749,12 +740,15 @@ class _ActionRow extends StatelessWidget {
                   const SizedBox(height: 3),
                   Text(
                     subtitle,
-                    style: const TextStyle(fontSize: 12.5, color: _textMid),
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      color: AppPalette.textMid,
+                    ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: _textMid),
+            const Icon(Icons.chevron_right, color: AppPalette.textMid),
           ],
         ),
       ),
@@ -803,13 +797,16 @@ class _SwitchRow extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: _textDark,
+                    color: AppPalette.textDark,
                   ),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   subtitle,
-                  style: const TextStyle(fontSize: 12.5, color: _textMid),
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    color: AppPalette.textMid,
+                  ),
                 ),
               ],
             ),
@@ -817,8 +814,8 @@ class _SwitchRow extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: _olive,
-            activeTrackColor: _olive.withOpacity(0.25),
+            activeColor: AppPalette.olive,
+            activeTrackColor: AppPalette.olive.withOpacity(0.25),
           ),
         ],
       ),
@@ -863,7 +860,7 @@ class _ChoiceSheet extends StatelessWidget {
             style: const TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w700,
-              color: _textDark,
+              color: AppPalette.textDark,
             ),
           ),
           const SizedBox(height: 14),
@@ -884,13 +881,13 @@ class _ChoiceSheet extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: option == selected
-                        ? _olive.withOpacity(0.09)
-                        : _warmWhite,
+                        ? AppPalette.olive.withOpacity(0.09)
+                        : AppPalette.warmWhite,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: option == selected
-                          ? _olive.withOpacity(0.25)
-                          : _tanLight,
+                          ? AppPalette.olive.withOpacity(0.25)
+                          : AppPalette.tanLight,
                     ),
                   ),
                   child: Row(
@@ -903,12 +900,16 @@ class _ChoiceSheet extends StatelessWidget {
                             fontWeight: option == selected
                                 ? FontWeight.w700
                                 : FontWeight.w500,
-                            color: _textDark,
+                            color: AppPalette.textDark,
                           ),
                         ),
                       ),
                       if (option == selected)
-                        const Icon(Icons.check_circle, size: 18, color: _olive),
+                        const Icon(
+                          Icons.check_circle,
+                          size: 18,
+                          color: AppPalette.olive,
+                        ),
                     ],
                   ),
                 ),
