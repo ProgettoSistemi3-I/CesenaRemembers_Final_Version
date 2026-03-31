@@ -1,0 +1,11 @@
+# ios/Podfile
+platform :ios, '15.0'
+
+# Imposta il workspace Flutter
+use_frameworks!
+use_modular_headers!
+
+# Target principale
+target 'Runner' do
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+end
