@@ -143,14 +143,18 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   }
 
   Future<void> _startTour() async {
-    if (_tourController.orderedStops.isEmpty) {
+    if (!_tourController.hasStops) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Nessuna tappa disponibile per il tour.')),
       );
       return;
     }
 
-    await _tourController.startTour();
+    final hasStarted = await _tourController.startTour();
+    if (!hasStarted || !mounted) {
+      return;
+    }
+
     final currentStop = _tourController.currentStop;
     if (currentStop != null) {
       _centerOnStop(currentStop.position);
