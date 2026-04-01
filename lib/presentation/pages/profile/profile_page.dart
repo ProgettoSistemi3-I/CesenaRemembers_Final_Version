@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-part 'profile/profile_page_sections.dart';
+part 'profile_page_sections.dart';
 
 // ─────────────────────────────────────────────
 //  Avatar options

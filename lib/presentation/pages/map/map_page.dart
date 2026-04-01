@@ -8,16 +8,16 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../domain/entities/tour_stop.dart';
-import '../../domain/usecases/poi_use_cases.dart';
-import '../../injection_container.dart';
-import '../controllers/tour_session_controller.dart';
-import '../services/location_permission_service.dart';
-import '../services/poi_marker_factory.dart';
-import '../services/tour_stop_mapper.dart';
-import '../theme/app_palette.dart';
-import 'map/widgets/map_controls.dart';
-import 'map/widgets/poi_bottom_sheet.dart';
+import '../../../domain/entities/tour_stop.dart';
+import '../../../domain/usecases/poi_use_cases.dart';
+import '../../../injection_container.dart';
+import '../../controllers/tour_session_controller.dart';
+import '../../services/location_permission_service.dart';
+import '../../services/poi_marker_factory.dart';
+import '../../services/tour_stop_mapper.dart';
+import '../../theme/app_palette.dart';
+import 'widgets/map_controls.dart';
+import 'widgets/poi_bottom_sheet.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});

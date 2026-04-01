@@ -22,6 +22,30 @@
           }
         },
         {
+          "client_id": "966666011561-c5mh8pl8kh7gkmindkkdnpc16mdhsgod.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cesena_remembers",
+            "certificate_hash": "60be4d8265571418141ea2194205008dae2b7fad"
+          }
+        },
+        {
+          "client_id": "966666011561-fru00ov092jib4j65sv685vr9311ntup.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cesena_remembers",
+            "certificate_hash": "876979bc92ac5d89ee9744f03f07dad83b60bd41"
+          }
+        },
+        {
+          "client_id": "966666011561-r4f04biq0tuthubksu8f56e4r0l08bd8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cesena_remembers",
+            "certificate_hash": "ac8c8d68a05d991b230fa03421e0f3747cf1c7a0"
+          }
+        },
+        {
           "client_id": "966666011561-jg82mh4vbt29s6cggi0kij05d6h0coo4.apps.googleusercontent.com",
           "client_type": 3
         }

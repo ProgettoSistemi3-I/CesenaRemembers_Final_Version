@@ -1,4 +1,4 @@
-part of '../profile_page.dart';
+part of 'profile_page.dart';
 
 class _HeroCard extends StatelessWidget {
   final _AvatarOption option;

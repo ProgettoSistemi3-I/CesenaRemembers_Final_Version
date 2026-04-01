@@ -1,4 +1,4 @@
-part of '../settings_page.dart';
+part of 'settings_page.dart';
 
 class _HeaderCard extends StatelessWidget {
   final String title;

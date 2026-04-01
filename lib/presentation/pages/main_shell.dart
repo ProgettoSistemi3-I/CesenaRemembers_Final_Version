@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'map_page.dart';
-import 'profile_page.dart';
-import 'settings_page.dart';
+import 'map/map_page.dart';
+import 'profile/profile_page.dart';
+import 'settings/settings_page.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
