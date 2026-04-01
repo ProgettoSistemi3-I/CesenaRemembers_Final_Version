@@ -259,6 +259,19 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
   }
 
   Widget _buildQuizContent() {
+    if (widget.stop.questions.isEmpty) {
+      return Column(
+        children: [
+          const Text(
+            'Nessun quiz disponibile per questa tappa.',
+            style: TextStyle(fontSize: 14, color: AppPalette.textMid),
+          ),
+          const SizedBox(height: 20),
+          NextStopActionButton(onTap: widget.onNextStop),
+        ],
+      );
+    }
+
     if (_quizController.quizDone) {
       return Column(
         children: [
@@ -274,6 +287,9 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
     }
 
     final question = _quizController.currentQuestion;
+    if (question == null) {
+      return const SizedBox.shrink();
+    }
     final answered = _quizController.selectedAnswer != null;
 
     return Column(

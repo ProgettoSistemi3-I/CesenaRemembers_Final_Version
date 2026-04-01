@@ -52,7 +52,18 @@ class TourSessionController {
     return const Distance().as(LengthUnit.Meter, _userPosition!, stop.position);
   }
 
-  Future<void> startTour() async {
+  bool get hasStops => _availableStops.isNotEmpty;
+
+  Future<bool> startTour() async {
+    if (_availableStops.isEmpty) {
+      _status = TourStatus.idle;
+      _orderedStops = [];
+      _currentStopIndex = 0;
+      _elapsedSeconds = 0;
+      _emit();
+      return false;
+    }
+
     final origin = await _resolveOrigin();
 
     _orderedStops = _routePlanner.sortNearestNeighbor(
@@ -66,9 +77,11 @@ class TourSessionController {
 
     _startPositionTracking();
     _startTimer();
+    return true;
   }
 
   void markArrivedManually() {
+    if (_status != TourStatus.running) return;
     _triggerArrival();
   }
 
