@@ -6,7 +6,5 @@ class GetPoisUseCase {
 
   GetPoisUseCase(this.repository);
 
-  Future<List<Poi>> call() async {
-    return await repository.getPois();
-  }
+  Future<List<Poi>> call() => repository.getPois();
 }

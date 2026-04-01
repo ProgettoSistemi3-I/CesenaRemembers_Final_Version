@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'firebase_options.dart';
 import 'injection_container.dart' as di;
 import 'presentation/pages/auth_gate.dart';
+import 'presentation/theme/app_palette.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,10 +45,10 @@ class CesenaRemembersApp extends StatelessWidget {
       title: 'Cesena Remembers 1945',
       theme: ThemeData(
         useMaterial3: true,
-        colorSchemeSeed: Colors.blue,
+        colorSchemeSeed: AppPalette.olive,
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          selectedItemColor: Colors.blue,
-          unselectedItemColor: Colors.grey,
+          selectedItemColor: AppPalette.olive,
+          unselectedItemColor: AppPalette.textMid,
           showUnselectedLabels: true,
           type: BottomNavigationBarType.fixed,
         ),
