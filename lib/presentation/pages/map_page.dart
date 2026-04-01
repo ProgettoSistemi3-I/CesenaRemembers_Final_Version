@@ -8,6 +8,7 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../domain/entities/tour_stop.dart';
 import '../../domain/usecases/poi_use_cases.dart';
 import '../../injection_container.dart';
 import '../controllers/tour_session_controller.dart';
@@ -31,6 +32,14 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   final _poiMarkerFactory = const PoiMarkerFactory();
   final TourStopMapper _tourStopMapper = const TourStopMapper();
 
+  static const LatLngBounds _cesenaBounds = LatLngBounds(
+    LatLng(44.0700, 12.1700),
+    LatLng(44.2050, 12.3350),
+  );
+
+  static List<Marker>? _cachedMarkers;
+  static List<TourStop>? _cachedStops;
+
   late TourSessionController _tourController;
 
   StreamSubscription<ServiceStatus>? _serviceStatusSub;
@@ -40,6 +49,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   double _currentRotation = 0.0;
   bool _isMapLocked = false;
   bool _isMapMenuOpen = false;
+  bool _canUseCurrentLocation = false;
 
   static const _urlStandard =
       'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png';
@@ -57,7 +67,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     _tourController = TourSessionController(availableStops: const []);
     _bindTourUpdates();
-    _checkPermissionsAndInitialize();
+    _checkPermissionsAndInitialize(showFeedback: false);
     _listenToServiceStatus();
     _loadPois();
   }
@@ -75,22 +85,40 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _checkPermissionsAndInitialize();
+      _checkPermissionsAndInitialize(showFeedback: false);
     }
   }
 
   Future<void> _loadPois() async {
+    if (_cachedMarkers != null && _cachedStops != null) {
+      _tourController.dispose();
+      _tourController = TourSessionController(availableStops: _cachedStops!);
+      _bindTourUpdates();
+      setState(() {
+        _markers = _cachedMarkers!;
+        _isLoading = false;
+        _loadError = null;
+      });
+      return;
+    }
+
     try {
       final getPois = sl<GetPoisUseCase>();
       final pois = await getPois();
       if (!mounted) return;
+
       final stops = _tourStopMapper.fromPois(pois);
+      final markers = pois.map(_poiMarkerFactory.fromPoi).toList(growable: false);
+
+      _cachedStops = stops;
+      _cachedMarkers = markers;
+
       _tourController.dispose();
       _tourController = TourSessionController(availableStops: stops);
       _bindTourUpdates();
 
       setState(() {
-        _markers = pois.map(_poiMarkerFactory.fromPoi).toList();
+        _markers = markers;
         _loadError = null;
         _isLoading = false;
       });
@@ -119,19 +147,60 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     });
   }
 
-  Future<void> _checkPermissionsAndInitialize() async {
-    final isAuthorized = await _locationPermissionService
-        .ensureLocationEnabledAndAuthorized();
-    if (!isAuthorized || !mounted) {
+  Future<void> _checkPermissionsAndInitialize({required bool showFeedback}) async {
+    final status = await _locationPermissionService.ensureLocationAccess();
+    if (!mounted) return;
+
+    setState(() {
+      _canUseCurrentLocation = status == LocationAccessStatus.granted;
+    });
+
+    if (!showFeedback || status == LocationAccessStatus.granted) {
       return;
     }
-    setState(() {});
+
+    final message = switch (status) {
+      LocationAccessStatus.serviceDisabled =>
+        'GPS disattivato. Attivalo per usare la posizione attuale.',
+      LocationAccessStatus.denied =>
+        'Permesso posizione negato. Puoi riattivarlo dalle impostazioni.',
+      LocationAccessStatus.deniedForever =>
+        'Permesso posizione bloccato in modo permanente. Apri le impostazioni app.',
+      LocationAccessStatus.error => 'Impossibile ottenere la posizione attuale.',
+      LocationAccessStatus.granted => null,
+    };
+
+    if (message == null) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        action: !kIsWeb
+            ? SnackBarAction(
+                label: 'Impostazioni',
+                textColor: Colors.white,
+                onPressed: () {
+                  if (status == LocationAccessStatus.serviceDisabled) {
+                    Geolocator.openLocationSettings();
+                  } else {
+                    Geolocator.openAppSettings();
+                  }
+                },
+              )
+            : null,
+      ),
+    );
   }
 
   void _listenToServiceStatus() {
     if (kIsWeb) return;
     _serviceStatusSub = Geolocator.getServiceStatusStream().listen((status) {
       if (!mounted || status != ServiceStatus.disabled) return;
+      setState(() => _canUseCurrentLocation = false);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('GPS disattivato'),
@@ -243,8 +312,9 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
             options: MapOptions(
               initialCenter: defaultCesenaCenter,
               initialZoom: 14.0,
-              minZoom: 3.0,
-              maxZoom: 19.0,
+              minZoom: 12.0,
+              maxZoom: 18.5,
+              cameraConstraint: CameraConstraint.contain(bounds: _cesenaBounds),
               backgroundColor: const Color(0xFFE4E5E6),
               interactionOptions: InteractionOptions(
                 flags:
@@ -275,27 +345,28 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                 userAgentPackageName: 'com.geoapp.prototype',
                 maxZoom: 19,
               ),
-              CurrentLocationLayer(
-                alignPositionOnUpdate: _alignPositionOnUpdate,
-                alignDirectionOnUpdate: AlignOnUpdate.never,
-                style: LocationMarkerStyle(
-                  marker: const DefaultLocationMarker(
-                    color: Colors.blue,
-                    child: Icon(Icons.navigation, color: Colors.white, size: 14),
-                  ),
-                  markerSize: const Size(40, 40),
-                  markerDirection: MarkerDirection.heading,
-                  accuracyCircleColor: Colors.blue.withValues(alpha: 0.1),
-                  headingSectorColor: Colors.blue.withValues(alpha: 0.2),
-                  headingSectorRadius: 60,
-                ),
-                positionStream: const LocationMarkerDataStreamFactory()
-                    .fromGeolocatorPositionStream(
-                      stream: Geolocator.getPositionStream(
-                        locationSettings: locationSettings,
-                      ),
+              if (_canUseCurrentLocation)
+                CurrentLocationLayer(
+                  alignPositionOnUpdate: _alignPositionOnUpdate,
+                  alignDirectionOnUpdate: AlignOnUpdate.never,
+                  style: LocationMarkerStyle(
+                    marker: const DefaultLocationMarker(
+                      color: Colors.blue,
+                      child: Icon(Icons.navigation, color: Colors.white, size: 14),
                     ),
-              ),
+                    markerSize: const Size(40, 40),
+                    markerDirection: MarkerDirection.heading,
+                    accuracyCircleColor: Colors.blue.withValues(alpha: 0.1),
+                    headingSectorColor: Colors.blue.withValues(alpha: 0.2),
+                    headingSectorRadius: 60,
+                  ),
+                  positionStream: const LocationMarkerDataStreamFactory()
+                      .fromGeolocatorPositionStream(
+                        stream: Geolocator.getPositionStream(
+                          locationSettings: locationSettings,
+                        ),
+                      ),
+                ),
               MarkerLayer(markers: _markers),
             ],
           ),
@@ -370,7 +441,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                         : Colors.black54,
                     onTap: () {
                       setState(() => _alignPositionOnUpdate = AlignOnUpdate.always);
-                      _checkPermissionsAndInitialize();
+                      _checkPermissionsAndInitialize(showFeedback: true);
                     },
                   ),
                 ),
