@@ -13,14 +13,17 @@ Future<void> init() async {
   if (!sl.isRegistered<IPoiRepository>()) {
     sl.registerLazySingleton<IPoiRepository>(() => PoiRepositoryImpl());
   }
+  if (!sl.isRegistered<AuthRepository>()) {
+    sl.registerLazySingleton<AuthRepository>(() => FirebaseAuthRepository());
+  }
+
   if (!sl.isRegistered<GetPoisUseCase>()) {
     sl.registerLazySingleton(() => GetPoisUseCase(sl()));
   }
-
-  // Registra i use case
-  sl.registerLazySingleton(() => SignInWithGoogleUseCase(sl()));
-  sl.registerLazySingleton(() => SignOutUseCase(sl()));
-
-  // Assicurati che il repository usi il nuovo impl
-  sl.registerLazySingleton<AuthRepository>(() => FirebaseAuthRepository());
+  if (!sl.isRegistered<SignInWithGoogleUseCase>()) {
+    sl.registerLazySingleton(() => SignInWithGoogleUseCase(sl()));
+  }
+  if (!sl.isRegistered<SignOutUseCase>()) {
+    sl.registerLazySingleton(() => SignOutUseCase(sl()));
+  }
 }
