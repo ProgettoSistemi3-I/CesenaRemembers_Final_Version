@@ -1,6 +1,6 @@
 import 'package:latlong2/latlong.dart';
 
-import '../../domain/entities/tour_stop.dart';
+import '../entities/tour_stop.dart';
 
 class TourRoutePlanner {
   const TourRoutePlanner();

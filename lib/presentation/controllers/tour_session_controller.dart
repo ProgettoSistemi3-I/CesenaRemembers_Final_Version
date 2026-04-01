@@ -101,9 +101,7 @@ class TourSessionController {
   Future<LatLng> _resolveOrigin() async {
     try {
       final pos = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-        ),
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
       ).timeout(const Duration(seconds: 4));
       _userPosition = LatLng(pos.latitude, pos.longitude);
       return _userPosition!;
@@ -115,22 +113,21 @@ class TourSessionController {
 
   void _startPositionTracking() {
     _positionSubscription?.cancel();
-    _positionSubscription =
-        Geolocator.getPositionStream(
-          locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.bestForNavigation,
-            distanceFilter: 5,
-          ),
-        ).listen((position) {
-          _userPosition = LatLng(position.latitude, position.longitude);
-          if (_status == TourStatus.running &&
-              distanceToCurrentStop >= 0 &&
-              distanceToCurrentStop <= _arrivedThresholdMeters) {
-            _triggerArrival();
-          } else {
-            _emit();
-          }
-        });
+    _positionSubscription = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.bestForNavigation,
+        distanceFilter: 5,
+      ),
+    ).listen((position) {
+      _userPosition = LatLng(position.latitude, position.longitude);
+      if (_status == TourStatus.running &&
+          distanceToCurrentStop >= 0 &&
+          distanceToCurrentStop <= _arrivedThresholdMeters) {
+        _triggerArrival();
+      } else {
+        _emit();
+      }
+    });
   }
 
   void _triggerArrival() {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../domain/entities/quiz_question.dart';
 import '../../../../domain/entities/tour_stop.dart';
+import '../../../controllers/poi_quiz_controller.dart';
 import '../../../theme/app_palette.dart';
 import '../tour_formatters.dart';
 
@@ -24,19 +24,13 @@ class PoiBottomSheet extends StatefulWidget {
 class _PoiBottomSheetState extends State<PoiBottomSheet>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  int? _selectedAnswer;
-  int _questionIndex = 0;
-  int _score = 0;
-  bool _quizDone = false;
-
-  QuizQuestion get _currentQuestion => widget.stop.questions[_questionIndex];
-  bool get _hasMoreQuestions =>
-      _questionIndex < widget.stop.questions.length - 1;
+  late PoiQuizController _quizController;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _quizController = PoiQuizController(questions: widget.stop.questions);
   }
 
   @override
@@ -46,24 +40,14 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
   }
 
   void _onAnswerTap(int index) {
-    if (_selectedAnswer != null) return;
-
-    final isCorrect = index == _currentQuestion.correctIndex;
     setState(() {
-      _selectedAnswer = index;
-      if (isCorrect) {
-        _score++;
-      }
-      if (!_hasMoreQuestions) {
-        _quizDone = true;
-      }
+      _quizController.selectAnswer(index);
     });
   }
 
   void _nextQuestion() {
     setState(() {
-      _questionIndex++;
-      _selectedAnswer = null;
+      _quizController.nextQuestion();
     });
   }
 
@@ -132,10 +116,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
                         color: AppPalette.olive.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
@@ -143,11 +124,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
-                            Icons.timer_outlined,
-                            size: 12,
-                            color: AppPalette.olive,
-                          ),
+                          const Icon(Icons.timer_outlined, size: 12, color: AppPalette.olive),
                           const SizedBox(width: 4),
                           Text(
                             formatElapsed(widget.elapsedSeconds),
@@ -175,19 +152,10 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                 unselectedLabelColor: AppPalette.textMid,
                 indicatorColor: AppPalette.olive,
                 indicatorWeight: 2,
-                labelStyle: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                ),
-                unselectedLabelStyle: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
+                labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                unselectedLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                tabs: const [
-                  Tab(text: 'Informazioni'),
-                  Tab(text: 'Quiz'),
-                ],
+                tabs: const [Tab(text: 'Informazioni'), Tab(text: 'Quiz')],
               ),
               Expanded(
                 child: TabBarView(
@@ -209,9 +177,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                               child: Icon(
                                 widget.stop.icon,
                                 size: 56,
-                                color: AppPalette.textDark.withValues(
-                                  alpha: 0.3,
-                                ),
+                                color: AppPalette.textDark.withValues(alpha: 0.3),
                               ),
                             ),
                           ),
@@ -253,20 +219,14 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(vertical: 13),
                               decoration: BoxDecoration(
-                                color: AppPalette.tanLight.withValues(
-                                  alpha: 0.5,
-                                ),
+                                color: AppPalette.tanLight.withValues(alpha: 0.5),
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(color: AppPalette.tanLight),
                               ),
                               child: const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(
-                                    Icons.quiz_outlined,
-                                    size: 16,
-                                    color: AppPalette.tan,
-                                  ),
+                                  Icon(Icons.quiz_outlined, size: 16, color: AppPalette.tan),
                                   SizedBox(width: 8),
                                   Text(
                                     'Fai il quiz su questa tappa →',
@@ -299,11 +259,11 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
   }
 
   Widget _buildQuizContent() {
-    if (_quizDone) {
+    if (_quizController.quizDone) {
       return Column(
         children: [
           QuizResultCard(
-            score: _score,
+            score: _quizController.score,
             total: widget.stop.questions.length,
             elapsed: widget.elapsedSeconds,
           ),
@@ -313,8 +273,8 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
       );
     }
 
-    final question = _currentQuestion;
-    final answered = _selectedAnswer != null;
+    final question = _quizController.currentQuestion;
+    final answered = _quizController.selectedAnswer != null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -322,13 +282,13 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         Row(
           children: [
             Text(
-              'Domanda ${_questionIndex + 1} di ${widget.stop.questions.length}',
+              'Domanda ${_quizController.questionIndex + 1} di ${widget.stop.questions.length}',
               style: const TextStyle(fontSize: 12, color: AppPalette.textMid),
             ),
             const Spacer(),
-            if (_score > 0)
+            if (_quizController.score > 0)
               Text(
-                '$_score ✓',
+                '${_quizController.score} ✓',
                 style: const TextStyle(
                   fontSize: 12,
                   color: AppPalette.olive,
@@ -341,7 +301,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
-            value: (_questionIndex + 1) / widget.stop.questions.length,
+            value: (_quizController.questionIndex + 1) / widget.stop.questions.length,
             backgroundColor: AppPalette.tanLight,
             valueColor: const AlwaysStoppedAnimation<Color>(AppPalette.olive),
             minHeight: 4,
@@ -359,7 +319,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         ),
         const SizedBox(height: 16),
         ...List.generate(question.options.length, (index) {
-          final isSelected = _selectedAnswer == index;
+          final isSelected = _quizController.selectedAnswer == index;
           final isCorrect = index == question.correctIndex;
 
           var bgColor = AppPalette.warmWhite;
@@ -405,12 +365,9 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                           ? (isCorrect
                                 ? AppPalette.moss.withValues(alpha: 0.2)
                                 : (isSelected
-                                      ? const Color(
-                                          0xFFE24B4A,
-                                        ).withValues(alpha: 0.1)
-                                      : AppPalette.tanLight.withValues(
-                                          alpha: 0.5,
-                                        )))
+                                      ? const Color(0xFFE24B4A)
+                                            .withValues(alpha: 0.1)
+                                      : AppPalette.tanLight.withValues(alpha: 0.5)))
                           : AppPalette.tanLight.withValues(alpha: 0.5),
                       shape: BoxShape.circle,
                     ),
@@ -432,14 +389,13 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                       style: TextStyle(fontSize: 14, color: textColor),
                     ),
                   ),
-                  if (trailing != null)
-                    Icon(trailing, size: 18, color: textColor),
+                  if (trailing != null) Icon(trailing, size: 18, color: textColor),
                 ],
               ),
             ),
           );
         }),
-        if (answered && _hasMoreQuestions) ...[
+        if (answered && _quizController.hasMoreQuestions) ...[
           const SizedBox(height: 6),
           SizedBox(
             width: double.infinity,
@@ -493,9 +449,7 @@ class QuizResultCard extends StatelessWidget {
             ? const Color(0xFFEAF3DE)
             : AppPalette.tanLight.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: perfect ? AppPalette.moss : AppPalette.tanLight,
-        ),
+        border: Border.all(color: perfect ? AppPalette.moss : AppPalette.tanLight),
       ),
       child: Column(
         children: [
@@ -522,11 +476,7 @@ class QuizResultCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.timer_outlined,
-                size: 13,
-                color: AppPalette.textMid,
-              ),
+              const Icon(Icons.timer_outlined, size: 13, color: AppPalette.textMid),
               const SizedBox(width: 4),
               Text(
                 'Tempo: ${formatElapsed(elapsed)}',

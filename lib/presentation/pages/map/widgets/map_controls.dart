@@ -66,11 +66,7 @@ class MapTypeButton extends StatelessWidget {
             color: bgColor,
             borderRadius: BorderRadius.circular(12),
             boxShadow: const [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 4,
-                offset: Offset(0, 2),
-              ),
+              BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2)),
             ],
           ),
           child: Column(
@@ -120,10 +116,7 @@ class MapTypeButton extends StatelessWidget {
           heroTag: 'btnMapType',
           backgroundColor: Colors.white,
           elevation: 4,
-          icon: Icon(
-            isOpen ? Icons.close : Icons.layers,
-            color: Colors.black87,
-          ),
+          icon: Icon(isOpen ? Icons.close : Icons.layers, color: Colors.black87),
           label: Text(
             isOpen ? 'Chiudi' : 'Mappe',
             style: const TextStyle(color: Colors.black87),
@@ -249,9 +242,7 @@ class NextStopCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppPalette.warmWhite,
           borderRadius: BorderRadius.circular(20),
-          border: arrived
-              ? Border.all(color: AppPalette.olive, width: 1.5)
-              : null,
+          border: arrived ? Border.all(color: AppPalette.olive, width: 1.5) : null,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.12),
@@ -310,9 +301,8 @@ class NextStopCard extends StatelessWidget {
                             color: arrived
                                 ? AppPalette.olive
                                 : AppPalette.textMid,
-                            fontWeight: arrived
-                                ? FontWeight.w600
-                                : FontWeight.normal,
+                            fontWeight:
+                                arrived ? FontWeight.w600 : FontWeight.normal,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -325,10 +315,7 @@ class NextStopCard extends StatelessWidget {
             const SizedBox(width: 8),
             if (arrived)
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   color: AppPalette.olive.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -343,11 +330,7 @@ class NextStopCard extends StatelessWidget {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
-                    Icons.timer_outlined,
-                    size: 14,
-                    color: AppPalette.textMid,
-                  ),
+                  const Icon(Icons.timer_outlined, size: 14, color: AppPalette.textMid),
                   const SizedBox(height: 2),
                   Text(
                     formatElapsed(elapsedSeconds),

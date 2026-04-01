@@ -8,12 +8,12 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../data/seeds/tour_stops_seed.dart';
 import '../../domain/usecases/poi_use_cases.dart';
 import '../../injection_container.dart';
 import '../controllers/tour_session_controller.dart';
 import '../services/location_permission_service.dart';
 import '../services/poi_marker_factory.dart';
+import '../services/tour_stop_mapper.dart';
 import '../theme/app_palette.dart';
 import 'map/widgets/map_controls.dart';
 import 'map/widgets/poi_bottom_sheet.dart';
@@ -29,9 +29,9 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   final MapController _mapController = MapController();
   final _locationPermissionService = const LocationPermissionService();
   final _poiMarkerFactory = const PoiMarkerFactory();
-  final TourSessionController _tourController = TourSessionController(
-    availableStops: TourStopsSeed.cesena,
-  );
+  final TourStopMapper _tourStopMapper = const TourStopMapper();
+
+  late TourSessionController _tourController;
 
   StreamSubscription<ServiceStatus>? _serviceStatusSub;
   StreamSubscription<void>? _tourUpdatesSub;
@@ -55,14 +55,11 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _tourController = TourSessionController(availableStops: const []);
+    _bindTourUpdates();
     _checkPermissionsAndInitialize();
     _listenToServiceStatus();
     _loadPois();
-    _tourUpdatesSub = _tourController.updates.listen((_) {
-      if (mounted) {
-        setState(() {});
-      }
-    });
   }
 
   @override
@@ -87,6 +84,11 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
       final getPois = sl<GetPoisUseCase>();
       final pois = await getPois();
       if (!mounted) return;
+      final stops = _tourStopMapper.fromPois(pois);
+      _tourController.dispose();
+      _tourController = TourSessionController(availableStops: stops);
+      _bindTourUpdates();
+
       setState(() {
         _markers = pois.map(_poiMarkerFactory.fromPoi).toList();
         _loadError = null;
@@ -106,6 +108,15 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
         ),
       );
     }
+  }
+
+  void _bindTourUpdates() {
+    _tourUpdatesSub?.cancel();
+    _tourUpdatesSub = _tourController.updates.listen((_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   Future<void> _checkPermissionsAndInitialize() async {
@@ -132,6 +143,13 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   }
 
   Future<void> _startTour() async {
+    if (_tourController.orderedStops.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nessuna tappa disponibile per il tour.')),
+      );
+      return;
+    }
+
     await _tourController.startTour();
     final currentStop = _tourController.currentStop;
     if (currentStop != null) {
@@ -225,9 +243,8 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
               maxZoom: 19.0,
               backgroundColor: const Color(0xFFE4E5E6),
               interactionOptions: InteractionOptions(
-                flags: _isMapLocked
-                    ? InteractiveFlag.none
-                    : InteractiveFlag.all,
+                flags:
+                    _isMapLocked ? InteractiveFlag.none : InteractiveFlag.all,
               ),
               onMapEvent: (event) {
                 if (event is MapEventMove || event is MapEventRotate) {
@@ -260,11 +277,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                 style: LocationMarkerStyle(
                   marker: const DefaultLocationMarker(
                     color: Colors.blue,
-                    child: Icon(
-                      Icons.navigation,
-                      color: Colors.white,
-                      size: 14,
-                    ),
+                    child: Icon(Icons.navigation, color: Colors.white, size: 14),
                   ),
                   markerSize: const Size(40, 40),
                   markerDirection: MarkerDirection.heading,
@@ -325,8 +338,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                     isOpen: _isMapMenuOpen,
                     urlStandard: _urlStandard,
                     urlSatellite: _urlSatellite,
-                    onToggle: () =>
-                        setState(() => _isMapMenuOpen = !_isMapMenuOpen),
+                    onToggle: () => setState(() => _isMapMenuOpen = !_isMapMenuOpen),
                     onSelect: (url) => setState(() {
                       _currentMapUrl = url;
                       _isMapMenuOpen = false;
@@ -353,9 +365,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                         ? AppPalette.olive
                         : Colors.black54,
                     onTap: () {
-                      setState(
-                        () => _alignPositionOnUpdate = AlignOnUpdate.always,
-                      );
+                      setState(() => _alignPositionOnUpdate = AlignOnUpdate.always);
                       _checkPermissionsAndInitialize();
                     },
                   ),
@@ -367,8 +377,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                     right: 0,
                     child: Center(child: StartTourButton(onTap: _startTour)),
                   ),
-                if (isTourActive &&
-                    _tourController.status == TourStatus.running)
+                if (isTourActive && _tourController.status == TourStatus.running)
                   Positioned(
                     right: 20,
                     bottom: cardBottom + 132,

@@ -1,34 +1,21 @@
 import '../domain/entities/poi.dart';
 import '../domain/repositories/i_poi_repository.dart';
 import '../models/poi_model.dart';
+import 'seeds/historic_places_seed.dart';
 
 class PoiRepositoryImpl implements IPoiRepository {
-  static final List<PoiModel> _seedPois = [
-    PoiModel(
-      id: '1',
-      name: 'BlaisePascal',
-      latitude: 44.143043,
-      longitude: 12.253486,
-      type: 'school',
-    ),
-    PoiModel(
-      id: '2',
-      name: 'Ponte di Ruffio',
-      latitude: 44.150864,
-      longitude: 12.309236,
-      type: 'bridge',
-    ),
-    PoiModel(
-      id: '3',
-      name: 'Malatestiana',
-      latitude: 44.136194,
-      longitude: 12.239886,
-      type: 'library',
-    ),
-  ];
+  static final List<PoiModel> _seedPois = HistoricPlacesSeed.items
+      .map(
+        (item) => PoiModel(
+          id: item.id,
+          name: item.name,
+          latitude: item.latitude,
+          longitude: item.longitude,
+          type: item.type,
+        ),
+      )
+      .toList(growable: false);
 
   @override
-  Future<List<Poi>> getPois() async {
-    return List<Poi>.unmodifiable(_seedPois);
-  }
+  Future<List<Poi>> getPois() async => List<Poi>.unmodifiable(_seedPois);
 }
