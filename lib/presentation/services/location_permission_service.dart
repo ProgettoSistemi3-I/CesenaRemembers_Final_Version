@@ -1,33 +1,36 @@
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 
+enum LocationAccessStatus { granted, serviceDisabled, denied, deniedForever, error }
+
 class LocationPermissionService {
   const LocationPermissionService();
 
-  Future<bool> ensureLocationEnabledAndAuthorized() async {
-    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      if (!kIsWeb) {
-        await Geolocator.openLocationSettings();
+  Future<LocationAccessStatus> ensureLocationAccess() async {
+    try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        return LocationAccessStatus.serviceDisabled;
       }
-      return false;
-    }
 
-    var permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
+      var permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
-        return false;
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return LocationAccessStatus.denied;
+        }
       }
-    }
 
-    if (permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.deniedForever) {
+        return LocationAccessStatus.deniedForever;
+      }
+
+      return LocationAccessStatus.granted;
+    } catch (_) {
       if (!kIsWeb) {
-        await Geolocator.openAppSettings();
+        return LocationAccessStatus.error;
       }
-      return false;
+      return LocationAccessStatus.denied;
     }
-
-    return true;
   }
 }

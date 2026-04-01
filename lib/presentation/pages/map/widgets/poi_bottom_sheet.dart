@@ -24,30 +24,43 @@ class PoiBottomSheet extends StatefulWidget {
 class _PoiBottomSheetState extends State<PoiBottomSheet>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  late PoiQuizController _quizController;
+  PoiQuizController? _quizController;
+  bool _quizInitialized = false;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _quizController = PoiQuizController(questions: widget.stop.questions);
+    _tabController.addListener(_handleTabChange);
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_handleTabChange);
     _tabController.dispose();
     super.dispose();
   }
 
+
+  void _handleTabChange() {
+    if (_quizInitialized || _tabController.index != 1) {
+      return;
+    }
+    setState(() {
+      _quizController = PoiQuizController(questions: widget.stop.questions);
+      _quizInitialized = true;
+    });
+  }
+
   void _onAnswerTap(int index) {
     setState(() {
-      _quizController.selectAnswer(index);
+      _quizController?.selectAnswer(index);
     });
   }
 
   void _nextQuestion() {
     setState(() {
-      _quizController.nextQuestion();
+      _quizController?.nextQuestion();
     });
   }
 
@@ -259,6 +272,20 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
   }
 
   Widget _buildQuizContent() {
+    if (!_quizInitialized) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          child: CircularProgressIndicator(color: AppPalette.olive),
+        ),
+      );
+    }
+
+    final quizController = _quizController;
+    if (quizController == null) {
+      return const SizedBox.shrink();
+    }
+
     if (widget.stop.questions.isEmpty) {
       return Column(
         children: [
@@ -272,11 +299,11 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
       );
     }
 
-    if (_quizController.quizDone) {
+    if (quizController.quizDone) {
       return Column(
         children: [
           QuizResultCard(
-            score: _quizController.score,
+            score: quizController.score,
             total: widget.stop.questions.length,
             elapsed: widget.elapsedSeconds,
           ),
@@ -286,11 +313,11 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
       );
     }
 
-    final question = _quizController.currentQuestion;
+    final question = quizController.currentQuestion;
     if (question == null) {
       return const SizedBox.shrink();
     }
-    final answered = _quizController.selectedAnswer != null;
+    final answered = quizController.selectedAnswer != null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -298,13 +325,13 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         Row(
           children: [
             Text(
-              'Domanda ${_quizController.questionIndex + 1} di ${widget.stop.questions.length}',
+              'Domanda ${quizController.questionIndex + 1} di ${widget.stop.questions.length}',
               style: const TextStyle(fontSize: 12, color: AppPalette.textMid),
             ),
             const Spacer(),
-            if (_quizController.score > 0)
+            if (quizController.score > 0)
               Text(
-                '${_quizController.score} ✓',
+                '${quizController.score} ✓',
                 style: const TextStyle(
                   fontSize: 12,
                   color: AppPalette.olive,
@@ -317,7 +344,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
-            value: (_quizController.questionIndex + 1) / widget.stop.questions.length,
+            value: (quizController.questionIndex + 1) / widget.stop.questions.length,
             backgroundColor: AppPalette.tanLight,
             valueColor: const AlwaysStoppedAnimation<Color>(AppPalette.olive),
             minHeight: 4,
@@ -335,7 +362,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         ),
         const SizedBox(height: 16),
         ...List.generate(question.options.length, (index) {
-          final isSelected = _quizController.selectedAnswer == index;
+          final isSelected = quizController.selectedAnswer == index;
           final isCorrect = index == question.correctIndex;
 
           var bgColor = AppPalette.warmWhite;
@@ -411,7 +438,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
             ),
           );
         }),
-        if (answered && _quizController.hasMoreQuestions) ...[
+        if (answered && quizController.hasMoreQuestions) ...[
           const SizedBox(height: 6),
           SizedBox(
             width: double.infinity,
