@@ -42,7 +42,8 @@ class PoiMarkerFactory {
       case 'library':
         return AppPalette.moss;
       default:
-        return AppPalette.textMid;
+        // Sostituito textMid con olive come fallback di sistema
+        return AppPalette.olive;
     }
   }
 
@@ -55,12 +56,11 @@ class PoiMarkerFactory {
       case 'library':
         return Icons.local_library;
       default:
-        return Icons.castle; // simbolo castello come in foto
+        return Icons.castle;
     }
   }
 }
 
-// Pittogramma a goccia stile Google Maps
 class _ThemedPoiPin extends StatelessWidget {
   const _ThemedPoiPin({required this.color, required this.icon});
 
@@ -78,12 +78,10 @@ class _ThemedPoiPin extends StatelessWidget {
       child: Stack(
         alignment: Alignment.topCenter,
         children: [
-          // Corpo della goccia disegnato con CustomPaint
           CustomPaint(
             size: const Size(pinWidth, pinHeight),
             painter: _DropPinPainter(color: color),
           ),
-          // Cerchio interno bianco con icona
           Positioned(
             top: 5,
             child: Container(
@@ -102,10 +100,8 @@ class _ThemedPoiPin extends StatelessWidget {
   }
 }
 
-// Disegna la forma a goccia (teardrop) come Maps
 class _DropPinPainter extends CustomPainter {
   const _DropPinPainter({required this.color});
-
   final Color color;
 
   @override
@@ -115,7 +111,7 @@ class _DropPinPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     final shadowPaint = Paint()
-      ..color = Colors.black.withValues(alpha: 0.25)
+      ..color = Colors.black.withOpacity(0.25)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
 
     final double w = size.width;
@@ -124,15 +120,12 @@ class _DropPinPainter extends CustomPainter {
     final double cx = w / 2;
     final double cy = r;
 
-    // Usa ui.Path invece di Path per evitare il conflitto con flutter_map
     final path = ui.Path();
-
     path.addArc(
       Rect.fromCircle(center: Offset(cx, cy), radius: r),
       math.pi * 0.75,
       math.pi * 1.5,
     );
-
     path.lineTo(cx, h);
     path.close();
 
@@ -140,7 +133,7 @@ class _DropPinPainter extends CustomPainter {
     canvas.drawPath(path, paint);
 
     final borderPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.6)
+      ..color = Colors.white.withOpacity(0.6)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
     canvas.drawPath(path, borderPaint);
@@ -152,21 +145,24 @@ class _DropPinPainter extends CustomPainter {
 
 class _PoiLabel extends StatelessWidget {
   const _PoiLabel({required this.text});
-
   final String text;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       constraints: const BoxConstraints(maxWidth: 170),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: AppPalette.warmWhite.withValues(alpha: 0.94),
+        color: theme.colorScheme.surface.withOpacity(0.94),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppPalette.tanLight, width: 1),
+        border: Border.all(
+          color: theme.colorScheme.surfaceContainerHighest,
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.18),
+            color: Colors.black.withOpacity(0.18),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -177,10 +173,10 @@ class _PoiLabel extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.center,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w800,
-          color: AppPalette.textDark,
+          color: theme.colorScheme.onSurface,
           letterSpacing: 0.1,
         ),
       ),
