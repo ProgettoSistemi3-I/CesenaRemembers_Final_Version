@@ -8,6 +8,7 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../../domain/entities/poi.dart';
 import '../../../domain/entities/tour_stop.dart';
 import '../../../domain/usecases/poi_use_cases.dart';
 import '../../../injection_container.dart';
@@ -37,7 +38,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     const LatLng(44.2050, 12.3350),
   );
 
-  static List<Marker>? _cachedMarkers;
+  static List<Poi>? _cachedPois;
   static List<TourStop>? _cachedStops;
 
   late TourSessionController _tourController;
@@ -57,7 +58,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
       'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
   String _currentMapUrl = _urlStandard;
 
-  List<Marker> _markers = [];
+  List<Poi> _pois = [];
   bool _isLoading = true;
   String? _loadError;
 
@@ -90,12 +91,12 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   }
 
   Future<void> _loadPois() async {
-    if (_cachedMarkers != null && _cachedStops != null) {
+    if (_cachedPois != null && _cachedStops != null) {
       _tourController.dispose();
       _tourController = TourSessionController(availableStops: _cachedStops!);
       _bindTourUpdates();
       setState(() {
-        _markers = _cachedMarkers!;
+        _pois = _cachedPois!;
         _isLoading = false;
         _loadError = null;
       });
@@ -108,26 +109,22 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
       if (!mounted) return;
 
       final stops = _tourStopMapper.fromPois(pois);
-      final markers = pois
-          .map(_poiMarkerFactory.fromPoi)
-          .toList(growable: false);
-
       _cachedStops = stops;
-      _cachedMarkers = markers;
+      _cachedPois = pois;
 
       _tourController.dispose();
       _tourController = TourSessionController(availableStops: stops);
       _bindTourUpdates();
 
       setState(() {
-        _markers = markers;
+        _pois = pois;
         _loadError = null;
         _isLoading = false;
       });
     } catch (error) {
       if (!mounted) return;
       setState(() {
-        _markers = [];
+        _pois = [];
         _loadError = 'Errore nel caricamento dei punti di interesse.';
         _isLoading = false;
       });
@@ -138,6 +135,18 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
         ),
       );
     }
+  }
+
+
+  List<Marker> _buildMarkers() {
+    return _pois
+        .map(
+          (poi) => _poiMarkerFactory.fromPoi(
+            poi,
+            counterRotationDegrees: _currentRotation,
+          ),
+        )
+        .toList(growable: false);
   }
 
   void _bindTourUpdates() {
@@ -379,7 +388,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                         ),
                       ),
                 ),
-              MarkerLayer(markers: _markers),
+              MarkerLayer(markers: _buildMarkers()),
             ],
           ),
           SafeArea(
