@@ -3,23 +3,12 @@ import 'package:flutter/material.dart';
 import '../../../domain/usecases/auth_use_cases.dart';
 import '../../../domain/usecases/user_use_cases.dart';
 import '../../../injection_container.dart';
-import '../../controllers/settings_controller.dart'; // Assicurati che il path sia giusto per te
+import '../../controllers/settings_controller.dart';
+import '../../theme/app_palette.dart';
+import '../../theme/theme_controller.dart'; // Import fondamentale per il tema dinamico
 
 // Dichiariamo che la parte visiva dei widget si trova in questo file separato
 part 'settings_page_sections.dart';
-
-// ─────────────────────────────────────────────
-//  Design tokens
-// ─────────────────────────────────────────────
-const _cream = Color(0xFFF7F3EE);
-const _warmWhite = Color(0xFFFFFFFF);
-const _olive = Color(0xFF5C6B3A);
-const _moss = Color(0xFF8A9E5B);
-const _tan = Color(0xFFB5885A);
-const _tanLight = Color(0xFFE8D4BE);
-const _textDark = Color(0xFF2C2C2C);
-const _textMid = Color(0xFF7A7A7A);
-const _danger = Color(0xFF9C4B4B);
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -39,7 +28,8 @@ class _SettingsPageState extends State<SettingsPage>
   late Animation<Offset> _slideAnim;
 
   String _selectedLanguage = 'Italiano';
-  String _selectedTheme = 'Chiaro';
+  String _selectedTheme =
+      'Sistema'; // Aggiornato per riflettere il tema globale
   String _notificationType = 'Solo eventi e progressi';
   String _consents = 'Minimi necessari';
   bool _offlineDownloadsEnabled = true;
@@ -48,15 +38,17 @@ class _SettingsPageState extends State<SettingsPage>
   void initState() {
     super.initState();
 
-    // Inizializziamo il cervello della pagina (SENZA GetCurrentUserUseCase, come concordato!)
+    // INIZIALIZZAZIONE CON IL THEME CONTROLLER GLOBALE!
     _controller = SettingsController(
       signOutUseCase: sl<SignOutUseCase>(),
       userUseCases: sl<UserUseCases>(),
+      themeController:
+          sl<ThemeController>(), // Questo fa la magia in tempo reale
     );
 
     _controller.addListener(_onControllerError);
 
-    // Animazioni di Ostolani
+    // Animazioni
     _animCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
@@ -77,7 +69,7 @@ class _SettingsPageState extends State<SettingsPage>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(_controller.errorMessage!),
-          backgroundColor: _danger,
+          backgroundColor: AppPalette.danger,
         ),
       );
       _controller.clearError();
@@ -93,12 +85,13 @@ class _SettingsPageState extends State<SettingsPage>
   }
 
   // ─────────────────────────────────────────────
-  //  METODI PER I POPUP (BOTTOM SHEETS)
+  //  METODI PER I POPUP (BOTTOM SHEETS) ADATTIVI
   // ─────────────────────────────────────────────
   void _showInfoSheet({required String title, required String body}) {
+    final theme = Theme.of(context);
     showModalBottomSheet(
       context: context,
-      backgroundColor: _warmWhite,
+      backgroundColor: theme.colorScheme.surface, // ADATTIVO!
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -114,26 +107,26 @@ class _SettingsPageState extends State<SettingsPage>
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 20),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: theme.colorScheme.onSurface.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
             ),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: _textDark,
+                color: theme.colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 12),
             Text(
               body,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14.5,
                 height: 1.45,
-                color: _textMid,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 18),
@@ -141,7 +134,7 @@ class _SettingsPageState extends State<SettingsPage>
               width: double.infinity,
               child: FilledButton(
                 style: FilledButton.styleFrom(
-                  backgroundColor: _olive,
+                  backgroundColor: AppPalette.olive,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
@@ -161,7 +154,7 @@ class _SettingsPageState extends State<SettingsPage>
   void _showLanguagePicker() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: _warmWhite,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -177,13 +170,13 @@ class _SettingsPageState extends State<SettingsPage>
   void _showThemePicker() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: _warmWhite,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (_) => _ChoiceSheet(
-        title: 'Tema',
-        options: const ['Chiaro', 'Scuro', 'Sistema'],
+        title: 'Tema App (Visivo)',
+        options: const ['Sistema', 'Chiaro', 'Scuro'],
         selected: _selectedTheme,
         onSelect: (value) => setState(() => _selectedTheme = value),
       ),
@@ -193,7 +186,7 @@ class _SettingsPageState extends State<SettingsPage>
   void _showNotificationTypes() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: _warmWhite,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -214,7 +207,7 @@ class _SettingsPageState extends State<SettingsPage>
   void _showConsentsPicker() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: _warmWhite,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -232,18 +225,25 @@ class _SettingsPageState extends State<SettingsPage>
   }
 
   void _confirmDeleteAccount() {
+    final theme = Theme.of(context);
     showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: _warmWhite,
+        backgroundColor: theme.colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-        title: const Text(
+        title: Text(
           'Eliminare account?',
-          style: TextStyle(fontWeight: FontWeight.w700, color: _textDark),
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            color: theme.colorScheme.onSurface,
+          ),
         ),
-        content: const Text(
+        content: Text(
           'Questa operazione rimuoverà account, progressi e dati associati.',
-          style: TextStyle(color: _textMid, height: 1.4),
+          style: TextStyle(
+            color: theme.colorScheme.onSurfaceVariant,
+            height: 1.4,
+          ),
         ),
         actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
         actions: [
@@ -253,7 +253,7 @@ class _SettingsPageState extends State<SettingsPage>
           ),
           FilledButton(
             style: FilledButton.styleFrom(
-              backgroundColor: _danger,
+              backgroundColor: AppPalette.danger,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
@@ -273,9 +273,10 @@ class _SettingsPageState extends State<SettingsPage>
   }
 
   void _showActionSheet(String title, String subtitle) {
+    final theme = Theme.of(context);
     showModalBottomSheet(
       context: context,
-      backgroundColor: _warmWhite,
+      backgroundColor: theme.colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -291,25 +292,25 @@ class _SettingsPageState extends State<SettingsPage>
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 20),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: theme.colorScheme.onSurface.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
             ),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: _textDark,
+                color: theme.colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               subtitle,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14.5,
-                color: _textMid,
+                color: theme.colorScheme.onSurfaceVariant,
                 height: 1.45,
               ),
             ),
@@ -318,7 +319,7 @@ class _SettingsPageState extends State<SettingsPage>
               width: double.infinity,
               child: FilledButton(
                 style: FilledButton.styleFrom(
-                  backgroundColor: _olive,
+                  backgroundColor: AppPalette.olive,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
@@ -337,15 +338,16 @@ class _SettingsPageState extends State<SettingsPage>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // Recuperiamo il tema attuale
+
     return Scaffold(
-      backgroundColor: _cream,
-      // Ascoltiamo il Controller per i cambiamenti in tempo reale
+      backgroundColor: theme.scaffoldBackgroundColor, // ADATTIVO!
       body: ListenableBuilder(
         listenable: _controller,
         builder: (context, _) {
           if (_controller.isLoading) {
             return const Center(
-              child: CircularProgressIndicator(color: _olive),
+              child: CircularProgressIndicator(color: AppPalette.olive),
             );
           }
 
@@ -355,8 +357,8 @@ class _SettingsPageState extends State<SettingsPage>
               position: _slideAnim,
               child: CustomScrollView(
                 slivers: [
-                  const SliverAppBar(
-                    backgroundColor: _cream,
+                  SliverAppBar(
+                    backgroundColor: theme.scaffoldBackgroundColor, // ADATTIVO
                     elevation: 0,
                     expandedHeight: 0,
                     floating: true,
@@ -365,7 +367,7 @@ class _SettingsPageState extends State<SettingsPage>
                     title: Text(
                       'Impostazioni',
                       style: TextStyle(
-                        color: _textDark,
+                        color: theme.colorScheme.onSurface, // ADATTIVO
                         fontWeight: FontWeight.w700,
                         fontSize: 17,
                         letterSpacing: 0.3,
@@ -386,9 +388,7 @@ class _SettingsPageState extends State<SettingsPage>
                           ),
                           const SizedBox(height: 24),
 
-                          // ─────────────────────────────────────────────
-                          // SEZIONE ACCOUNT
-                          // ─────────────────────────────────────────────
+                          // --- ACCOUNT ---
                           const _SectionLabel('Account'),
                           const SizedBox(height: 12),
                           _SettingsCard(
@@ -401,7 +401,7 @@ class _SettingsPageState extends State<SettingsPage>
                                 subtitle: _controller.isLoggingOut
                                     ? 'Uscita in corso...'
                                     : 'Esci dall’account corrente',
-                                accent: _olive,
+                                accent: AppPalette.olive,
                                 onTap: _controller.isLoggingOut
                                     ? () {}
                                     : _controller.handleLogout,
@@ -411,18 +411,15 @@ class _SettingsPageState extends State<SettingsPage>
                                 icon: Icons.delete_outline,
                                 title: 'Elimina account',
                                 subtitle: 'Rimuovi profilo e dati associati',
-                                accent: _danger,
+                                accent: AppPalette.danger,
                                 onTap: _confirmDeleteAccount,
                                 destructive: true,
                               ),
                             ],
                           ),
-
                           const SizedBox(height: 22),
 
-                          // ─────────────────────────────────────────────
-                          // SEZIONE PREFERENZE APP (Collegate al DB)
-                          // ─────────────────────────────────────────────
+                          // --- PREFERENZE APP ---
                           const _SectionLabel('Preferenze App'),
                           const SizedBox(height: 12),
                           _SettingsCard(
@@ -431,7 +428,7 @@ class _SettingsPageState extends State<SettingsPage>
                                 icon: Icons.notifications_active_outlined,
                                 title: 'Notifiche',
                                 subtitle: 'Ricevi avvisi su tappe e premi',
-                                accent: _tan,
+                                accent: AppPalette.tan,
                                 value: _controller.notifiche,
                                 onChanged: (v) => _controller.updatePreference(
                                   newNotifiche: v,
@@ -441,45 +438,44 @@ class _SettingsPageState extends State<SettingsPage>
                               _SwitchRow(
                                 icon: Icons.dark_mode_outlined,
                                 title: 'Modalità Notte',
-                                subtitle: 'Tema scuro per risparmiare batteria',
-                                accent: _olive,
+                                subtitle: 'Tema scuro per l\'intera app',
+                                accent: AppPalette.olive,
                                 value: _controller.modalitaNotte,
                                 onChanged: (v) => _controller.updatePreference(
                                   newModalitaNotte: v,
                                 ),
                               ),
-                              const _ThinDivider(),
+                              // Posizione GPS spostata da qui
+                            ],
+                          ),
+                          const SizedBox(height: 22),
+
+                          // --- PRIVACY ---
+                          const _SectionLabel('Privacy'),
+                          const SizedBox(height: 12),
+                          _SettingsCard(
+                            children: [
+                              // Posizione GPS inserita qui
                               _SwitchRow(
                                 icon: Icons.location_on_outlined,
                                 title: 'Posizione GPS',
                                 subtitle: 'Necessario per esplorare la mappa',
-                                accent: _moss,
+                                accent: AppPalette.moss,
                                 value: _controller.posizione,
                                 onChanged: (v) => _controller.updatePreference(
                                   newPosizione: v,
                                 ),
                               ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 22),
-
-                          // ─────────────────────────────────────────────
-                          // SEZIONE PRIVACY
-                          // ─────────────────────────────────────────────
-                          const _SectionLabel('Privacy'),
-                          const SizedBox(height: 12),
-                          _SettingsCard(
-                            children: [
+                              const _ThinDivider(),
                               _ActionRow(
                                 icon: Icons.privacy_tip_outlined,
                                 title: 'Informativa privacy',
                                 subtitle: 'Leggi come vengono trattati i dati',
-                                accent: _tan,
+                                accent: AppPalette.tan,
                                 onTap: () => _showInfoSheet(
                                   title: 'Informativa privacy',
                                   body:
-                                      'Inserisci qui il testo o il link alla tua informativa privacy. Deve spiegare in modo chiaro quali dati raccogli, perché li usi, per quanto tempo li conservi e come l’utente può esercitare i propri diritti.',
+                                      'Inserisci qui il testo o il link alla tua informativa privacy.',
                                 ),
                               ),
                               const _ThinDivider(),
@@ -487,31 +483,15 @@ class _SettingsPageState extends State<SettingsPage>
                                 icon: Icons.checklist_outlined,
                                 title: 'Consensi',
                                 subtitle: _consents,
-                                accent: _moss,
+                                accent: AppPalette.moss,
                                 onTap: _showConsentsPicker,
                               ),
-                              const _ThinDivider(),
-                              _ActionRow(
-                                icon: Icons.manage_accounts_outlined,
-                                title: 'Autorizzazioni',
-                                subtitle: _controller.posizione
-                                    ? 'GPS, notifiche e permessi attivi'
-                                    : 'Permessi limitati',
-                                accent: _olive,
-                                onTap: () => _showInfoSheet(
-                                  title: 'Autorizzazioni',
-                                  body:
-                                      'Qui puoi indirizzare l’utente alle autorizzazioni del sistema per GPS, notifiche, fotocamera o altri permessi usati dalla tua app.',
-                                ),
-                              ),
+                              // Autorizzazioni rimossa!
                             ],
                           ),
-
                           const SizedBox(height: 22),
 
-                          // ─────────────────────────────────────────────
-                          // SEZIONE GENERALE
-                          // ─────────────────────────────────────────────
+                          // --- GENERALE ---
                           const _SectionLabel('Generale'),
                           const SizedBox(height: 12),
                           _SettingsCard(
@@ -520,25 +500,22 @@ class _SettingsPageState extends State<SettingsPage>
                                 icon: Icons.language,
                                 title: 'Lingua',
                                 subtitle: _selectedLanguage,
-                                accent: _olive,
+                                accent: AppPalette.olive,
                                 onTap: _showLanguagePicker,
                               ),
                               const _ThinDivider(),
                               _ActionRow(
-                                icon: Icons.dark_mode_outlined,
-                                title: 'Tema App (Visivo)',
+                                icon: Icons.color_lens_outlined,
+                                title: 'Stile Icone',
                                 subtitle: _selectedTheme,
-                                accent: _tan,
+                                accent: AppPalette.tan,
                                 onTap: _showThemePicker,
                               ),
                             ],
                           ),
-
                           const SizedBox(height: 22),
 
-                          // ─────────────────────────────────────────────
-                          // SEZIONE DATI
-                          // ─────────────────────────────────────────────
+                          // --- DATI ---
                           const _SectionLabel('Dati'),
                           const SizedBox(height: 12),
                           _SettingsCard(
@@ -547,7 +524,7 @@ class _SettingsPageState extends State<SettingsPage>
                                 icon: Icons.download_for_offline_outlined,
                                 title: 'Download offline',
                                 subtitle: 'Scarica mappe, testi e tappe',
-                                accent: _olive,
+                                accent: AppPalette.olive,
                                 value: _offlineDownloadsEnabled,
                                 onChanged: (v) => setState(
                                   () => _offlineDownloadsEnabled = v,
@@ -558,20 +535,17 @@ class _SettingsPageState extends State<SettingsPage>
                                 icon: Icons.cleaning_services_outlined,
                                 title: 'Cancella cache',
                                 subtitle: 'Libera spazio occupato',
-                                accent: _tan,
+                                accent: AppPalette.tan,
                                 onTap: () => _showActionSheet(
                                   'Cancella cache',
-                                  'Qui puoi eseguire la pulizia dei file temporanei, immagini e contenuti precari salvati localmente.',
+                                  'Vuoi eseguire la pulizia dei file temporanei?',
                                 ),
                               ),
                             ],
                           ),
-
                           const SizedBox(height: 22),
 
-                          // ─────────────────────────────────────────────
-                          // SEZIONE INFO
-                          // ─────────────────────────────────────────────
+                          // --- INFO ---
                           const _SectionLabel('Info'),
                           const SizedBox(height: 12),
                           _SettingsCard(
@@ -580,10 +554,10 @@ class _SettingsPageState extends State<SettingsPage>
                                 icon: Icons.info_outline,
                                 title: 'Versione',
                                 subtitle: '1.0.0',
-                                accent: _moss,
+                                accent: AppPalette.moss,
                                 onTap: () => _showActionSheet(
                                   'Versione app',
-                                  'Mostra qui build number, release notes o controlli aggiornamenti.',
+                                  'Build number: 1.0.0',
                                 ),
                               ),
                               const _ThinDivider(),
@@ -591,11 +565,10 @@ class _SettingsPageState extends State<SettingsPage>
                                 icon: Icons.description_outlined,
                                 title: 'Termini di servizio',
                                 subtitle: 'Regole d’uso e responsabilità',
-                                accent: _olive,
+                                accent: AppPalette.olive,
                                 onTap: () => _showInfoSheet(
                                   title: 'Termini di servizio',
-                                  body:
-                                      'Inserisci qui i tuoi termini di servizio. Per una app con tour reali è utile chiarire uso corretto, responsabilità, limiti dei contenuti storici e sicurezza durante il percorso.',
+                                  body: 'Testo dei termini di servizio...',
                                 ),
                               ),
                               const _ThinDivider(),
@@ -603,15 +576,14 @@ class _SettingsPageState extends State<SettingsPage>
                                 icon: Icons.mail_outline,
                                 title: 'Contatti',
                                 subtitle: 'supporto@cesenaremembers.it',
-                                accent: _tan,
+                                accent: AppPalette.tan,
                                 onTap: () => _showActionSheet(
                                   'Contatti',
-                                  'Qui puoi inserire email di supporto, sito web, social o modulo feedback.',
+                                  'supporto@cesenaremembers.it',
                                 ),
                               ),
                             ],
                           ),
-
                           const SizedBox(height: 36),
                         ],
                       ),

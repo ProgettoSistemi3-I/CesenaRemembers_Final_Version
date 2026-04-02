@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../domain/entities/app_user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../injection_container.dart';
-import 'login_page.dart';
+import '../pages/login_page.dart';
 import 'main_shell.dart';
 
 class AuthGate extends StatelessWidget {

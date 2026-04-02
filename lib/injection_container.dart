@@ -6,10 +6,11 @@ import 'data/poi_repository_impl.dart';
 import 'data/user_repository_impl.dart';
 import 'domain/repositories/auth_repository.dart';
 import 'domain/repositories/i_poi_repository.dart';
-import 'domain/repositories/user_repository.dart'; // Basato sul tuo import attuale
+import 'domain/repositories/user_repository.dart';
 import 'domain/usecases/auth_use_cases.dart';
 import 'domain/usecases/poi_use_cases.dart';
 import 'domain/usecases/user_use_cases.dart';
+import 'presentation/theme/theme_controller.dart';
 
 final sl = GetIt.instance;
 
@@ -21,7 +22,7 @@ Future<void> init() async {
     );
   }
 
-  // --- REPOSITORY (Dati) ---
+  // --- REPOSITORY ---
   if (!sl.isRegistered<IPoiRepository>()) {
     sl.registerLazySingleton<IPoiRepository>(() => PoiRepositoryImpl());
   }
@@ -34,7 +35,7 @@ Future<void> init() async {
     );
   }
 
-  // --- USE CASES (Logica) ---
+  // --- USE CASES ---
   if (!sl.isRegistered<GetPoisUseCase>()) {
     sl.registerLazySingleton(() => GetPoisUseCase(sl()));
   }
@@ -46,5 +47,10 @@ Future<void> init() async {
   }
   if (!sl.isRegistered<UserUseCases>()) {
     sl.registerLazySingleton(() => UserUseCases(sl()));
+  }
+
+  // --- THEME CONTROLLER ---
+  if (!sl.isRegistered<ThemeController>()) {
+    sl.registerLazySingleton(() => ThemeController());
   }
 }

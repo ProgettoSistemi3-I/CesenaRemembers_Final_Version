@@ -19,15 +19,19 @@ class _HeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // TEMA ADATTIVO
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
       decoration: BoxDecoration(
-        color: _warmWhite,
+        color: theme.colorScheme.surface, // ADATTIVO
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: _tan.withOpacity(0.08),
+            color: AppPalette.tan.withValues(
+              alpha: theme.brightness == Brightness.light ? 0.08 : 0.01,
+            ),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -43,10 +47,10 @@ class _HeroCard extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: const LinearGradient(
-                      colors: [_olive, _tan],
+                    gradient: LinearGradient(
+                      colors: [AppPalette.olive, AppPalette.tan],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -57,7 +61,9 @@ class _HeroCard extends StatelessWidget {
                     child: Icon(
                       option.icon,
                       size: 58,
-                      color: Colors.black.withOpacity(0.5),
+                      color: Colors.black.withValues(
+                        alpha: 0.5,
+                      ), // Le icone restano scure sul bg colorato
                     ),
                   ),
                 ),
@@ -65,7 +71,7 @@ class _HeroCard extends StatelessWidget {
                   padding: const EdgeInsets.all(5),
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    color: _tan,
+                    color: AppPalette.tan,
                   ),
                   child: const Icon(Icons.edit, size: 13, color: Colors.white),
                 ),
@@ -87,10 +93,10 @@ class _HeroCard extends StatelessWidget {
                     controller: nameController,
                     autofocus: true,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
-                      color: _textDark,
+                      color: theme.colorScheme.onSurface, // ADATTIVO
                       letterSpacing: 0.2,
                     ),
                     decoration: InputDecoration(
@@ -98,10 +104,15 @@ class _HeroCard extends StatelessWidget {
                       contentPadding: EdgeInsets.zero,
                       border: InputBorder.none,
                       enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: _olive.withOpacity(0.4)),
+                        borderSide: BorderSide(
+                          color: AppPalette.olive.withValues(alpha: 0.4),
+                        ),
                       ),
                       focusedBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide(color: _olive, width: 1.5),
+                        borderSide: BorderSide(
+                          color: AppPalette.olive,
+                          width: 1.5,
+                        ),
                       ),
                     ),
                   ),
@@ -109,10 +120,10 @@ class _HeroCard extends StatelessWidget {
               else
                 Text(
                   nameController.text,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
-                    color: _textDark,
+                    color: theme.colorScheme.onSurface, // ADATTIVO
                     letterSpacing: 0.2,
                   ),
                 ),
@@ -122,7 +133,9 @@ class _HeroCard extends StatelessWidget {
                 child: Icon(
                   isEditingName ? Icons.check_circle : Icons.edit_outlined,
                   size: 18,
-                  color: isEditingName ? _olive : _textMid,
+                  color: isEditingName
+                      ? AppPalette.olive
+                      : theme.colorScheme.onSurfaceVariant, // ADATTIVO
                 ),
               ),
             ],
@@ -133,9 +146,9 @@ class _HeroCard extends StatelessWidget {
           // Username
           Text(
             username,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
-              color: _textMid,
+              color: theme.colorScheme.onSurfaceVariant, // ADATTIVO
               letterSpacing: 0.3,
             ),
           ),
@@ -143,14 +156,19 @@ class _HeroCard extends StatelessWidget {
           const SizedBox(height: 18),
 
           // Divisore
-          Container(height: 1, color: _tanLight),
+          Container(
+            height: 1,
+            color: theme.colorScheme.surfaceContainerHighest.withValues(
+              alpha: 0.5,
+            ),
+          ), // ADATTIVO
 
           const SizedBox(height: 16),
 
           // Mini stats inline
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: const [
+            children: [
               _MiniStat(label: 'Punti', value: '1.240'),
               _VerticalDivider(),
               _MiniStat(label: 'Giorni attivi', value: '14'),
@@ -171,6 +189,7 @@ class _MiniStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       children: [
         Text(
@@ -178,16 +197,16 @@ class _MiniStat extends StatelessWidget {
           style: const TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w800,
-            color: _olive,
+            color: AppPalette.olive,
             letterSpacing: 0.2,
           ),
         ),
         const SizedBox(height: 2),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
-            color: _textMid,
+            color: theme.colorScheme.onSurfaceVariant, // ADATTIVO
             letterSpacing: 0.3,
           ),
         ),
@@ -200,13 +219,15 @@ class _VerticalDivider extends StatelessWidget {
   const _VerticalDivider();
 
   @override
-  Widget build(BuildContext context) =>
-      Container(height: 28, width: 1, color: _tanLight);
+  Widget build(BuildContext context) => Container(
+    height: 28,
+    width: 1,
+    color: Theme.of(
+      context,
+    ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+  ); // ADATTIVO
 }
 
-// ─────────────────────────────────────────────
-//  Stat card
-// ─────────────────────────────────────────────
 class _StatCard extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -222,14 +243,17 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: _warmWhite,
+        color: theme.colorScheme.surface, // ADATTIVO
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.07),
+            color: theme.brightness == Brightness.light
+                ? color.withValues(alpha: 0.07)
+                : Colors.black.withValues(alpha: 0.2), // ADATTIVO
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -242,7 +266,7 @@ class _StatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 18),
@@ -261,9 +285,9 @@ class _StatCard extends StatelessWidget {
               ),
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11.5,
-                  color: _textMid,
+                  color: theme.colorScheme.onSurfaceVariant, // ADATTIVO
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -275,15 +299,16 @@ class _StatCard extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────
-//  Badges row
-// ─────────────────────────────────────────────
 class _BadgesRow extends StatelessWidget {
   final List<_BadgeData> badges = const [
-    _BadgeData(Icons.military_tech, 'Pioniere', _olive),
-    _BadgeData(Icons.explore, 'Esploratore', _tan),
-    _BadgeData(Icons.history_edu, 'Storico', _moss),
-    _BadgeData(Icons.lock_outline, '?', _textMid),
+    _BadgeData(Icons.military_tech, 'Pioniere', AppPalette.olive),
+    _BadgeData(Icons.explore, 'Esploratore', AppPalette.tan),
+    _BadgeData(Icons.history_edu, 'Storico', AppPalette.moss),
+    _BadgeData(
+      Icons.lock_outline,
+      '?',
+      Colors.grey,
+    ), // Usa un grigio standard per il placeholder
   ];
 
   @override
@@ -317,31 +342,44 @@ class _BadgeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    // Logica per adattare il grigio del lucchetto al tema corrente
+    final isPlaceholder = data.label == '?';
+    final iconColor = isPlaceholder
+        ? theme.colorScheme.onSurfaceVariant
+        : data.color;
+
     return Column(
       children: [
         Container(
           width: 60,
           height: 60,
           decoration: BoxDecoration(
-            color: _warmWhite,
+            color: theme.colorScheme.surface, // ADATTIVO
             shape: BoxShape.circle,
-            border: Border.all(color: data.color.withOpacity(0.35), width: 2),
+            border: Border.all(
+              color: iconColor.withValues(alpha: 0.35),
+              width: 2,
+            ),
             boxShadow: [
               BoxShadow(
-                color: data.color.withOpacity(0.08),
+                color: theme.brightness == Brightness.light
+                    ? iconColor.withValues(alpha: 0.08)
+                    : Colors.transparent, // ADATTIVO
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
             ],
           ),
-          child: Icon(data.icon, color: data.color, size: 26),
+          child: Icon(data.icon, color: iconColor, size: 26),
         ),
         const SizedBox(height: 6),
         Text(
           data.label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 10.5,
-            color: _textMid,
+            color: theme.colorScheme.onSurfaceVariant, // ADATTIVO
             fontWeight: FontWeight.w500,
           ),
           textAlign: TextAlign.center,
@@ -351,9 +389,6 @@ class _BadgeTile extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────
-//  Section label
-// ─────────────────────────────────────────────
 class _SectionLabel extends StatelessWidget {
   final String text;
   const _SectionLabel(this.text);
@@ -369,16 +404,16 @@ class _SectionLabel extends StatelessWidget {
             height: 16,
             margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
-              color: _olive,
+              color: AppPalette.olive,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: _textDark,
+              color: Theme.of(context).colorScheme.onSurface, // ADATTIVO
               letterSpacing: 0.3,
             ),
           ),
@@ -388,9 +423,6 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────
-//  Avatar picker bottom sheet
-// ─────────────────────────────────────────────
 class _AvatarPickerSheet extends StatelessWidget {
   final int selected;
   final ValueChanged<int> onSelect;
@@ -399,6 +431,8 @@ class _AvatarPickerSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // ADATTIVO
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
       child: Column(
@@ -412,18 +446,20 @@ class _AvatarPickerSheet extends StatelessWidget {
               height: 4,
               margin: const EdgeInsets.only(bottom: 20),
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: theme.colorScheme.onSurface.withValues(
+                  alpha: 0.1,
+                ), // ADATTIVO
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),
 
-          const Text(
+          Text(
             'Scegli avatar',
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w700,
-              color: _textDark,
+              color: theme.colorScheme.onSurface, // ADATTIVO
             ),
           ),
 
@@ -452,13 +488,13 @@ class _AvatarPickerSheet extends StatelessWidget {
                     shape: BoxShape.circle,
                     color: opt.background,
                     border: Border.all(
-                      color: isSel ? _olive : Colors.transparent,
+                      color: isSel ? AppPalette.olive : Colors.transparent,
                       width: 2.5,
                     ),
                     boxShadow: isSel
                         ? [
                             BoxShadow(
-                              color: _olive.withOpacity(0.25),
+                              color: AppPalette.olive.withValues(alpha: 0.25),
                               blurRadius: 8,
                             ),
                           ]
@@ -467,7 +503,9 @@ class _AvatarPickerSheet extends StatelessWidget {
                   child: Icon(
                     opt.icon,
                     size: 30,
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(
+                      alpha: 0.5,
+                    ), // Le icone restano scure
                   ),
                 ),
               );

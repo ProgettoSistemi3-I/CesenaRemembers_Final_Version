@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 
 import '../../../../domain/entities/tour_stop.dart';
 import '../../../controllers/poi_quiz_controller.dart';
 import '../../../theme/app_palette.dart';
-import '../tour_formatters.dart';
+import '../../../services/tour_formatters.dart';
 
 class PoiBottomSheet extends StatefulWidget {
   const PoiBottomSheet({
@@ -41,11 +42,8 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
     super.dispose();
   }
 
-
   void _handleTabChange() {
-    if (_quizInitialized || _tabController.index != 1) {
-      return;
-    }
+    if (_quizInitialized || _tabController.index != 1) return;
     setState(() {
       _quizController = PoiQuizController(questions: widget.stop.questions);
       _quizInitialized = true;
@@ -66,6 +64,8 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // TEMA ADATTIVO
+
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: 0.60,
@@ -73,9 +73,9 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
       maxChildSize: 0.90,
       builder: (_, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
-            color: AppPalette.warmWhite,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface, // ADATTIVO
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
             children: [
@@ -84,7 +84,9 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                 height: 4,
                 margin: const EdgeInsets.only(top: 12, bottom: 4),
                 decoration: BoxDecoration(
-                  color: AppPalette.tanLight,
+                  color: theme.colorScheme.onSurface.withValues(
+                    alpha: 0.1,
+                  ), // ADATTIVO
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -102,7 +104,9 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                       child: Icon(
                         widget.stop.icon,
                         size: 24,
-                        color: AppPalette.textDark.withValues(alpha: 0.55),
+                        color: Colors.black87.withValues(
+                          alpha: 0.55,
+                        ), // L'icona resta scura sul suo sfondo colorato
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -112,24 +116,29 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                         children: [
                           Text(
                             widget.stop.name,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w700,
-                              color: AppPalette.textDark,
+                              color: theme.colorScheme.onSurface, // ADATTIVO
                             ),
                           ),
                           Text(
                             widget.stop.period,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: AppPalette.textMid,
+                              color: theme
+                                  .colorScheme
+                                  .onSurfaceVariant, // ADATTIVO
                             ),
                           ),
                         ],
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
                       decoration: BoxDecoration(
                         color: AppPalette.olive.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
@@ -137,7 +146,11 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.timer_outlined, size: 12, color: AppPalette.olive),
+                          const Icon(
+                            Icons.timer_outlined,
+                            size: 12,
+                            color: AppPalette.olive,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             formatElapsed(widget.elapsedSeconds),
@@ -156,19 +169,31 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
               const SizedBox(height: 12),
               Container(
                 height: .5,
-                color: AppPalette.tanLight.withValues(alpha: 0.8),
+                color: theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.5,
+                ), // ADATTIVO
                 margin: const EdgeInsets.symmetric(horizontal: 20),
               ),
               TabBar(
                 controller: _tabController,
                 labelColor: AppPalette.olive,
-                unselectedLabelColor: AppPalette.textMid,
+                unselectedLabelColor:
+                    theme.colorScheme.onSurfaceVariant, // ADATTIVO
                 indicatorColor: AppPalette.olive,
                 indicatorWeight: 2,
-                labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-                unselectedLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                labelStyle: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+                unselectedLabelStyle: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                tabs: const [Tab(text: 'Informazioni'), Tab(text: 'Quiz')],
+                tabs: const [
+                  Tab(text: 'Informazioni'),
+                  Tab(text: 'Quiz'),
+                ],
               ),
               Expanded(
                 child: TabBarView(
@@ -190,7 +215,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                               child: Icon(
                                 widget.stop.icon,
                                 size: 56,
-                                color: AppPalette.textDark.withValues(alpha: 0.3),
+                                color: Colors.black.withValues(alpha: 0.3),
                               ),
                             ),
                           ),
@@ -206,12 +231,13 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                                   borderRadius: BorderRadius.circular(2),
                                 ),
                               ),
-                              const Text(
+                              Text(
                                 'Storia',
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
-                                  color: AppPalette.textDark,
+                                  color:
+                                      theme.colorScheme.onSurface, // ADATTIVO
                                 ),
                               ),
                             ],
@@ -219,10 +245,12 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                           const SizedBox(height: 8),
                           Text(
                             widget.stop.description,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
-                              color: AppPalette.textMid,
                               height: 1.65,
+                              color: theme
+                                  .colorScheme
+                                  .onSurfaceVariant, // ADATTIVO
                             ),
                           ),
                           const SizedBox(height: 24),
@@ -232,14 +260,30 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(vertical: 13),
                               decoration: BoxDecoration(
-                                color: AppPalette.tanLight.withValues(alpha: 0.5),
+                                color:
+                                    theme.brightness ==
+                                        Brightness
+                                            .dark // ADATTIVO
+                                    ? AppPalette.tan.withValues(alpha: 0.15)
+                                    : theme.colorScheme.surfaceContainerHighest
+                                          .withValues(alpha: 0.5),
                                 borderRadius: BorderRadius.circular(14),
-                                border: Border.all(color: AppPalette.tanLight),
+                                border: Border.all(
+                                  color: theme.brightness == Brightness.dark
+                                      ? AppPalette.tan.withValues(alpha: 0.3)
+                                      : theme
+                                            .colorScheme
+                                            .surfaceContainerHighest,
+                                ),
                               ),
                               child: const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.quiz_outlined, size: 16, color: AppPalette.tan),
+                                  Icon(
+                                    Icons.quiz_outlined,
+                                    size: 16,
+                                    color: AppPalette.tan,
+                                  ),
                                   SizedBox(width: 8),
                                   Text(
                                     'Fai il quiz su questa tappa →',
@@ -259,7 +303,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                     SingleChildScrollView(
                       controller: scrollController,
                       padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-                      child: _buildQuizContent(),
+                      child: _buildQuizContent(theme),
                     ),
                   ],
                 ),
@@ -271,7 +315,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
     );
   }
 
-  Widget _buildQuizContent() {
+  Widget _buildQuizContent(ThemeData theme) {
     if (!_quizInitialized) {
       return const Center(
         child: Padding(
@@ -282,16 +326,17 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
     }
 
     final quizController = _quizController;
-    if (quizController == null) {
-      return const SizedBox.shrink();
-    }
+    if (quizController == null) return const SizedBox.shrink();
 
     if (widget.stop.questions.isEmpty) {
       return Column(
         children: [
-          const Text(
+          Text(
             'Nessun quiz disponibile per questa tappa.',
-            style: TextStyle(fontSize: 14, color: AppPalette.textMid),
+            style: TextStyle(
+              fontSize: 14,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 20),
           NextStopActionButton(onTap: widget.onNextStop),
@@ -314,9 +359,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
     }
 
     final question = quizController.currentQuestion;
-    if (question == null) {
-      return const SizedBox.shrink();
-    }
+    if (question == null) return const SizedBox.shrink();
     final answered = quizController.selectedAnswer != null;
 
     return Column(
@@ -326,7 +369,10 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
           children: [
             Text(
               'Domanda ${quizController.questionIndex + 1} di ${widget.stop.questions.length}',
-              style: const TextStyle(fontSize: 12, color: AppPalette.textMid),
+              style: TextStyle(
+                fontSize: 12,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
             const Spacer(),
             if (quizController.score > 0)
@@ -344,8 +390,11 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
-            value: (quizController.questionIndex + 1) / widget.stop.questions.length,
-            backgroundColor: AppPalette.tanLight,
+            value:
+                (quizController.questionIndex + 1) /
+                widget.stop.questions.length,
+            backgroundColor:
+                theme.colorScheme.surfaceContainerHighest, // ADATTIVO
             valueColor: const AlwaysStoppedAnimation<Color>(AppPalette.olive),
             minHeight: 4,
           ),
@@ -353,11 +402,11 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         const SizedBox(height: 18),
         Text(
           question.question,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w700,
-            color: AppPalette.textDark,
             height: 1.4,
+            color: theme.colorScheme.onSurface, // ADATTIVO
           ),
         ),
         const SizedBox(height: 16),
@@ -365,21 +414,24 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
           final isSelected = quizController.selectedAnswer == index;
           final isCorrect = index == question.correctIndex;
 
-          var bgColor = AppPalette.warmWhite;
-          var borderColor = AppPalette.tanLight;
-          var textColor = AppPalette.textDark;
+          // COLORI DINAMICI DEL QUIZ
+          var bgColor = theme.colorScheme.surface;
+          var borderColor = theme.colorScheme.surfaceContainerHighest;
+          var textColor = theme.colorScheme.onSurface;
           IconData? trailing;
 
           if (answered) {
             if (isCorrect) {
-              bgColor = const Color(0xFFEAF3DE);
+              bgColor = AppPalette.moss.withValues(alpha: 0.15);
               borderColor = AppPalette.moss;
-              textColor = const Color(0xFF3B6D11);
+              textColor = theme.brightness == Brightness.dark
+                  ? AppPalette.moss
+                  : const Color(0xFF3B6D11);
               trailing = Icons.check_circle_outline;
             } else if (isSelected) {
-              bgColor = const Color(0xFFFCEBEB);
-              borderColor = const Color(0xFFE24B4A);
-              textColor = const Color(0xFFA32D2D);
+              bgColor = AppPalette.danger.withValues(alpha: 0.15);
+              borderColor = AppPalette.danger;
+              textColor = AppPalette.danger;
               trailing = Icons.cancel_outlined;
             }
           }
@@ -408,10 +460,15 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                           ? (isCorrect
                                 ? AppPalette.moss.withValues(alpha: 0.2)
                                 : (isSelected
-                                      ? const Color(0xFFE24B4A)
-                                            .withValues(alpha: 0.1)
-                                      : AppPalette.tanLight.withValues(alpha: 0.5)))
-                          : AppPalette.tanLight.withValues(alpha: 0.5),
+                                      ? AppPalette.danger.withValues(alpha: 0.1)
+                                      : theme
+                                            .colorScheme
+                                            .surfaceContainerHighest
+                                            .withValues(
+                                              alpha: 0.5,
+                                            ))) // ADATTIVO
+                          : theme.colorScheme.surfaceContainerHighest
+                                .withValues(alpha: 0.5), // ADATTIVO
                       shape: BoxShape.circle,
                     ),
                     child: Center(
@@ -432,7 +489,8 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                       style: TextStyle(fontSize: 14, color: textColor),
                     ),
                   ),
-                  if (trailing != null) Icon(trailing, size: 18, color: textColor),
+                  if (trailing != null)
+                    Icon(trailing, size: 18, color: textColor),
                 ],
               ),
             ),
@@ -483,16 +541,23 @@ class QuizResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final perfect = score == total;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: perfect
-            ? const Color(0xFFEAF3DE)
-            : AppPalette.tanLight.withValues(alpha: 0.4),
+            ? AppPalette.moss.withValues(alpha: 0.15)
+            : theme.colorScheme.surfaceContainerHighest.withValues(
+                alpha: 0.4,
+              ), // ADATTIVO
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: perfect ? AppPalette.moss : AppPalette.tanLight),
+        border: Border.all(
+          color: perfect
+              ? AppPalette.moss
+              : theme.colorScheme.surfaceContainerHighest,
+        ),
       ),
       child: Column(
         children: [
@@ -513,17 +578,27 @@ class QuizResultCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             '$score / $total risposte corrette',
-            style: const TextStyle(fontSize: 15, color: AppPalette.textMid),
+            style: TextStyle(
+              fontSize: 15,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 4),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.timer_outlined, size: 13, color: AppPalette.textMid),
+              Icon(
+                Icons.timer_outlined,
+                size: 13,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
               const SizedBox(width: 4),
               Text(
                 'Tempo: ${formatElapsed(elapsed)}',
-                style: const TextStyle(fontSize: 13, color: AppPalette.textMid),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),

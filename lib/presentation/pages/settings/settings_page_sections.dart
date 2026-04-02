@@ -13,15 +13,18 @@ class _HeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
       decoration: BoxDecoration(
-        color: _warmWhite,
+        color: theme.colorScheme.surface, // ADATTIVO
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: _tan.withOpacity(0.08),
+            color: AppPalette.tan.withValues(
+              alpha: theme.brightness == Brightness.light ? 0.08 : 0.02,
+            ),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -32,10 +35,10 @@ class _HeaderCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: _olive.withOpacity(0.10),
+              color: AppPalette.olive.withValues(alpha: 0.10),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 28, color: _olive),
+            child: Icon(icon, size: 28, color: AppPalette.olive),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -44,20 +47,20 @@ class _HeaderCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: _textDark,
+                    color: theme.colorScheme.onSurface, // ADATTIVO
                     letterSpacing: 0.2,
                   ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13.5,
                     height: 1.45,
-                    color: _textMid,
+                    color: theme.colorScheme.onSurfaceVariant, // ADATTIVO
                   ),
                 ),
               ],
@@ -75,13 +78,16 @@ class _SettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: _warmWhite,
+        color: theme.colorScheme.surface, // ADATTIVO
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: _tan.withOpacity(0.06),
+            color: AppPalette.tan.withValues(
+              alpha: theme.brightness == Brightness.light ? 0.06 : 0.01,
+            ),
             blurRadius: 16,
             offset: const Offset(0, 5),
           ),
@@ -103,7 +109,9 @@ class _ThinDivider extends StatelessWidget {
     return Container(
       height: 1,
       margin: const EdgeInsets.only(left: 20),
-      color: _tanLight,
+      color: Theme.of(
+        context,
+      ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5), // ADATTIVO
     );
   }
 }
@@ -123,16 +131,16 @@ class _SectionLabel extends StatelessWidget {
             height: 16,
             margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
-              color: _olive,
+              color: AppPalette.olive,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: _textDark,
+              color: Theme.of(context).colorScheme.onSurface, // ADATTIVO
               letterSpacing: 0.3,
             ),
           ),
@@ -161,7 +169,10 @@ class _ActionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = destructive ? _danger : _textDark;
+    final theme = Theme.of(context);
+    final textColor = destructive
+        ? AppPalette.danger
+        : theme.colorScheme.onSurface;
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -171,7 +182,7 @@ class _ActionRow extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(9),
               decoration: BoxDecoration(
-                color: accent.withOpacity(0.12),
+                color: accent.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: accent, size: 20),
@@ -192,12 +203,18 @@ class _ActionRow extends StatelessWidget {
                   const SizedBox(height: 3),
                   Text(
                     subtitle,
-                    style: const TextStyle(fontSize: 12.5, color: _textMid),
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: _textMid),
+            Icon(
+              Icons.chevron_right,
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+            ),
           ],
         ),
       ),
@@ -224,6 +241,7 @@ class _SwitchRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
       child: Row(
@@ -231,7 +249,7 @@ class _SwitchRow extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(9),
             decoration: BoxDecoration(
-              color: accent.withOpacity(0.12),
+              color: accent.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: accent, size: 20),
@@ -243,16 +261,19 @@ class _SwitchRow extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: _textDark,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   subtitle,
-                  style: const TextStyle(fontSize: 12.5, color: _textMid),
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -260,8 +281,8 @@ class _SwitchRow extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: _olive,
-            activeTrackColor: _olive.withOpacity(0.25),
+            activeColor: AppPalette.olive,
+            activeTrackColor: AppPalette.olive.withValues(alpha: 0.25),
           ),
         ],
       ),
@@ -284,6 +305,7 @@ class _ChoiceSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
       child: Column(
@@ -296,17 +318,17 @@ class _ChoiceSheet extends StatelessWidget {
               height: 4,
               margin: const EdgeInsets.only(bottom: 20),
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w700,
-              color: _textDark,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 14),
@@ -327,13 +349,14 @@ class _ChoiceSheet extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: option == selected
-                        ? _olive.withOpacity(0.09)
-                        : _warmWhite,
+                        ? AppPalette.olive.withValues(alpha: 0.09)
+                        : theme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: option == selected
-                          ? _olive.withOpacity(0.25)
-                          : _tanLight,
+                          ? AppPalette.olive.withValues(alpha: 0.25)
+                          : theme.colorScheme.surfaceContainerHighest
+                                .withValues(alpha: 0.3),
                     ),
                   ),
                   child: Row(
@@ -346,12 +369,16 @@ class _ChoiceSheet extends StatelessWidget {
                             fontWeight: option == selected
                                 ? FontWeight.w700
                                 : FontWeight.w500,
-                            color: _textDark,
+                            color: theme.colorScheme.onSurface,
                           ),
                         ),
                       ),
                       if (option == selected)
-                        const Icon(Icons.check_circle, size: 18, color: _olive),
+                        const Icon(
+                          Icons.check_circle,
+                          size: 18,
+                          color: AppPalette.olive,
+                        ),
                     ],
                   ),
                 ),

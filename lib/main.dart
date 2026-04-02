@@ -6,8 +6,9 @@ import 'package:geolocator/geolocator.dart';
 
 import 'firebase_options.dart';
 import 'injection_container.dart' as di;
-import 'presentation/pages/auth_gate.dart';
+import 'presentation/services/auth_gate.dart';
 import 'presentation/theme/app_palette.dart';
+import 'presentation/theme/theme_controller.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +29,6 @@ Future<void> main() async {
 
 Future<void> _requestLocationPermissionOnFirstOpen() async {
   if (kIsWeb) return;
-
   final permission = await Geolocator.checkPermission();
   if (permission == LocationPermission.denied) {
     await Geolocator.requestPermission();
@@ -40,20 +40,20 @@ class CesenaRemembersApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Cesena Remembers 1945',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: AppPalette.olive,
-        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          selectedItemColor: AppPalette.olive,
-          unselectedItemColor: AppPalette.textMid,
-          showUnselectedLabels: true,
-          type: BottomNavigationBarType.fixed,
-        ),
-      ),
-      home: const AuthGate(),
+    final themeCtrl = di.sl<ThemeController>();
+
+    return ListenableBuilder(
+      listenable: themeCtrl,
+      builder: (context, _) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Cesena Remembers 1945',
+          themeMode: themeCtrl.themeMode,
+          theme: AppPalette.lightTheme,
+          darkTheme: AppPalette.darkTheme,
+          home: const AuthGate(),
+        );
+      },
     );
   }
 }

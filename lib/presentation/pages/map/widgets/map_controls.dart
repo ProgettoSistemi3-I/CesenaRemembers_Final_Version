@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../domain/entities/tour_stop.dart';
 import '../../../theme/app_palette.dart';
-import '../tour_formatters.dart';
+import '../../../services/tour_formatters.dart';
 
 class CircleFab extends StatelessWidget {
   const CircleFab({
@@ -22,9 +22,10 @@ class CircleFab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return FloatingActionButton(
       heroTag: heroTag,
-      backgroundColor: Colors.white,
+      backgroundColor: theme.colorScheme.surface, // ADATTIVO
       elevation: 4,
       shape: const CircleBorder(),
       onPressed: onTap,
@@ -51,6 +52,8 @@ class MapTypeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     Widget square({
       required String title,
       required IconData icon,
@@ -66,20 +69,28 @@ class MapTypeButton extends StatelessWidget {
             color: bgColor,
             borderRadius: BorderRadius.circular(12),
             boxShadow: const [
-              BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2)),
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
             ],
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 30, color: Colors.black87),
+              Icon(
+                icon,
+                size: 30,
+                color: theme.colorScheme.onSurface,
+              ), // ADATTIVO
               const SizedBox(height: 4),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: theme.colorScheme.onSurface, // ADATTIVO
                 ),
               ),
             ],
@@ -98,14 +109,18 @@ class MapTypeButton extends StatelessWidget {
               square(
                 title: 'Standard',
                 icon: Icons.map,
-                bgColor: Colors.grey.shade100,
+                bgColor: theme.brightness == Brightness.dark
+                    ? theme.colorScheme.surfaceContainerHighest
+                    : Colors.grey.shade100, // ADATTIVO
                 url: urlStandard,
               ),
               const SizedBox(width: 12),
               square(
                 title: 'Satellite',
                 icon: Icons.satellite_alt,
-                bgColor: Colors.green.shade100,
+                bgColor: theme.brightness == Brightness.dark
+                    ? AppPalette.moss.withValues(alpha: 0.2)
+                    : Colors.green.shade100, // ADATTIVO
                 url: urlSatellite,
               ),
             ],
@@ -114,13 +129,16 @@ class MapTypeButton extends StatelessWidget {
         ],
         FloatingActionButton.extended(
           heroTag: 'btnMapType',
-          backgroundColor: Colors.white,
+          backgroundColor: theme.colorScheme.surface, // ADATTIVO
           elevation: 4,
-          icon: Icon(isOpen ? Icons.close : Icons.layers, color: Colors.black87),
+          icon: Icon(
+            isOpen ? Icons.close : Icons.layers,
+            color: theme.colorScheme.onSurface,
+          ), // ADATTIVO
           label: Text(
             isOpen ? 'Chiudi' : 'Mappe',
-            style: const TextStyle(color: Colors.black87),
-          ),
+            style: TextStyle(color: theme.colorScheme.onSurface),
+          ), // ADATTIVO
           onPressed: onToggle,
         ),
       ],
@@ -178,6 +196,7 @@ class ManualArrivalButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: ClipRRect(
@@ -187,7 +206,9 @@ class ManualArrivalButton extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
             decoration: BoxDecoration(
-              color: AppPalette.warmWhite,
+              color: theme.colorScheme.surface.withValues(
+                alpha: 0.8,
+              ), // ADATTIVO
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: AppPalette.moss.withValues(alpha: 0.5)),
             ),
@@ -235,17 +256,22 @@ class NextStopCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
         decoration: BoxDecoration(
-          color: AppPalette.warmWhite,
+          color: theme.colorScheme.surface, // ADATTIVO
           borderRadius: BorderRadius.circular(20),
-          border: arrived ? Border.all(color: AppPalette.olive, width: 1.5) : null,
+          border: arrived
+              ? Border.all(color: AppPalette.olive, width: 1.5)
+              : null,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
+              color: theme.brightness == Brightness.light
+                  ? Colors.black.withValues(alpha: 0.12)
+                  : Colors.black.withValues(alpha: 0.5), // ADATTIVO
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -263,8 +289,8 @@ class NextStopCard extends StatelessWidget {
               child: Icon(
                 stop.icon,
                 size: 26,
-                color: AppPalette.textDark.withValues(alpha: 0.6),
-              ),
+                color: Colors.black87.withValues(alpha: 0.6),
+              ), // Icona fissa per staccare dal background generato
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -274,11 +300,11 @@ class NextStopCard extends StatelessWidget {
                 children: [
                   Text(
                     stop.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: AppPalette.textDark,
-                    ),
+                      color: theme.colorScheme.onSurface,
+                    ), // ADATTIVO
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -300,9 +326,12 @@ class NextStopCard extends StatelessWidget {
                             fontSize: 11.5,
                             color: arrived
                                 ? AppPalette.olive
-                                : AppPalette.textMid,
-                            fontWeight:
-                                arrived ? FontWeight.w600 : FontWeight.normal,
+                                : theme
+                                      .colorScheme
+                                      .onSurfaceVariant, // ADATTIVO
+                            fontWeight: arrived
+                                ? FontWeight.w600
+                                : FontWeight.normal,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -315,7 +344,10 @@ class NextStopCard extends StatelessWidget {
             const SizedBox(width: 8),
             if (arrived)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: AppPalette.olive.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -330,15 +362,19 @@ class NextStopCard extends StatelessWidget {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.timer_outlined, size: 14, color: AppPalette.textMid),
+                  Icon(
+                    Icons.timer_outlined,
+                    size: 14,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ), // ADATTIVO
                   const SizedBox(height: 2),
                   Text(
                     formatElapsed(elapsedSeconds),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
-                      color: AppPalette.textMid,
+                      color: theme.colorScheme.onSurfaceVariant, // ADATTIVO
                       fontWeight: FontWeight.w600,
-                      fontFeatures: [FontFeature.tabularFigures()],
+                      fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
                 ],

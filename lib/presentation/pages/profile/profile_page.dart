@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/app_palette.dart'; // Import vitale per i colori base (olive, tan)
+
 part 'profile_page_sections.dart';
 
 // ─────────────────────────────────────────────
@@ -23,18 +25,6 @@ class _AvatarOption {
   final Color background;
   const _AvatarOption(this.icon, this.background);
 }
-
-// ─────────────────────────────────────────────
-//  Design tokens
-// ─────────────────────────────────────────────
-const _cream = Color(0xFFF7F3EE); // sfondo principale
-const _warmWhite = Color(0xFFFFFFFF);
-const _olive = Color(0xFF5C6B3A); // verde oliva – accento primario
-const _moss = Color(0xFF8A9E5B); // verde chiaro
-const _tan = Color(0xFFB5885A); // marrone/arancione – accento secondario
-const _tanLight = Color(0xFFE8D4BE); // tan chiarissimo per superfici
-const _textDark = Color(0xFF2C2C2C);
-const _textMid = Color(0xFF7A7A7A);
 
 // ─────────────────────────────────────────────
 //  Page
@@ -89,9 +79,11 @@ class _ProfilePageState extends State<ProfilePage>
 
   // ── Avatar picker ─────────────────────────
   void _showAvatarPicker() {
+    final theme = Theme.of(context);
     showModalBottomSheet(
       context: context,
-      backgroundColor: _warmWhite,
+      backgroundColor:
+          theme.colorScheme.surface, // ADATTIVO: Sostituito _warmWhite
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -105,9 +97,11 @@ class _ProfilePageState extends State<ProfilePage>
   @override
   Widget build(BuildContext context) {
     final selected = _avatarOptions[_selectedAvatarIndex];
+    final theme = Theme.of(context); // TEMA ADATTIVO
 
     return Scaffold(
-      backgroundColor: _cream,
+      backgroundColor:
+          theme.scaffoldBackgroundColor, // ADATTIVO: Sostituito _cream
       body: FadeTransition(
         opacity: _fadeAnim,
         child: SlideTransition(
@@ -116,15 +110,18 @@ class _ProfilePageState extends State<ProfilePage>
             slivers: [
               // ── App bar
               SliverAppBar(
-                backgroundColor: _cream,
+                backgroundColor: theme
+                    .scaffoldBackgroundColor, // ADATTIVO: Sostituito _cream
                 elevation: 0,
                 expandedHeight: 0,
                 floating: true,
                 snap: true,
-                title: const Text(
+                title: Text(
                   'Il mio profilo',
                   style: TextStyle(
-                    color: _textDark,
+                    color: theme
+                        .colorScheme
+                        .onSurface, // ADATTIVO: Sostituito _textDark
                     fontWeight: FontWeight.w700,
                     fontSize: 17,
                     letterSpacing: 0.3,
@@ -155,7 +152,7 @@ class _ProfilePageState extends State<ProfilePage>
                       const SizedBox(height: 28),
 
                       // ── Divisore sezione stats
-                      _SectionLabel('Statistiche'),
+                      const _SectionLabel('Statistiche'),
 
                       const SizedBox(height: 14),
 
@@ -172,25 +169,26 @@ class _ProfilePageState extends State<ProfilePage>
                             icon: Icons.verified_user_outlined,
                             label: 'Traguardi',
                             value: '3 / 11',
-                            color: _olive,
+                            color: AppPalette
+                                .olive, // Manteniamo i colori del brand
                           ),
                           _StatCard(
                             icon: Icons.emoji_events_outlined,
                             label: 'Classifica',
                             value: '# 1',
-                            color: _tan,
+                            color: AppPalette.tan,
                           ),
                           _StatCard(
                             icon: Icons.location_on_outlined,
                             label: 'Siti Visitati',
                             value: '67',
-                            color: _moss,
+                            color: AppPalette.moss,
                           ),
                           _StatCard(
                             icon: Icons.quiz_outlined,
                             label: 'Quiz Superati',
                             value: '34',
-                            color: _tan,
+                            color: AppPalette.tan,
                           ),
                         ],
                       ),
@@ -198,7 +196,7 @@ class _ProfilePageState extends State<ProfilePage>
                       const SizedBox(height: 28),
 
                       // ── Divisore sezione badges
-                      _SectionLabel('Ultimi badge'),
+                      const _SectionLabel('Ultimi badge'),
 
                       const SizedBox(height: 14),
 
@@ -216,7 +214,3 @@ class _ProfilePageState extends State<ProfilePage>
     );
   }
 }
-
-// ─────────────────────────────────────────────
-//  Hero card
-// ─────────────────────────────────────────────
