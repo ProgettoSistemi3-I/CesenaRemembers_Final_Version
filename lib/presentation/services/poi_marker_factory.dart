@@ -1,50 +1,189 @@
+import 'dart:math' as math;
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-
 import '../../domain/entities/poi.dart';
+import '../theme/app_palette.dart';
 
 class PoiMarkerFactory {
   const PoiMarkerFactory();
 
-  Marker fromPoi(Poi poi) {
+  Marker fromPoi(Poi poi, {double counterRotationDegrees = 0}) {
     return Marker(
       point: LatLng(poi.latitude, poi.longitude),
-      width: 120,
-      height: 80,
-      child: Column(
-        children: [
-          Icon(Icons.location_on, color: _colorFromType(poi.type), size: 40),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
-              boxShadow: const [
-                BoxShadow(blurRadius: 2, color: Colors.black26),
-              ],
+      width: 180,
+      height: 100,
+      child: Transform.rotate(
+        angle: _degreesToRadians(-counterRotationDegrees),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _ThemedPoiPin(
+              color: _colorFromType(poi.type),
+              icon: _iconFromType(poi.type),
             ),
-            child: Text(
-              poi.name,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
-              overflow: TextOverflow.ellipsis,
+            const SizedBox(height: 4),
+            _PoiLabel(text: poi.name),
+          ],
+        ),
+      ),
+    );
+  }
+
+  double _degreesToRadians(double value) => value * (math.pi / 180);
+
+  Color _colorFromType(String type) {
+    switch (type) {
+      case 'school':
+        return AppPalette.tan;
+      case 'bridge':
+        return AppPalette.olive;
+      case 'library':
+        return AppPalette.moss;
+      default:
+        return AppPalette.textMid;
+    }
+  }
+
+  IconData _iconFromType(String type) {
+    switch (type) {
+      case 'school':
+        return Icons.school;
+      case 'bridge':
+        return Icons.architecture;
+      case 'library':
+        return Icons.local_library;
+      default:
+        return Icons.castle; // simbolo castello come in foto
+    }
+  }
+}
+
+// Pittogramma a goccia stile Google Maps
+class _ThemedPoiPin extends StatelessWidget {
+  const _ThemedPoiPin({required this.color, required this.icon});
+
+  final Color color;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    const double pinWidth = 40;
+    const double pinHeight = 52;
+
+    return SizedBox(
+      width: pinWidth,
+      height: pinHeight,
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          // Corpo della goccia disegnato con CustomPaint
+          CustomPaint(
+            size: const Size(pinWidth, pinHeight),
+            painter: _DropPinPainter(color: color),
+          ),
+          // Cerchio interno bianco con icona
+          Positioned(
+            top: 5,
+            child: Container(
+              width: 30,
+              height: 30,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+              child: Icon(icon, color: color, size: 18),
             ),
           ),
         ],
       ),
     );
   }
+}
 
-  Color _colorFromType(String type) {
-    switch (type) {
-      case 'school':
-        return Colors.red;
-      case 'bridge':
-        return Colors.green;
-      case 'library':
-        return Colors.orange;
-      default:
-        return Colors.blue;
-    }
+// Disegna la forma a goccia (teardrop) come Maps
+class _DropPinPainter extends CustomPainter {
+  const _DropPinPainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final shadowPaint = Paint()
+      ..color = Colors.black.withValues(alpha: 0.25)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+
+    final double w = size.width;
+    final double h = size.height;
+    final double r = w / 2;
+    final double cx = w / 2;
+    final double cy = r;
+
+    // Usa ui.Path invece di Path per evitare il conflitto con flutter_map
+    final path = ui.Path();
+
+    path.addArc(
+      Rect.fromCircle(center: Offset(cx, cy), radius: r),
+      math.pi * 0.75,
+      math.pi * 1.5,
+    );
+
+    path.lineTo(cx, h);
+    path.close();
+
+    canvas.drawPath(path, shadowPaint);
+    canvas.drawPath(path, paint);
+
+    final borderPaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+    canvas.drawPath(path, borderPaint);
+  }
+
+  @override
+  bool shouldRepaint(_DropPinPainter oldDelegate) => oldDelegate.color != color;
+}
+
+class _PoiLabel extends StatelessWidget {
+  const _PoiLabel({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 170),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppPalette.warmWhite.withValues(alpha: 0.94),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppPalette.tanLight, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.18),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Text(
+        text,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w800,
+          color: AppPalette.textDark,
+          letterSpacing: 0.1,
+        ),
+      ),
+    );
   }
 }

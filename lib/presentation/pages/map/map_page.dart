@@ -9,6 +9,7 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../../domain/entities/poi.dart';
 import '../../../domain/entities/tour_stop.dart';
 import '../../../domain/usecases/poi_use_cases.dart';
 import '../../../injection_container.dart';
@@ -36,7 +37,8 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     const LatLng(44.2050, 12.3350),
   );
 
-  static List<Marker>? _cachedMarkers;
+  // Cache per non ricaricare tutto ogni volta che si cambia tab
+  static List<Poi>? _cachedPois;
   static List<TourStop>? _cachedStops;
 
   late TourSessionController _tourController;
@@ -48,20 +50,20 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   bool _isMapLocked = false;
   bool _isMapMenuOpen = false;
 
-  // --- IL NUOVO MOTORE GPS BLINDATO ---
+  // --- MOTORE GPS REATTIVO ---
   bool _isGpsEnabled = false;
   bool _hasPermissions = false;
-  bool _isCheckingLocation = true; // Scudo per nascondere il banner all'avvio
+  bool _isCheckingLocation = true; // Scudo anti-sfarfallio del banner
+
+  List<Poi> _pois = [];
+  bool _isLoading = true;
+  String? _loadError;
 
   static const _urlStandard =
       'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png';
   static const _urlSatellite =
       'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
   String _currentMapUrl = _urlStandard;
-
-  List<Marker> _markers = [];
-  bool _isLoading = true;
-  String? _loadError;
 
   @override
   void initState() {
@@ -87,16 +89,16 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // Se l'utente torna dalle impostazioni del telefono, ricalcoliamo tutto
       _verifyLocationState(requestPerms: false);
     }
   }
 
-  Future<void> _initLocationLogic() async {
-    // 1. Controlla e chiedi permessi all'avvio
-    await _verifyLocationState(requestPerms: true);
+  // ──────────────────────────────────────────────────────────────────────────
+  //  LOGICA POSIZIONE E GPS
+  // ──────────────────────────────────────────────────────────────────────────
 
-    // 2. Mettiti in ascolto del chip GPS (Hardware)
+  Future<void> _initLocationLogic() async {
+    await _verifyLocationState(requestPerms: true);
     if (kIsWeb) return;
     _serviceStatusSub = Geolocator.getServiceStatusStream().listen((status) {
       if (!mounted) return;
@@ -106,7 +108,6 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     });
   }
 
-  // IL METODO SUPREMO CHE CALCOLA LA VERITÀ SUL GPS
   Future<void> _verifyLocationState({required bool requestPerms}) async {
     if (kIsWeb) {
       if (mounted) setState(() => _isCheckingLocation = false);
@@ -130,28 +131,30 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
       setState(() {
         _isGpsEnabled = gps;
         _hasPermissions = hasPerm;
-        _isCheckingLocation = false; // Abbassa lo scudo, aggiorna l'interfaccia
+        _isCheckingLocation = false;
       });
     }
   }
 
-  // Azione del bottone "Risolvi" nel banner
   Future<void> _resolveLocationIssues() async {
     if (!_isGpsEnabled) {
       await Geolocator.openLocationSettings();
-      // Quando torna, l'appLifecycle (resumed) farà ripartire il controllo
     } else if (!_hasPermissions) {
       await Geolocator.openAppSettings();
     }
   }
 
+  // ──────────────────────────────────────────────────────────────────────────
+  //  CARICAMENTO DATI POI
+  // ──────────────────────────────────────────────────────────────────────────
+
   Future<void> _loadPois() async {
-    if (_cachedMarkers != null && _cachedStops != null) {
+    if (_cachedPois != null && _cachedStops != null) {
       _tourController.dispose();
       _tourController = TourSessionController(availableStops: _cachedStops!);
       _bindTourUpdates();
       setState(() {
-        _markers = _cachedMarkers!;
+        _pois = _cachedPois!;
         _isLoading = false;
       });
       return;
@@ -163,28 +166,37 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
       if (!mounted) return;
 
       final stops = _tourStopMapper.fromPois(pois);
-      final markers = pois
-          .map(_poiMarkerFactory.fromPoi)
-          .toList(growable: false);
-
       _cachedStops = stops;
-      _cachedMarkers = markers;
+      _cachedPois = pois;
 
       _tourController.dispose();
       _tourController = TourSessionController(availableStops: stops);
       _bindTourUpdates();
 
       setState(() {
-        _markers = markers;
+        _pois = pois;
+        _loadError = null;
         _isLoading = false;
       });
     } catch (error) {
       if (!mounted) return;
       setState(() {
+        _pois = [];
         _loadError = 'Errore nel caricamento dei punti di interesse.';
         _isLoading = false;
       });
     }
+  }
+
+  List<Marker> _buildMarkers() {
+    return _pois
+        .map(
+          (poi) => _poiMarkerFactory.fromPoi(
+            poi,
+            counterRotationDegrees: _currentRotation,
+          ),
+        )
+        .toList(growable: false);
   }
 
   void _bindTourUpdates() {
@@ -193,6 +205,10 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
       if (mounted) setState(() {});
     });
   }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  //  AZIONI TOUR E MAPPA
+  // ──────────────────────────────────────────────────────────────────────────
 
   Future<void> _startTour() async {
     if (!_tourController.hasStops) return;
@@ -229,8 +245,9 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
         onNextStop: () {
           Navigator.pop(context);
           if (_tourController.advanceToNextStop()) {
-            if (_tourController.currentStop != null)
+            if (_tourController.currentStop != null) {
               _centerOnStop(_tourController.currentStop!.position);
+            }
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -254,6 +271,11 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     final theme = Theme.of(context);
     const LatLng defaultCesenaCenter = LatLng(44.1391, 12.2431);
 
+    const locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.bestForNavigation,
+      distanceFilter: 0,
+    );
+
     const cardHeight = 82.0;
     const cardPadding = 12.0;
     const cardBottom = cardHeight + cardPadding * 2;
@@ -276,8 +298,6 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
 
     final currentStop = _tourController.currentStop;
     final isTourActive = _tourController.isActive;
-
-    // LA CONDIZIONE PERFETTA: Funziona solo se abbiamo SIA permessi SIA hardware acceso
     final bool canUseLocation = _isGpsEnabled && _hasPermissions;
 
     return Scaffold(
@@ -323,14 +343,11 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                 userAgentPackageName: 'com.geoapp.prototype',
                 maxZoom: 19,
                 tileBounds: _cesenaBounds,
-                panBuffer: 0,
               ),
-
-              // IL PALLINO BLU: Niente più stream difettosi. Gestisce tutto da solo!
+              // PALLINO POSIZIONE
               if (canUseLocation)
                 CurrentLocationLayer(
                   alignPositionOnUpdate: _alignPositionOnUpdate,
-                  alignDirectionOnUpdate: AlignOnUpdate.never,
                   style: LocationMarkerStyle(
                     marker: const DefaultLocationMarker(
                       color: Colors.blue,
@@ -340,20 +357,25 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                         size: 14,
                       ),
                     ),
-                    markerSize: const Size(40, 40),
-                    markerDirection: MarkerDirection.heading,
                     accuracyCircleColor: Colors.blue.withOpacity(0.1),
                     headingSectorColor: Colors.blue.withOpacity(0.2),
-                    headingSectorRadius: 60,
                   ),
+                  positionStream: const LocationMarkerDataStreamFactory()
+                      .fromGeolocatorPositionStream(
+                        stream: Geolocator.getPositionStream(
+                          locationSettings: locationSettings,
+                        ),
+                      ),
                 ),
-              MarkerLayer(markers: _markers),
+              // MARKERS POI (RUOTATI)
+              MarkerLayer(markers: _buildMarkers()),
             ],
           ),
+
           SafeArea(
             child: Stack(
               children: [
-                // ── BANNER UI FIGA PER GPS DISATTIVATO ──
+                // ── BANNER GPS DISATTIVATO ──
                 if (!_isCheckingLocation && !canUseLocation)
                   Positioned(
                     top: 16,
@@ -405,7 +427,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                                           ? 'Permessi mancanti'
                                           : 'GPS Disattivato',
                                       style: TextStyle(
-                                        fontSize: 15,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w800,
                                         color: theme.colorScheme.onSurface,
                                       ),
@@ -414,7 +436,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                                     Text(
                                       'Attiva la posizione per esplorare la mappa in tempo reale.',
                                       style: TextStyle(
-                                        fontSize: 12.5,
+                                        fontSize: 12,
                                         height: 1.3,
                                         color:
                                             theme.colorScheme.onSurfaceVariant,
@@ -428,16 +450,11 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                                 style: FilledButton.styleFrom(
                                   backgroundColor: AppPalette.danger,
                                   foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 0,
-                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
-                                onPressed:
-                                    _resolveLocationIssues, // Cliccando qui apre le impostazioni
+                                onPressed: _resolveLocationIssues,
                                 child: const Text(
                                   'Risolvi',
                                   style: TextStyle(
@@ -453,38 +470,19 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                     ),
                   ),
 
-                // ────────────────────────────────────────
+                // ── CONTROLLI MAPPA ──
                 if (_currentRotation != 0)
                   Positioned(
-                    top: 100,
+                    top: 105,
                     right: 20,
-                    child: GestureDetector(
+                    child: CircleFab(
+                      heroTag: 'rot',
+                      icon: Icons.navigation,
+                      iconColor: AppPalette.danger,
                       onTap: () {
                         _mapController.rotate(0);
                         setState(() => _currentRotation = 0);
                       },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surface,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.15),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        padding: const EdgeInsets.all(8),
-                        child: Transform.rotate(
-                          angle: -_currentRotation * (math.pi / 180),
-                          child: const Icon(
-                            Icons.navigation,
-                            color: AppPalette.danger,
-                            size: 22,
-                          ),
-                        ),
-                      ),
                     ),
                   ),
                 Positioned(
@@ -506,7 +504,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                   right: 20,
                   bottom: isTourActive ? cardBottom + 66 : 90,
                   child: CircleFab(
-                    heroTag: 'btnLock',
+                    heroTag: 'lock',
                     icon: _isMapLocked ? Icons.lock : Icons.lock_open,
                     iconColor: _isMapLocked
                         ? AppPalette.danger
@@ -518,7 +516,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                   right: 20,
                   bottom: isTourActive ? cardBottom + 8 : 20,
                   child: CircleFab(
-                    heroTag: 'btnLoc',
+                    heroTag: 'loc',
                     icon: Icons.my_location,
                     iconColor: _alignPositionOnUpdate == AlignOnUpdate.always
                         ? AppPalette.olive
@@ -531,6 +529,8 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                     },
                   ),
                 ),
+
+                // ── INTERFACCIA TOUR ──
                 if (!isTourActive)
                   Positioned(
                     bottom: 28,
@@ -598,9 +598,6 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppPalette.olive,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
               ),
               child: const Text('Riprova'),
             ),
