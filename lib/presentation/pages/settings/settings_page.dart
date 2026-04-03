@@ -4,6 +4,7 @@ import '../../../domain/usecases/auth_use_cases.dart';
 import '../../../domain/usecases/user_use_cases.dart';
 import '../../../injection_container.dart';
 import '../../controllers/settings_controller.dart';
+import '../../services/shell_navigation_store.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/theme_controller.dart'; // Import fondamentale per il tema dinamico
 
@@ -11,7 +12,9 @@ import '../../theme/theme_controller.dart'; // Import fondamentale per il tema d
 part 'settings_page_sections.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+  const SettingsPage({super.key, this.focusGpsToggle = false});
+
+  final bool focusGpsToggle;
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -26,6 +29,8 @@ class _SettingsPageState extends State<SettingsPage>
   late AnimationController _animCtrl;
   late Animation<double> _fadeAnim;
   late Animation<Offset> _slideAnim;
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _gpsToggleKey = GlobalKey();
 
   String _selectedLanguage = 'Italiano';
   String _selectedTheme =
@@ -62,6 +67,35 @@ class _SettingsPageState extends State<SettingsPage>
       curve: Curves.easeOutCubic,
     ).drive(Tween(begin: const Offset(0, 0.06), end: Offset.zero));
     _animCtrl.forward();
+
+    if (widget.focusGpsToggle) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToGpsToggle();
+      });
+    }
+
+    ShellNavigationStore.focusGpsToggleInSettings.addListener(
+      _onFocusGpsRequested,
+    );
+  }
+
+  Future<void> _scrollToGpsToggle() async {
+    final contextForGps = _gpsToggleKey.currentContext;
+    if (contextForGps == null || !mounted) return;
+    await Scrollable.ensureVisible(
+      contextForGps,
+      duration: const Duration(milliseconds: 420),
+      curve: Curves.easeOutCubic,
+      alignment: 0.2,
+    );
+  }
+
+  void _onFocusGpsRequested() {
+    if (!ShellNavigationStore.focusGpsToggleInSettings.value) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _scrollToGpsToggle();
+      ShellNavigationStore.focusGpsToggleInSettings.value = false;
+    });
   }
 
   void _onControllerError() {
@@ -81,6 +115,10 @@ class _SettingsPageState extends State<SettingsPage>
     _controller.removeListener(_onControllerError);
     _controller.dispose();
     _animCtrl.dispose();
+    _scrollController.dispose();
+    ShellNavigationStore.focusGpsToggleInSettings.removeListener(
+      _onFocusGpsRequested,
+    );
     super.dispose();
   }
 
@@ -356,6 +394,7 @@ class _SettingsPageState extends State<SettingsPage>
             child: SlideTransition(
               position: _slideAnim,
               child: CustomScrollView(
+                controller: _scrollController,
                 slivers: [
                   SliverAppBar(
                     backgroundColor: theme.scaffoldBackgroundColor, // ADATTIVO
@@ -456,14 +495,19 @@ class _SettingsPageState extends State<SettingsPage>
                           _SettingsCard(
                             children: [
                               // Posizione GPS inserita qui
-                              _SwitchRow(
-                                icon: Icons.location_on_outlined,
-                                title: 'Posizione GPS',
-                                subtitle: 'Necessario per esplorare la mappa',
-                                accent: AppPalette.moss,
-                                value: _controller.posizione,
-                                onChanged: (v) => _controller.updatePreference(
-                                  newPosizione: v,
+                              Container(
+                                key: _gpsToggleKey,
+                                child: _SwitchRow(
+                                  icon: Icons.location_on_outlined,
+                                  title: 'Posizione GPS',
+                                  subtitle:
+                                      'Necessario per esplorare la mappa',
+                                  accent: AppPalette.moss,
+                                  value: _controller.posizione,
+                                  onChanged: (v) =>
+                                      _controller.updatePreference(
+                                        newPosizione: v,
+                                      ),
                                 ),
                               ),
                               const _ThinDivider(),

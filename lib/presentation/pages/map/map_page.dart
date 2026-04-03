@@ -15,6 +15,8 @@ import '../../../domain/usecases/poi_use_cases.dart';
 import '../../../injection_container.dart';
 import '../../controllers/tour_session_controller.dart';
 import '../../services/poi_marker_factory.dart';
+import '../../services/location_preference_store.dart';
+import '../../services/shell_navigation_store.dart';
 import '../../services/tour_stop_mapper.dart';
 import '../../theme/app_palette.dart';
 import 'widgets/map_controls.dart';
@@ -53,7 +55,9 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   // --- MOTORE GPS REATTIVO ---
   bool _isGpsEnabled = false;
   bool _hasPermissions = false;
+  bool _isGpsPreferenceEnabled = LocationPreferenceStore.gpsEnabled.value;
   bool _isCheckingLocation = true; // Scudo anti-sfarfallio del banner
+  bool _isCenteringOnUser = false;
 
   List<Poi> _pois = [];
   bool _isLoading = true;
@@ -71,6 +75,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     _tourController = TourSessionController(availableStops: const []);
     _bindTourUpdates();
+    LocationPreferenceStore.gpsEnabled.addListener(_onGpsPreferenceChanged);
 
     _initLocationLogic();
     _loadPois();
@@ -81,6 +86,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _serviceStatusSub?.cancel();
     _tourUpdatesSub?.cancel();
+    LocationPreferenceStore.gpsEnabled.removeListener(_onGpsPreferenceChanged);
     _tourController.dispose();
     _mapController.dispose();
     super.dispose();
@@ -97,6 +103,17 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   //  LOGICA POSIZIONE E GPS
   // ──────────────────────────────────────────────────────────────────────────
 
+  void _onGpsPreferenceChanged() {
+    if (!mounted) return;
+    final enabled = LocationPreferenceStore.gpsEnabled.value;
+    setState(() {
+      _isGpsPreferenceEnabled = enabled;
+      if (!enabled) {
+        _alignPositionOnUpdate = AlignOnUpdate.never;
+      }
+    });
+  }
+
   Future<void> _initLocationLogic() async {
     await _verifyLocationState(requestPerms: true);
     if (kIsWeb) return;
@@ -105,12 +122,26 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
       setState(() {
         _isGpsEnabled = (status == ServiceStatus.enabled);
       });
+      _verifyLocationState(requestPerms: false);
     });
   }
 
   Future<void> _verifyLocationState({required bool requestPerms}) async {
     if (kIsWeb) {
-      if (mounted) setState(() => _isCheckingLocation = false);
+      var perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.denied && requestPerms) {
+        perm = await Geolocator.requestPermission();
+      }
+      final hasPerm =
+          perm == LocationPermission.whileInUse ||
+          perm == LocationPermission.always;
+      if (mounted) {
+        setState(() {
+          _isGpsEnabled = true;
+          _hasPermissions = hasPerm;
+          _isCheckingLocation = false;
+        });
+      }
       return;
     }
 
@@ -137,10 +168,48 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   }
 
   Future<void> _resolveLocationIssues() async {
-    if (!_isGpsEnabled) {
-      await Geolocator.openLocationSettings();
-    } else if (!_hasPermissions) {
-      await Geolocator.openAppSettings();
+    ShellNavigationStore.openSettingsAndFocusGpsToggle();
+  }
+
+  Future<void> _centerOnUserLocation() async {
+    if (_isCenteringOnUser) return;
+
+    if (!_isGpsPreferenceEnabled) {
+      _resolveLocationIssues();
+      return;
+    }
+
+    setState(() {
+      _isCenteringOnUser = true;
+      _alignPositionOnUpdate = AlignOnUpdate.always;
+    });
+
+    try {
+      await _verifyLocationState(requestPerms: true);
+      final canUseLocation =
+          _isGpsEnabled && _hasPermissions && _isGpsPreferenceEnabled;
+      if (!canUseLocation) return;
+
+      Position? position;
+      try {
+        position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.bestForNavigation,
+          timeLimit: const Duration(seconds: 6),
+        );
+      } catch (_) {
+        position = await Geolocator.getLastKnownPosition();
+      }
+
+      if (position != null && mounted) {
+        _mapController.move(
+          LatLng(position.latitude, position.longitude),
+          math.max(_mapController.camera.zoom, 16.5),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isCenteringOnUser = false);
+      }
     }
   }
 
@@ -298,7 +367,8 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
 
     final currentStop = _tourController.currentStop;
     final isTourActive = _tourController.isActive;
-    final bool canUseLocation = _isGpsEnabled && _hasPermissions;
+    final bool canUseLocation =
+        _isGpsEnabled && _hasPermissions && _isGpsPreferenceEnabled;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -424,7 +494,9 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                                   children: [
                                     Text(
                                       _isGpsEnabled
-                                          ? 'Permessi mancanti'
+                                          ? (_isGpsPreferenceEnabled
+                                                ? 'Permessi mancanti'
+                                                : 'Posizione disattivata')
                                           : 'GPS Disattivato',
                                       style: TextStyle(
                                         fontSize: 14,
@@ -434,7 +506,9 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      'Attiva la posizione per esplorare la mappa in tempo reale.',
+                                      _isGpsPreferenceEnabled
+                                          ? 'Attiva la posizione per esplorare la mappa in tempo reale.'
+                                          : 'Riattiva la posizione nelle impostazioni per mostrare la tua posizione sulla mappa.',
                                       style: TextStyle(
                                         fontSize: 12,
                                         height: 1.3,
@@ -473,7 +547,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                 // ── CONTROLLI MAPPA ──
                 if (_currentRotation != 0)
                   Positioned(
-                    top: 105,
+                    top: canUseLocation ? 16 : 100,
                     right: 20,
                     child: CircleFab(
                       heroTag: 'rot',
@@ -518,15 +592,12 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                   child: CircleFab(
                     heroTag: 'loc',
                     icon: Icons.my_location,
-                    iconColor: _alignPositionOnUpdate == AlignOnUpdate.always
+                    iconColor: _isCenteringOnUser
+                        ? AppPalette.olive
+                        : _alignPositionOnUpdate == AlignOnUpdate.always
                         ? AppPalette.olive
                         : theme.colorScheme.onSurfaceVariant,
-                    onTap: () {
-                      setState(
-                        () => _alignPositionOnUpdate = AlignOnUpdate.always,
-                      );
-                      _verifyLocationState(requestPerms: true);
-                    },
+                    onTap: _centerOnUserLocation,
                   ),
                 ),
 
