@@ -377,6 +377,8 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
         : _tourStopVisuals.forStop(currentStop);
     final bool canUseLocation =
         _isGpsEnabled && _hasPermissions && _isGpsPreferenceEnabled;
+    final bool isLocationBannerVisible =
+        !_isCheckingLocation && !canUseLocation;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -454,7 +456,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
             child: Stack(
               children: [
                 // ── BANNER GPS DISATTIVATO ──
-                if (!_isCheckingLocation && !canUseLocation)
+                if (isLocationBannerVisible)
                   Positioned(
                     top: 16,
                     left: 16,
@@ -553,9 +555,9 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                   ),
 
                 // ── CONTROLLI MAPPA ──
-                if (_currentRotation != 0)
+                if (_currentRotation != 0 && !isLocationBannerVisible)
                   Positioned(
-                    top: canUseLocation ? 16 : 100,
+                    top: 16,
                     right: 20,
                     child: CircleFab(
                       heroTag: 'rot',

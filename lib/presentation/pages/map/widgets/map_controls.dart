@@ -127,19 +127,15 @@ class MapTypeButton extends StatelessWidget {
           ),
           const SizedBox(height: 12),
         ],
-        FloatingActionButton.extended(
+        FloatingActionButton(
           heroTag: 'btnMapType',
           backgroundColor: theme.colorScheme.surface, // ADATTIVO
           elevation: 4,
-          icon: Icon(
+          onPressed: onToggle,
+          child: Icon(
             isOpen ? Icons.close : Icons.layers,
             color: theme.colorScheme.onSurface,
-          ), // ADATTIVO
-          label: Text(
-            isOpen ? 'Chiudi' : 'Mappe',
-            style: TextStyle(color: theme.colorScheme.onSurface),
-          ), // ADATTIVO
-          onPressed: onToggle,
+          ),
         ),
       ],
     );
