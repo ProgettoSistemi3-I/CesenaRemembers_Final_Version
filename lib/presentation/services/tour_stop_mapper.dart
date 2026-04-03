@@ -25,8 +25,6 @@ class TourStopMapper {
             period: metadata.period,
             description: metadata.description,
             position: LatLng(poi.latitude, poi.longitude),
-            icon: metadata.icon,
-            iconBackground: metadata.iconBackground,
             questions: metadata.questions,
           );
         })

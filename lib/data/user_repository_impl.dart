@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../domain/entities/userprofile.dart';
-import '../../domain/repositories/user_repository.dart';
+import '../domain/entities/userprofile.dart';
+import '../domain/repositories/user_repository.dart';
 import '../models/user_model.dart';
 
 class UserRepositoryImpl implements IUserRepository {
@@ -43,7 +43,10 @@ class UserRepositoryImpl implements IUserRepository {
     if (gps != null) updates['preferences.posizioneGps'] = gps;
 
     if (updates.isNotEmpty) {
-      await firestore.collection('users').doc(uid).update(updates);
+      await firestore.collection('users').doc(uid).set(
+        updates,
+        SetOptions(merge: true),
+      );
     }
   }
 
@@ -53,11 +56,24 @@ class UserRepositoryImpl implements IUserRepository {
     required String poiId,
     required int xpGained,
   }) async {
-    // Usiamo FieldValue per operazioni atomiche sicure
-    // Questo previene bug se l'utente clicca molto velocemente
-    await firestore.collection('users').doc(uid).update({
-      'visitedPoiIds': FieldValue.arrayUnion([poiId]),
-      'xp': FieldValue.increment(xpGained),
+    final userRef = firestore.collection('users').doc(uid);
+
+    await firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(userRef);
+      final data = snapshot.data() ?? <String, dynamic>{};
+      final visitedPoiIds = List<String>.from(data['visitedPoiIds'] ?? const []);
+
+      if (visitedPoiIds.contains(poiId)) {
+        return;
+      }
+
+      final currentXp = (data['xp'] as num?)?.toInt() ?? 0;
+      visitedPoiIds.add(poiId);
+
+      transaction.set(userRef, {
+        'visitedPoiIds': visitedPoiIds,
+        'xp': currentXp + xpGained,
+      }, SetOptions(merge: true));
     });
   }
 }

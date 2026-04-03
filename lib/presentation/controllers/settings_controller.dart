@@ -1,11 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:geolocator/geolocator.dart';
 
 import '../../domain/usecases/auth_use_cases.dart';
 import '../../domain/usecases/user_use_cases.dart';
 import '../theme/theme_controller.dart';
-import '../services/location_permission_service.dart'; // IMPORTANTE: Aggiunto per il GPS
+import '../services/location_permission_service.dart';
 import '../services/location_preference_store.dart';
 
 class SettingsController extends ChangeNotifier {
@@ -49,9 +48,7 @@ class SettingsController extends ChangeNotifier {
       notifiche = profile.notificheEnabled;
       modalitaNotte = profile.darkModeEnabled;
 
-      // Controllo INCROCIATO per il GPS:
-      // Verifichiamo se il permesso è DAVVERO attivo sul telefono
-      final hasRealPermission = await _checkRealGpsPermission();
+      final hasRealPermission = await _locationService.hasActivePermission();
       posizione = profile.gpsEnabled && hasRealPermission;
       LocationPreferenceStore.setGpsEnabled(posizione);
 
@@ -64,21 +61,6 @@ class SettingsController extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
-  }
-
-  // Nuova funzione per verificare il permesso reale
-  Future<bool> _checkRealGpsPermission() async {
-    if (kIsWeb) {
-      final permission = await Geolocator.checkPermission();
-      return permission == LocationPermission.always ||
-          permission == LocationPermission.whileInUse;
-    }
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) return false;
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    return permission == LocationPermission.always ||
-        permission == LocationPermission.whileInUse;
   }
 
   Future<void> updatePreference({

@@ -18,6 +18,7 @@ import '../../services/poi_marker_factory.dart';
 import '../../services/location_preference_store.dart';
 import '../../services/shell_navigation_store.dart';
 import '../../services/tour_stop_mapper.dart';
+import '../../services/tour_stop_visuals.dart';
 import '../../theme/app_palette.dart';
 import 'widgets/map_controls.dart';
 import 'widgets/poi_bottom_sheet.dart';
@@ -33,6 +34,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   final MapController _mapController = MapController();
   final _poiMarkerFactory = const PoiMarkerFactory();
   final TourStopMapper _tourStopMapper = const TourStopMapper();
+  final TourStopVisuals _tourStopVisuals = const TourStopVisuals();
 
   static final LatLngBounds _cesenaBounds = LatLngBounds(
     const LatLng(44.0700, 12.1700),
@@ -298,6 +300,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   void _openPoiPopup() {
     final currentStop = _tourController.currentStop;
     if (currentStop == null) return;
+    final visual = _tourStopVisuals.forStop(currentStop);
 
     showModalBottomSheet(
       context: context,
@@ -310,6 +313,8 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
       ),
       builder: (_) => PoiBottomSheet(
         stop: currentStop,
+        icon: visual.icon,
+        iconBackground: visual.iconBackground,
         elapsedSeconds: _tourController.elapsedSeconds,
         onNextStop: () {
           Navigator.pop(context);
@@ -623,16 +628,23 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                     bottom: cardPadding,
                     left: 16,
                     right: 16,
-                    child: NextStopCard(
-                      stop: currentStop,
-                      stopIndex: _tourController.currentStopIndex,
-                      totalStops: _tourController.orderedStops.length,
-                      distanceMeters: _tourController.distanceToCurrentStop,
-                      elapsedSeconds: _tourController.elapsedSeconds,
-                      arrived: _tourController.isArrived,
-                      onTap: _tourController.isArrived
-                          ? _openPoiPopup
-                          : () => _centerOnStop(currentStop.position),
+                    child: Builder(
+                      builder: (_) {
+                        final visual = _tourStopVisuals.forStop(currentStop);
+                        return NextStopCard(
+                          stop: currentStop,
+                          icon: visual.icon,
+                          iconBackground: visual.iconBackground,
+                          stopIndex: _tourController.currentStopIndex,
+                          totalStops: _tourController.orderedStops.length,
+                          distanceMeters: _tourController.distanceToCurrentStop,
+                          elapsedSeconds: _tourController.elapsedSeconds,
+                          arrived: _tourController.isArrived,
+                          onTap: _tourController.isArrived
+                              ? _openPoiPopup
+                              : () => _centerOnStop(currentStop.position),
+                        );
+                      },
                     ),
                   ),
               ],

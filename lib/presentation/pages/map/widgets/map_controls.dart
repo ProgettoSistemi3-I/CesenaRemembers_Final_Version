@@ -238,6 +238,8 @@ class NextStopCard extends StatelessWidget {
   const NextStopCard({
     super.key,
     required this.stop,
+    required this.icon,
+    required this.iconBackground,
     required this.stopIndex,
     required this.totalStops,
     required this.distanceMeters,
@@ -247,6 +249,8 @@ class NextStopCard extends StatelessWidget {
   });
 
   final TourStop stop;
+  final IconData icon;
+  final Color iconBackground;
   final int stopIndex;
   final int totalStops;
   final double distanceMeters;
@@ -283,11 +287,11 @@ class NextStopCard extends StatelessWidget {
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: stop.iconBackground,
+                color: iconBackground,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
-                stop.icon,
+                icon,
                 size: 26,
                 color: Colors.black87.withValues(alpha: 0.6),
               ), // Icona fissa per staccare dal background generato

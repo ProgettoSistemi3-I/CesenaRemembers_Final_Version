@@ -10,11 +10,15 @@ class PoiBottomSheet extends StatefulWidget {
   const PoiBottomSheet({
     super.key,
     required this.stop,
+    required this.icon,
+    required this.iconBackground,
     required this.elapsedSeconds,
     required this.onNextStop,
   });
 
   final TourStop stop;
+  final IconData icon;
+  final Color iconBackground;
   final int elapsedSeconds;
   final VoidCallback onNextStop;
 
@@ -98,11 +102,11 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: widget.stop.iconBackground,
+                        color: widget.iconBackground,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
-                        widget.stop.icon,
+                        widget.icon,
                         size: 24,
                         color: Colors.black87.withValues(
                           alpha: 0.55,
@@ -208,12 +212,12 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                           Container(
                             height: 140,
                             decoration: BoxDecoration(
-                              color: widget.stop.iconBackground,
+                              color: widget.iconBackground,
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Center(
                               child: Icon(
-                                widget.stop.icon,
+                                widget.icon,
                                 size: 56,
                                 color: Colors.black.withValues(alpha: 0.3),
                               ),
