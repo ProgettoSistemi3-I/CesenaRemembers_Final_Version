@@ -4,6 +4,7 @@ import '../../../domain/usecases/auth_use_cases.dart';
 import '../../../domain/usecases/user_use_cases.dart';
 import '../../../injection_container.dart';
 import '../../controllers/settings_controller.dart';
+import '../../controllers/settings_ui_controller.dart';
 import '../../services/shell_navigation_store.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/theme_controller.dart'; // Import fondamentale per il tema dinamico
@@ -24,6 +25,7 @@ class _SettingsPageState extends State<SettingsPage>
     with SingleTickerProviderStateMixin {
   // --- IL NOSTRO CONTROLLER (MOTORE) ---
   late final SettingsController _controller;
+  late final SettingsUiController _uiController;
 
   // --- VARIABILI VISIVE (Non salvate sul DB per ora) ---
   late AnimationController _animCtrl;
@@ -31,13 +33,6 @@ class _SettingsPageState extends State<SettingsPage>
   late Animation<Offset> _slideAnim;
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _gpsToggleKey = GlobalKey();
-
-  String _selectedLanguage = 'Italiano';
-  String _selectedTheme =
-      'Sistema'; // Aggiornato per riflettere il tema globale
-  String _notificationType = 'Solo eventi e progressi';
-  String _consents = 'Minimi necessari';
-  bool _offlineDownloadsEnabled = true;
 
   @override
   void initState() {
@@ -52,6 +47,7 @@ class _SettingsPageState extends State<SettingsPage>
     );
 
     _controller.addListener(_onControllerError);
+    _uiController = SettingsUiController();
 
     // Animazioni
     _animCtrl = AnimationController(
@@ -114,6 +110,7 @@ class _SettingsPageState extends State<SettingsPage>
   void dispose() {
     _controller.removeListener(_onControllerError);
     _controller.dispose();
+    _uiController.dispose();
     _animCtrl.dispose();
     _scrollController.dispose();
     ShellNavigationStore.focusGpsToggleInSettings.removeListener(
@@ -199,8 +196,8 @@ class _SettingsPageState extends State<SettingsPage>
       builder: (_) => _ChoiceSheet(
         title: 'Lingua',
         options: const ['Italiano', 'English', 'Français', 'Deutsch'],
-        selected: _selectedLanguage,
-        onSelect: (value) => setState(() => _selectedLanguage = value),
+        selected: _uiController.selectedLanguage,
+        onSelect: _uiController.setLanguage,
       ),
     );
   }
@@ -215,8 +212,8 @@ class _SettingsPageState extends State<SettingsPage>
       builder: (_) => _ChoiceSheet(
         title: 'Tema App (Visivo)',
         options: const ['Sistema', 'Chiaro', 'Scuro'],
-        selected: _selectedTheme,
-        onSelect: (value) => setState(() => _selectedTheme = value),
+        selected: _uiController.selectedTheme,
+        onSelect: _uiController.setTheme,
       ),
     );
   }
@@ -236,8 +233,8 @@ class _SettingsPageState extends State<SettingsPage>
           'Solo eventi e progressi',
           'Nessuna promozione',
         ],
-        selected: _notificationType,
-        onSelect: (value) => setState(() => _notificationType = value),
+        selected: _uiController.notificationType,
+        onSelect: _uiController.setNotificationType,
       ),
     );
   }
@@ -256,8 +253,8 @@ class _SettingsPageState extends State<SettingsPage>
           'Statistiche anonime',
           'Statistiche + personalizzazione',
         ],
-        selected: _consents,
-        onSelect: (value) => setState(() => _consents = value),
+        selected: _uiController.consents,
+        onSelect: _uiController.setConsents,
       ),
     );
   }
@@ -381,7 +378,7 @@ class _SettingsPageState extends State<SettingsPage>
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor, // ADATTIVO!
       body: ListenableBuilder(
-        listenable: _controller,
+        listenable: Listenable.merge([_controller, _uiController]),
         builder: (context, _) {
           if (_controller.isLoading) {
             return const Center(
@@ -526,7 +523,7 @@ class _SettingsPageState extends State<SettingsPage>
                               _ActionRow(
                                 icon: Icons.checklist_outlined,
                                 title: 'Consensi',
-                                subtitle: _consents,
+                                subtitle: _uiController.consents,
                                 accent: AppPalette.moss,
                                 onTap: _showConsentsPicker,
                               ),
@@ -543,7 +540,7 @@ class _SettingsPageState extends State<SettingsPage>
                               _ActionRow(
                                 icon: Icons.language,
                                 title: 'Lingua',
-                                subtitle: _selectedLanguage,
+                                subtitle: _uiController.selectedLanguage,
                                 accent: AppPalette.olive,
                                 onTap: _showLanguagePicker,
                               ),
@@ -551,7 +548,7 @@ class _SettingsPageState extends State<SettingsPage>
                               _ActionRow(
                                 icon: Icons.color_lens_outlined,
                                 title: 'Stile Icone',
-                                subtitle: _selectedTheme,
+                                subtitle: _uiController.selectedTheme,
                                 accent: AppPalette.tan,
                                 onTap: _showThemePicker,
                               ),
@@ -569,10 +566,9 @@ class _SettingsPageState extends State<SettingsPage>
                                 title: 'Download offline',
                                 subtitle: 'Scarica mappe, testi e tappe',
                                 accent: AppPalette.olive,
-                                value: _offlineDownloadsEnabled,
-                                onChanged: (v) => setState(
-                                  () => _offlineDownloadsEnabled = v,
-                                ),
+                                value: _uiController.offlineDownloadsEnabled,
+                                onChanged:
+                                    _uiController.setOfflineDownloadsEnabled,
                               ),
                               const _ThinDivider(),
                               _ActionRow(

@@ -6,6 +6,21 @@ enum LocationAccessStatus { granted, serviceDisabled, denied, deniedForever, err
 class LocationPermissionService {
   const LocationPermissionService();
 
+  Future<bool> hasActivePermission() async {
+    try {
+      if (!kIsWeb) {
+        final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!serviceEnabled) return false;
+      }
+
+      final permission = await Geolocator.checkPermission();
+      return permission == LocationPermission.always ||
+          permission == LocationPermission.whileInUse;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<LocationAccessStatus> ensureLocationAccess() async {
     try {
       if (kIsWeb) {

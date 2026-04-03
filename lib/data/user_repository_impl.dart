@@ -20,8 +20,7 @@ class UserRepositoryImpl implements IUserRepository {
       // È il primo login! Creiamo un profilo base sul momento
       final newUser = UserModel(
         uid: uid,
-        email:
-            '', // Idealmente dovresti passarla, ma la gestiamo basica per ora
+        email: '', // Idealmente dovresti passarla, ma la gestiamo basica per ora
         displayName: 'Nuovo Utente',
       );
       await docRef.set(newUser.toJson());
@@ -37,17 +36,17 @@ class UserRepositoryImpl implements IUserRepository {
     bool? gps,
   }) async {
     final Map<String, dynamic> updates = {};
-
+    
     // Aggiorniamo solo i campi che ci vengono passati
     if (notifiche != null) updates['preferences.notifiche'] = notifiche;
     if (darkMode != null) updates['preferences.modalitaNotte'] = darkMode;
     if (gps != null) updates['preferences.posizioneGps'] = gps;
 
     if (updates.isNotEmpty) {
-      await firestore
-          .collection('users')
-          .doc(uid)
-          .set(updates, SetOptions(merge: true));
+      await firestore.collection('users').doc(uid).set(
+        updates,
+        SetOptions(merge: true),
+      );
     }
   }
 
@@ -62,9 +61,7 @@ class UserRepositoryImpl implements IUserRepository {
     await firestore.runTransaction((transaction) async {
       final snapshot = await transaction.get(userRef);
       final data = snapshot.data() ?? <String, dynamic>{};
-      final visitedPoiIds = List<String>.from(
-        data['visitedPoiIds'] ?? const [],
-      );
+      final visitedPoiIds = List<String>.from(data['visitedPoiIds'] ?? const []);
 
       if (visitedPoiIds.contains(poiId)) {
         return;

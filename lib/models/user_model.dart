@@ -20,9 +20,7 @@ class UserModel extends UserProfile {
       displayName: json['displayName'] ?? 'Utente',
       xp: json['xp'] ?? 0,
       visitedPoiIds: List<String>.from(json['visitedPoiIds'] ?? []),
-      unlockedAchievements: List<String>.from(
-        json['unlockedAchievements'] ?? [],
-      ),
+      unlockedAchievements: List<String>.from(json['unlockedAchievements'] ?? []),
       notificheEnabled: json['preferences']?['notifiche'] ?? true,
       darkModeEnabled: json['preferences']?['modalitaNotte'] ?? false,
       gpsEnabled: json['preferences']?['posizioneGps'] ?? true,
@@ -40,7 +38,7 @@ class UserModel extends UserProfile {
         'notifiche': notificheEnabled,
         'modalitaNotte': darkModeEnabled,
         'posizioneGps': gpsEnabled,
-      },
+      }
     };
   }
 }
