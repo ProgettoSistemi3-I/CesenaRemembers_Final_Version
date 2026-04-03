@@ -15,6 +15,7 @@ Future<void> main() async {
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await di.init();
+  await di.sl<ThemeController>().initTheme();
   await _requestLocationPermissionOnFirstOpen();
 
   SystemChrome.setSystemUIOverlayStyle(

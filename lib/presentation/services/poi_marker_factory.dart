@@ -34,7 +34,13 @@ class PoiMarkerFactory {
   double _degreesToRadians(double value) => value * (math.pi / 180);
 
   Color _colorFromType(String type) {
-    switch (type) {
+    switch (type.toLowerCase()) {
+      case 'church':
+        return const Color(0xFF7B6AA5);
+      case 'monument':
+        return AppPalette.olive;
+      case 'square':
+        return AppPalette.tan;
       case 'school':
         return AppPalette.tan;
       case 'bridge':
@@ -48,7 +54,13 @@ class PoiMarkerFactory {
   }
 
   IconData _iconFromType(String type) {
-    switch (type) {
+    switch (type.toLowerCase()) {
+      case 'church':
+        return Icons.church_outlined;
+      case 'monument':
+        return Icons.account_balance_outlined;
+      case 'square':
+        return Icons.location_city_outlined;
       case 'school':
         return Icons.school;
       case 'bridge':

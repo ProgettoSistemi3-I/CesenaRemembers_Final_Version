@@ -4,23 +4,28 @@ import '../../domain/usecases/user_use_cases.dart';
 import '../../injection_container.dart';
 
 class ThemeController extends ChangeNotifier {
-  ThemeMode _themeMode = ThemeMode.system;
+  ThemeMode _themeMode = ThemeMode.light;
   ThemeMode get themeMode => _themeMode;
 
-  ThemeController() {
-    _loadThemeFromFirebase();
+  ThemeController();
+
+  Future<void> initTheme() async {
+    await _loadThemeFromFirebase();
   }
 
   Future<void> _loadThemeFromFirebase() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+    if (user == null) {
+      _themeMode = ThemeMode.light;
+      return;
+    }
     try {
       final userUseCases = sl<UserUseCases>();
       final profile = await userUseCases.getUserProfile(user.uid);
       _themeMode = profile.darkModeEnabled ? ThemeMode.dark : ThemeMode.light;
-      notifyListeners();
     } catch (e) {
       debugPrint("Errore caricamento tema: $e");
+      _themeMode = ThemeMode.light;
     }
   }
 
