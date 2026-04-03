@@ -68,7 +68,11 @@ class SettingsController extends ChangeNotifier {
 
   // Nuova funzione per verificare il permesso reale
   Future<bool> _checkRealGpsPermission() async {
-    if (kIsWeb) return false;
+    if (kIsWeb) {
+      final permission = await Geolocator.checkPermission();
+      return permission == LocationPermission.always ||
+          permission == LocationPermission.whileInUse;
+    }
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) return false;
 
@@ -92,6 +96,7 @@ class SettingsController extends ChangeNotifier {
           errorMessage =
               'Permesso negato o GPS disattivato. Controlla le impostazioni del telefono.';
           posizione = false;
+          LocationPreferenceStore.setGpsEnabled(false);
           notifyListeners();
           return; // Interrompiamo qui, non salviamo su DB
         }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../pages/map/map_page.dart';
 import '../pages/profile/profile_page.dart';
 import '../pages/settings/settings_page.dart';
+import 'shell_navigation_store.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -17,12 +18,34 @@ class _MainShellState extends State<MainShell> {
   final List<Widget> _pages = const [MapPage(), ProfilePage(), SettingsPage()];
 
   @override
+  void initState() {
+    super.initState();
+    ShellNavigationStore.tabIndex.addListener(_onTabIndexChanged);
+  }
+
+  @override
+  void dispose() {
+    ShellNavigationStore.tabIndex.removeListener(_onTabIndexChanged);
+    super.dispose();
+  }
+
+  void _onTabIndexChanged() {
+    if (!mounted) return;
+    setState(() => _currentIndex = ShellNavigationStore.tabIndex.value);
+  }
+
+  void _onTapBottomBar(int index) {
+    ShellNavigationStore.goToTab(index);
+    setState(() => _currentIndex = index);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: _onTapBottomBar,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.map_outlined),

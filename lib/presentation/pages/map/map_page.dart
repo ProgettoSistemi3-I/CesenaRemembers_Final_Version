@@ -14,9 +14,9 @@ import '../../../domain/entities/tour_stop.dart';
 import '../../../domain/usecases/poi_use_cases.dart';
 import '../../../injection_container.dart';
 import '../../controllers/tour_session_controller.dart';
-import '../settings/settings_page.dart';
 import '../../services/poi_marker_factory.dart';
 import '../../services/location_preference_store.dart';
+import '../../services/shell_navigation_store.dart';
 import '../../services/tour_stop_mapper.dart';
 import '../../theme/app_palette.dart';
 import 'widgets/map_controls.dart';
@@ -128,7 +128,20 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
 
   Future<void> _verifyLocationState({required bool requestPerms}) async {
     if (kIsWeb) {
-      if (mounted) setState(() => _isCheckingLocation = false);
+      var perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.denied && requestPerms) {
+        perm = await Geolocator.requestPermission();
+      }
+      final hasPerm =
+          perm == LocationPermission.whileInUse ||
+          perm == LocationPermission.always;
+      if (mounted) {
+        setState(() {
+          _isGpsEnabled = true;
+          _hasPermissions = hasPerm;
+          _isCheckingLocation = false;
+        });
+      }
       return;
     }
 
@@ -155,13 +168,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   }
 
   Future<void> _resolveLocationIssues() async {
-    if (!mounted) return;
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const SettingsPage(focusGpsToggle: true),
-      ),
-    );
-    await _verifyLocationState(requestPerms: false);
+    ShellNavigationStore.openSettingsAndFocusGpsToggle();
   }
 
   Future<void> _centerOnUserLocation() async {

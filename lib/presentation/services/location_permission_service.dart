@@ -8,6 +8,20 @@ class LocationPermissionService {
 
   Future<LocationAccessStatus> ensureLocationAccess() async {
     try {
+      if (kIsWeb) {
+        var webPermission = await Geolocator.checkPermission();
+        if (webPermission == LocationPermission.denied) {
+          webPermission = await Geolocator.requestPermission();
+        }
+        if (webPermission == LocationPermission.deniedForever) {
+          return LocationAccessStatus.deniedForever;
+        }
+        return (webPermission == LocationPermission.always ||
+                webPermission == LocationPermission.whileInUse)
+            ? LocationAccessStatus.granted
+            : LocationAccessStatus.denied;
+      }
+
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         return LocationAccessStatus.serviceDisabled;
@@ -27,10 +41,7 @@ class LocationPermissionService {
 
       return LocationAccessStatus.granted;
     } catch (_) {
-      if (!kIsWeb) {
-        return LocationAccessStatus.error;
-      }
-      return LocationAccessStatus.denied;
+      return LocationAccessStatus.error;
     }
   }
 }

@@ -4,6 +4,7 @@ import '../../../domain/usecases/auth_use_cases.dart';
 import '../../../domain/usecases/user_use_cases.dart';
 import '../../../injection_container.dart';
 import '../../controllers/settings_controller.dart';
+import '../../services/shell_navigation_store.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/theme_controller.dart'; // Import fondamentale per il tema dinamico
 
@@ -72,6 +73,10 @@ class _SettingsPageState extends State<SettingsPage>
         _scrollToGpsToggle();
       });
     }
+
+    ShellNavigationStore.focusGpsToggleInSettings.addListener(
+      _onFocusGpsRequested,
+    );
   }
 
   Future<void> _scrollToGpsToggle() async {
@@ -83,6 +88,14 @@ class _SettingsPageState extends State<SettingsPage>
       curve: Curves.easeOutCubic,
       alignment: 0.2,
     );
+  }
+
+  void _onFocusGpsRequested() {
+    if (!ShellNavigationStore.focusGpsToggleInSettings.value) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _scrollToGpsToggle();
+      ShellNavigationStore.focusGpsToggleInSettings.value = false;
+    });
   }
 
   void _onControllerError() {
@@ -103,6 +116,9 @@ class _SettingsPageState extends State<SettingsPage>
     _controller.dispose();
     _animCtrl.dispose();
     _scrollController.dispose();
+    ShellNavigationStore.focusGpsToggleInSettings.removeListener(
+      _onFocusGpsRequested,
+    );
     super.dispose();
   }
 
