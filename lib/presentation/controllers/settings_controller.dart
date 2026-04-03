@@ -6,6 +6,7 @@ import '../../domain/usecases/auth_use_cases.dart';
 import '../../domain/usecases/user_use_cases.dart';
 import '../theme/theme_controller.dart';
 import '../services/location_permission_service.dart'; // IMPORTANTE: Aggiunto per il GPS
+import '../services/location_preference_store.dart';
 
 class SettingsController extends ChangeNotifier {
   final SignOutUseCase _signOutUseCase;
@@ -52,6 +53,7 @@ class SettingsController extends ChangeNotifier {
       // Verifichiamo se il permesso è DAVVERO attivo sul telefono
       final hasRealPermission = await _checkRealGpsPermission();
       posizione = profile.gpsEnabled && hasRealPermission;
+      LocationPreferenceStore.setGpsEnabled(posizione);
 
       errorMessage = null;
 
@@ -106,6 +108,9 @@ class SettingsController extends ChangeNotifier {
       _themeController.toggleTheme(newModalitaNotte);
     }
     if (newPosizione != null) posizione = newPosizione;
+    if (newPosizione != null) {
+      LocationPreferenceStore.setGpsEnabled(newPosizione);
+    }
     notifyListeners();
 
     try {
@@ -121,6 +126,7 @@ class SettingsController extends ChangeNotifier {
       errorMessage = 'Errore di connessione. Modifica annullata.';
       await loadUserPreferences();
       _themeController.toggleTheme(modalitaNotte);
+      LocationPreferenceStore.setGpsEnabled(posizione);
     }
   }
 
