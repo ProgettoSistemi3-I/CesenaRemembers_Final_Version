@@ -11,7 +11,7 @@ class SettingsController extends ChangeNotifier {
   final SignOutUseCase _signOutUseCase;
   final UserUseCases _userUseCases;
   final ThemeController _themeController;
-  final LocationPermissionService _locationService; // AGGIUNTO
+  final LocationPermissionService _locationService;
 
   // --- STATO DELLE PREFERENZE (Salvate su Firebase e Locali) ---
   bool notifiche = true;

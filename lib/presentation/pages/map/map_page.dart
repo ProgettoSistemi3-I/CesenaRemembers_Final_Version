@@ -372,6 +372,9 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
 
     final currentStop = _tourController.currentStop;
     final isTourActive = _tourController.isActive;
+    final currentStopVisual = currentStop == null
+        ? null
+        : _tourStopVisuals.forStop(currentStop);
     final bool canUseLocation =
         _isGpsEnabled && _hasPermissions && _isGpsPreferenceEnabled;
 
@@ -628,23 +631,18 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                     bottom: cardPadding,
                     left: 16,
                     right: 16,
-                    child: Builder(
-                      builder: (_) {
-                        final visual = _tourStopVisuals.forStop(currentStop);
-                        return NextStopCard(
-                          stop: currentStop,
-                          icon: visual.icon,
-                          iconBackground: visual.iconBackground,
-                          stopIndex: _tourController.currentStopIndex,
-                          totalStops: _tourController.orderedStops.length,
-                          distanceMeters: _tourController.distanceToCurrentStop,
-                          elapsedSeconds: _tourController.elapsedSeconds,
-                          arrived: _tourController.isArrived,
-                          onTap: _tourController.isArrived
-                              ? _openPoiPopup
-                              : () => _centerOnStop(currentStop.position),
-                        );
-                      },
+                    child: NextStopCard(
+                      stop: currentStop,
+                      icon: currentStopVisual!.icon,
+                      iconBackground: currentStopVisual.iconBackground,
+                      stopIndex: _tourController.currentStopIndex,
+                      totalStops: _tourController.orderedStops.length,
+                      distanceMeters: _tourController.distanceToCurrentStop,
+                      elapsedSeconds: _tourController.elapsedSeconds,
+                      arrived: _tourController.isArrived,
+                      onTap: _tourController.isArrived
+                          ? _openPoiPopup
+                          : () => _centerOnStop(currentStop.position),
                     ),
                   ),
               ],
