@@ -12,10 +12,13 @@ abstract class IUserRepository {
     bool? gps,
   });
 
-  // Aggiunge un POI alla lista dei visitati e aggiorna gli XP
-  Future<void> markPoiAsVisited({
-    required String uid, 
-    required String poiId, 
-    required int xpGained
+  // Registra il completamento del quiz per una tappa e aggiorna le statistiche.
+  Future<void> registerQuizCompletion({
+    required String uid,
+    required String poiId,
+    required int xpGained,
+    required int correctAnswers,
+    required int totalQuestions,
+    required int tourElapsedSeconds,
   });
 }

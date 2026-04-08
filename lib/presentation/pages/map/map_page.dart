@@ -6,12 +6,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../domain/entities/poi.dart';
 import '../../../domain/entities/tour_stop.dart';
+import '../../../domain/services/tour_scoring_service.dart';
 import '../../../domain/usecases/poi_use_cases.dart';
+import '../../../domain/usecases/user_use_cases.dart';
 import '../../../injection_container.dart';
 import '../../controllers/tour_session_controller.dart';
 import '../../services/poi_marker_factory.dart';
@@ -35,6 +38,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   final _poiMarkerFactory = const PoiMarkerFactory();
   final TourStopMapper _tourStopMapper = const TourStopMapper();
   final TourStopVisuals _tourStopVisuals = const TourStopVisuals();
+  final TourScoringService _tourScoringService = const TourScoringService();
 
   static final LatLngBounds _cesenaBounds = LatLngBounds(
     const LatLng(44.0700, 12.1700),
@@ -60,6 +64,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   bool _isGpsPreferenceEnabled = LocationPreferenceStore.gpsEnabled.value;
   bool _isCheckingLocation = true; // Scudo anti-sfarfallio del banner
   bool _isCenteringOnUser = false;
+  bool _isSavingQuizResult = false;
 
   List<Poi> _pois = [];
   bool _isLoading = true;
@@ -339,8 +344,66 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
             );
           }
         },
+        onQuizCompleted: (result) {
+          _registerQuizCompletion(currentStop.id, result);
+        },
       ),
     );
+  }
+
+  Future<void> _registerQuizCompletion(
+    String poiId,
+    QuizCompletionData result,
+  ) async {
+    if (_isSavingQuizResult) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    _isSavingQuizResult = true;
+
+    final score = _tourScoringService.calculate(
+      correctAnswers: result.score,
+      totalElapsedSeconds: _tourController.totalElapsedSeconds,
+    );
+
+    try {
+      await sl<UserUseCases>().registerQuizCompletion(
+        uid: user.uid,
+        poiId: poiId,
+        xpGained: score.totalXp,
+        correctAnswers: result.score,
+        totalQuestions: result.totalQuestions,
+        tourElapsedSeconds: _tourController.totalElapsedSeconds,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '+${score.totalXp} XP (${score.baseXp} × ${score.timeMultiplier.toStringAsFixed(2)})',
+          ),
+          backgroundColor: AppPalette.olive,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            'Errore nel salvataggio del punteggio. Riprova tra poco.',
+          ),
+          backgroundColor: AppPalette.danger,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
+        ),
+      );
+    } finally {
+      _isSavingQuizResult = false;
+    }
   }
 
   @override

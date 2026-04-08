@@ -51,10 +51,13 @@ class UserRepositoryImpl implements IUserRepository {
   }
 
   @override
-  Future<void> markPoiAsVisited({
+  Future<void> registerQuizCompletion({
     required String uid,
     required String poiId,
     required int xpGained,
+    required int correctAnswers,
+    required int totalQuestions,
+    required int tourElapsedSeconds,
   }) async {
     final userRef = firestore.collection('users').doc(uid);
 
@@ -68,11 +71,30 @@ class UserRepositoryImpl implements IUserRepository {
       }
 
       final currentXp = (data['xp'] as num?)?.toInt() ?? 0;
+      final currentMaxQuizScore = (data['maxQuizScore'] as num?)?.toInt() ?? 0;
+      final currentQuizCompleted =
+          (data['totalQuizCompleted'] as num?)?.toInt() ?? 0;
+      final currentCorrectAnswers =
+          (data['totalCorrectAnswers'] as num?)?.toInt() ?? 0;
+      final currentBestTourTime =
+          (data['bestTourTimeSeconds'] as num?)?.toInt() ?? 0;
+      final quizScorePercent = totalQuestions <= 0
+          ? 0
+          : ((correctAnswers / totalQuestions) * 100).round();
       visitedPoiIds.add(poiId);
 
       transaction.set(userRef, {
         'visitedPoiIds': visitedPoiIds,
         'xp': currentXp + xpGained,
+        'maxQuizScore': quizScorePercent > currentMaxQuizScore
+            ? quizScorePercent
+            : currentMaxQuizScore,
+        'totalQuizCompleted': currentQuizCompleted + 1,
+        'totalCorrectAnswers': currentCorrectAnswers + correctAnswers,
+        'bestTourTimeSeconds':
+            currentBestTourTime == 0 || tourElapsedSeconds < currentBestTourTime
+            ? tourElapsedSeconds
+            : currentBestTourTime,
       }, SetOptions(merge: true));
     });
   }

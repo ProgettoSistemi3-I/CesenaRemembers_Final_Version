@@ -13,6 +13,7 @@ class PoiBottomSheet extends StatefulWidget {
     required this.icon,
     required this.iconBackground,
     required this.elapsedSeconds,
+    required this.onQuizCompleted,
     required this.onNextStop,
   });
 
@@ -20,6 +21,7 @@ class PoiBottomSheet extends StatefulWidget {
   final IconData icon;
   final Color iconBackground;
   final int elapsedSeconds;
+  final ValueChanged<QuizCompletionData> onQuizCompleted;
   final VoidCallback onNextStop;
 
   @override
@@ -31,6 +33,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
   late TabController _tabController;
   PoiQuizController? _quizController;
   bool _quizInitialized = false;
+  bool _quizCompletionSent = false;
 
   @override
   void initState() {
@@ -63,6 +66,24 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
   void _nextQuestion() {
     setState(() {
       _quizController?.nextQuestion();
+    });
+  }
+
+  void _completeQuiz() {
+    final quizController = _quizController;
+    if (quizController == null) return;
+
+    setState(() {
+      quizController.completeQuiz();
+      if (!_quizCompletionSent && quizController.quizDone) {
+        _quizCompletionSent = true;
+        widget.onQuizCompleted(
+          QuizCompletionData(
+            score: quizController.score,
+            totalQuestions: widget.stop.questions.length,
+          ),
+        );
+      }
     });
   }
 
@@ -526,9 +547,42 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
             ),
           ),
         ],
+        if (answered && quizController.isLastQuestionAnswered) ...[
+          const SizedBox(height: 6),
+          SizedBox(
+            width: double.infinity,
+            child: GestureDetector(
+              onTap: _completeQuiz,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                decoration: BoxDecoration(
+                  color: AppPalette.olive,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Center(
+                  child: Text(
+                    'Termina quiz →',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }
+}
+
+class QuizCompletionData {
+  const QuizCompletionData({required this.score, required this.totalQuestions});
+
+  final int score;
+  final int totalQuestions;
 }
 
 class QuizResultCard extends StatelessWidget {

@@ -5,6 +5,9 @@ class _HeroCard extends StatelessWidget {
   final TextEditingController nameController;
   final bool isEditingName;
   final String username;
+  final String points;
+  final String toursCompleted;
+  final String level;
   final VoidCallback onAvatarTap;
   final VoidCallback onEditToggle;
 
@@ -13,6 +16,9 @@ class _HeroCard extends StatelessWidget {
     required this.nameController,
     required this.isEditingName,
     required this.username,
+    required this.points,
+    required this.toursCompleted,
+    required this.level,
     required this.onAvatarTap,
     required this.onEditToggle,
   });
@@ -166,14 +172,14 @@ class _HeroCard extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Mini stats inline
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _MiniStat(label: 'Punti', value: '1.240'),
-              _VerticalDivider(),
-              _MiniStat(label: 'Giorni attivi', value: '14'),
-              _VerticalDivider(),
-              _MiniStat(label: 'Livello', value: '4'),
+              _MiniStat(label: 'Punti', value: points),
+              const _VerticalDivider(),
+              _MiniStat(label: 'Tappe completate', value: toursCompleted),
+              const _VerticalDivider(),
+              _MiniStat(label: 'Livello', value: level),
             ],
           ),
         ],
