@@ -25,15 +25,15 @@ class AppPalette {
 
   static final ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
-    scaffoldBackgroundColor: const Color(0xFF121212),
+    scaffoldBackgroundColor: const Color(0xFF0F1110),
     colorScheme: const ColorScheme.dark(
-      primary: moss,
-      secondary: tan,
-      surface: Color(0xFF1E1E1E),
-      error: Color(0xFFCF6679),
-      onSurface: Color(0xFFE0E0E0),
-      onSurfaceVariant: Color(0xFFA0A0A0),
-      surfaceContainerHighest: Color(0xFF333333),
+      primary: Color(0xFFA8BC7A),
+      secondary: Color(0xFFD1A877),
+      surface: Color(0xFF171A18),
+      error: Color(0xFFE08C8C),
+      onSurface: Color(0xFFF1F4EE),
+      onSurfaceVariant: Color(0xFFC2C8BD),
+      surfaceContainerHighest: Color(0xFF2A2F2B),
     ),
     useMaterial3: true,
   );

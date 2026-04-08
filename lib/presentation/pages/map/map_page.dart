@@ -67,9 +67,11 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
 
   static const _urlStandard =
       'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png';
+  static const _urlStandardDark =
+      'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
   static const _urlSatellite =
       'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-  String _currentMapUrl = _urlStandard;
+  bool _isSatelliteMap = false;
 
   @override
   void initState() {
@@ -343,6 +345,10 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final standardMapUrl = theme.brightness == Brightness.dark
+        ? _urlStandardDark
+        : _urlStandard;
+    final currentMapUrl = _isSatelliteMap ? _urlSatellite : standardMapUrl;
     const LatLng defaultCesenaCenter = LatLng(44.1391, 12.2431);
 
     const locationSettings = LocationSettings(
@@ -418,7 +424,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
             ),
             children: [
               TileLayer(
-                urlTemplate: _currentMapUrl,
+                urlTemplate: currentMapUrl,
                 subdomains: const ['a', 'b', 'c', 'd'],
                 userAgentPackageName: 'com.geoapp.prototype',
                 maxZoom: 19,
@@ -574,12 +580,15 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                   bottom: isTourActive ? cardBottom : 20,
                   child: MapTypeButton(
                     isOpen: _isMapMenuOpen,
-                    urlStandard: _urlStandard,
-                    urlSatellite: _urlSatellite,
+                    isSatelliteSelected: _isSatelliteMap,
                     onToggle: () =>
                         setState(() => _isMapMenuOpen = !_isMapMenuOpen),
-                    onSelect: (url) => setState(() {
-                      _currentMapUrl = url;
+                    onSelectStandard: () => setState(() {
+                      _isSatelliteMap = false;
+                      _isMapMenuOpen = false;
+                    }),
+                    onSelectSatellite: () => setState(() {
+                      _isSatelliteMap = true;
                       _isMapMenuOpen = false;
                     }),
                   ),

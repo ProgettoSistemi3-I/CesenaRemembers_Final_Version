@@ -195,25 +195,9 @@ class _SettingsPageState extends State<SettingsPage>
       ),
       builder: (_) => _ChoiceSheet(
         title: 'Lingua',
-        options: const ['Italiano', 'English', 'Français', 'Deutsch'],
+        options: const ['Italiano', 'English'],
         selected: _uiController.selectedLanguage,
         onSelect: _uiController.setLanguage,
-      ),
-    );
-  }
-
-  void _showThemePicker() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (_) => _ChoiceSheet(
-        title: 'Tema App (Visivo)',
-        options: const ['Sistema', 'Chiaro', 'Scuro'],
-        selected: _uiController.selectedTheme,
-        onSelect: _uiController.setTheme,
       ),
     );
   }
@@ -543,14 +527,6 @@ class _SettingsPageState extends State<SettingsPage>
                                 subtitle: _uiController.selectedLanguage,
                                 accent: AppPalette.olive,
                                 onTap: _showLanguagePicker,
-                              ),
-                              const _ThinDivider(),
-                              _ActionRow(
-                                icon: Icons.color_lens_outlined,
-                                title: 'Stile Icone',
-                                subtitle: _uiController.selectedTheme,
-                                accent: AppPalette.tan,
-                                onTap: _showThemePicker,
                               ),
                             ],
                           ),
