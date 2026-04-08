@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 
 class SettingsUiController extends ChangeNotifier {
   String selectedLanguage = 'Italiano';
-  String selectedTheme = 'Sistema';
   String notificationType = 'Solo eventi e progressi';
   String consents = 'Minimi necessari';
   bool offlineDownloadsEnabled = true;
@@ -10,12 +9,6 @@ class SettingsUiController extends ChangeNotifier {
   void setLanguage(String value) {
     if (selectedLanguage == value) return;
     selectedLanguage = value;
-    notifyListeners();
-  }
-
-  void setTheme(String value) {
-    if (selectedTheme == value) return;
-    selectedTheme = value;
     notifyListeners();
   }
 

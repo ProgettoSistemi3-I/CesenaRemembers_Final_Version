@@ -38,17 +38,17 @@ class MapTypeButton extends StatelessWidget {
   const MapTypeButton({
     super.key,
     required this.isOpen,
-    required this.urlStandard,
-    required this.urlSatellite,
+    required this.isSatelliteSelected,
     required this.onToggle,
-    required this.onSelect,
+    required this.onSelectStandard,
+    required this.onSelectSatellite,
   });
 
   final bool isOpen;
-  final String urlStandard;
-  final String urlSatellite;
+  final bool isSatelliteSelected;
   final VoidCallback onToggle;
-  final ValueChanged<String> onSelect;
+  final VoidCallback onSelectStandard;
+  final VoidCallback onSelectSatellite;
 
   @override
   Widget build(BuildContext context) {
@@ -58,16 +58,20 @@ class MapTypeButton extends StatelessWidget {
       required String title,
       required IconData icon,
       required Color bgColor,
-      required String url,
+      required bool isSelected,
+      required VoidCallback onTap,
     }) {
       return GestureDetector(
-        onTap: () => onSelect(url),
+        onTap: onTap,
         child: Container(
           width: 80,
           height: 80,
           decoration: BoxDecoration(
             color: bgColor,
             borderRadius: BorderRadius.circular(12),
+            border: isSelected
+                ? Border.all(color: AppPalette.olive, width: 2)
+                : null,
             boxShadow: const [
               BoxShadow(
                 color: Colors.black26,
@@ -109,19 +113,21 @@ class MapTypeButton extends StatelessWidget {
               square(
                 title: 'Standard',
                 icon: Icons.map,
+                isSelected: !isSatelliteSelected,
                 bgColor: theme.brightness == Brightness.dark
                     ? theme.colorScheme.surfaceContainerHighest
                     : Colors.grey.shade100, // ADATTIVO
-                url: urlStandard,
+                onTap: onSelectStandard,
               ),
               const SizedBox(width: 12),
               square(
                 title: 'Satellite',
                 icon: Icons.satellite_alt,
+                isSelected: isSatelliteSelected,
                 bgColor: theme.brightness == Brightness.dark
                     ? AppPalette.moss.withValues(alpha: 0.2)
                     : Colors.green.shade100, // ADATTIVO
-                url: urlSatellite,
+                onTap: onSelectSatellite,
               ),
             ],
           ),
