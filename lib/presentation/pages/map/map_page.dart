@@ -66,7 +66,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   String? _loadError;
 
   static const _urlStandard =
-      'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=8331ce94-8651-4d9c-9534-b5891833b33e';
+      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png';
   static const _urlStandardDark =
       'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key=8331ce94-8651-4d9c-9534-b5891833b33e';
 
