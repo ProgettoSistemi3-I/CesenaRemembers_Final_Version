@@ -11,6 +11,10 @@ class UserModel extends UserProfile {
     super.notificheEnabled,
     super.darkModeEnabled,
     super.gpsEnabled,
+    super.maxQuizScore,
+    super.totalQuizCompleted,
+    super.totalCorrectAnswers,
+    super.bestTourTimeSeconds,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json, String documentId) {
@@ -24,6 +28,10 @@ class UserModel extends UserProfile {
       notificheEnabled: json['preferences']?['notifiche'] ?? true,
       darkModeEnabled: json['preferences']?['modalitaNotte'] ?? false,
       gpsEnabled: json['preferences']?['posizioneGps'] ?? true,
+      maxQuizScore: json['maxQuizScore'] ?? 0,
+      totalQuizCompleted: json['totalQuizCompleted'] ?? 0,
+      totalCorrectAnswers: json['totalCorrectAnswers'] ?? 0,
+      bestTourTimeSeconds: json['bestTourTimeSeconds'] ?? 0,
     );
   }
 
@@ -34,6 +42,10 @@ class UserModel extends UserProfile {
       'xp': xp,
       'visitedPoiIds': visitedPoiIds,
       'unlockedAchievements': unlockedAchievements,
+      'maxQuizScore': maxQuizScore,
+      'totalQuizCompleted': totalQuizCompleted,
+      'totalCorrectAnswers': totalCorrectAnswers,
+      'bestTourTimeSeconds': bestTourTimeSeconds,
       'preferences': {
         'notifiche': notificheEnabled,
         'modalitaNotte': darkModeEnabled,

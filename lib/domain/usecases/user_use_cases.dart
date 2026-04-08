@@ -26,16 +26,22 @@ class UserUseCases {
     );
   }
 
-  // 3. Segna un POI come visitato e aggiungi XP
-  Future<void> markPoiAsVisited({
+  // 3. Registra il completamento del quiz e aggiorna statistiche
+  Future<void> registerQuizCompletion({
     required String uid,
     required String poiId,
     required int xpGained,
+    required int correctAnswers,
+    required int totalQuestions,
+    required int tourElapsedSeconds,
   }) async {
-    return await repository.markPoiAsVisited(
+    return await repository.registerQuizCompletion(
       uid: uid,
       poiId: poiId,
       xpGained: xpGained,
+      correctAnswers: correctAnswers,
+      totalQuestions: totalQuestions,
+      tourElapsedSeconds: tourElapsedSeconds,
     );
   }
   

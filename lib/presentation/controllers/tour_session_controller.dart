@@ -33,6 +33,7 @@ class TourSessionController {
   int _currentStopIndex = 0;
   LatLng? _userPosition;
   int _elapsedSeconds = 0;
+  int _totalElapsedSeconds = 0;
 
   Timer? _timer;
   StreamSubscription<Position>? _positionSubscription;
@@ -41,6 +42,7 @@ class TourSessionController {
   bool get isActive => _status != TourStatus.idle;
   bool get isArrived => _status == TourStatus.arrived;
   int get elapsedSeconds => _elapsedSeconds;
+  int get totalElapsedSeconds => _totalElapsedSeconds;
   List<TourStop> get orderedStops => List.unmodifiable(_orderedStops);
   int get currentStopIndex => _currentStopIndex;
   TourStop? get currentStop =>
@@ -60,6 +62,7 @@ class TourSessionController {
       _orderedStops = [];
       _currentStopIndex = 0;
       _elapsedSeconds = 0;
+      _totalElapsedSeconds = 0;
       _emit();
       return false;
     }
@@ -72,6 +75,7 @@ class TourSessionController {
     );
     _currentStopIndex = 0;
     _elapsedSeconds = 0;
+    _totalElapsedSeconds = 0;
     _status = TourStatus.running;
     _emit();
 
@@ -155,6 +159,7 @@ class TourSessionController {
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (_status == TourStatus.running) {
         _elapsedSeconds++;
+        _totalElapsedSeconds++;
         _emit();
       }
     });
