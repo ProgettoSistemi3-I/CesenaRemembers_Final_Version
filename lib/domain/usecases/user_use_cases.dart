@@ -11,6 +11,50 @@ class UserUseCases {
     return await repository.getUserProfile(uid);
   }
 
+  Future<void> ensureUserDocument({
+    required String uid,
+    required String email,
+    String? authDisplayName,
+  }) async {
+    return repository.ensureUserDocument(
+      uid: uid,
+      email: email,
+      authDisplayName: authDisplayName,
+    );
+  }
+
+  Future<void> completeInitialProfile({
+    required String uid,
+    required String email,
+    required String username,
+    required String displayName,
+    required String avatarId,
+  }) async {
+    return repository.completeInitialProfile(
+      uid: uid,
+      email: email,
+      username: username,
+      displayName: displayName,
+      avatarId: avatarId,
+    );
+  }
+
+  Future<void> updateProfileBasics({
+    required String uid,
+    String? displayName,
+    String? avatarId,
+  }) async {
+    return repository.updateProfileBasics(
+      uid: uid,
+      displayName: displayName,
+      avatarId: avatarId,
+    );
+  }
+
+  Future<bool> isUsernameAvailable(String username) async {
+    return repository.isUsernameAvailable(username);
+  }
+
   // 2. Aggiorna le preferenze
   Future<void> updatePreferences({
     required String uid,

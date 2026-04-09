@@ -1,7 +1,7 @@
 part of 'profile_page.dart';
 
 class _HeroCard extends StatelessWidget {
-  final _AvatarOption option;
+  final AvatarOption option;
   final TextEditingController nameController;
   final bool isEditingName;
   final String username;
@@ -479,9 +479,9 @@ class _AvatarPickerSheet extends StatelessWidget {
               crossAxisSpacing: 14,
               mainAxisSpacing: 14,
             ),
-            itemCount: _avatarOptions.length,
+            itemCount: avatarOptions.length,
             itemBuilder: (context, i) {
-              final opt = _avatarOptions[i];
+              final opt = avatarOptions[i];
               final isSel = selected == i;
               return GestureDetector(
                 onTap: () {
