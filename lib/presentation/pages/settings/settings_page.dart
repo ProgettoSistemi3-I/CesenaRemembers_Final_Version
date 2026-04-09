@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../domain/usecases/auth_use_cases.dart';
 import '../../../domain/usecases/user_use_cases.dart';
@@ -220,26 +221,6 @@ class _SettingsPageState extends State<SettingsPage>
         ],
         selected: _uiController.notificationType,
         onSelect: _uiController.setNotificationType,
-      ),
-    );
-  }
-
-  void _showConsentsPicker() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (_) => _ChoiceSheet(
-        title: 'Consensi',
-        options: const [
-          'Minimi necessari',
-          'Statistiche anonime',
-          'Statistiche + personalizzazione',
-        ],
-        selected: _uiController.consents,
-        onSelect: _uiController.setConsents,
       ),
     );
   }
@@ -502,14 +483,11 @@ class _SettingsPageState extends State<SettingsPage>
                                 child: _SwitchRow(
                                   icon: Icons.location_on_outlined,
                                   title: 'Posizione GPS',
-                                  subtitle:
-                                      'Necessario per esplorare la mappa',
+                                  subtitle: 'Necessario per esplorare la mappa',
                                   accent: AppPalette.moss,
                                   value: _controller.posizione,
-                                  onChanged: (v) =>
-                                      _controller.updatePreference(
-                                        newPosizione: v,
-                                      ),
+                                  onChanged: (v) => _controller
+                                      .updatePreference(newPosizione: v),
                                 ),
                               ),
                               const _ThinDivider(),
@@ -518,19 +496,11 @@ class _SettingsPageState extends State<SettingsPage>
                                 title: 'Informativa privacy',
                                 subtitle: 'Leggi come vengono trattati i dati',
                                 accent: AppPalette.tan,
-                                onTap: () => _showInfoSheet(
-                                  title: 'Informativa privacy',
-                                  body:
-                                      'Inserisci qui il testo o il link alla tua informativa privacy.',
+                                onTap: () => launchUrl(
+                                  Uri.parse(
+                                    'https://cesenaremembers.pages.dev/privacy',
+                                  ),
                                 ),
-                              ),
-                              const _ThinDivider(),
-                              _ActionRow(
-                                icon: Icons.checklist_outlined,
-                                title: 'Consensi',
-                                subtitle: _uiController.consents,
-                                accent: AppPalette.moss,
-                                onTap: _showConsentsPicker,
                               ),
                               // Autorizzazioni rimossa!
                             ],
@@ -603,20 +573,21 @@ class _SettingsPageState extends State<SettingsPage>
                                 title: 'Termini di servizio',
                                 subtitle: 'Regole d’uso e responsabilità',
                                 accent: AppPalette.olive,
-                                onTap: () => _showInfoSheet(
-                                  title: 'Termini di servizio',
-                                  body: 'Testo dei termini di servizio...',
+                                onTap: () => launchUrl(
+                                  Uri.parse(
+                                    'https://cesenaremembers.pages.dev/terms',
+                                  ),
                                 ),
                               ),
                               const _ThinDivider(),
                               _ActionRow(
                                 icon: Icons.mail_outline,
                                 title: 'Contatti',
-                                subtitle: 'supporto@cesenaremembers.it',
+                                subtitle: 'cesenaremembers@gmail.com',
                                 accent: AppPalette.tan,
                                 onTap: () => _showActionSheet(
                                   'Contatti',
-                                  'supporto@cesenaremembers.it',
+                                  'cesenaremembers@gmail.com',
                                 ),
                               ),
                             ],
