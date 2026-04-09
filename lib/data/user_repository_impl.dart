@@ -31,6 +31,12 @@ class UserRepositoryImpl implements IUserRepository {
     required String email,
     String? authDisplayName,
   }) async {
+    final doc = await _users.doc(uid).get();
+    if (doc.exists) {
+      // Il documento esiste già – non riscriviamo per evitare snapshot
+      // intermedi che farebbero lampeggiare la schermata di setup profilo.
+      return;
+    }
     await _users.doc(uid).set({
       'email': email,
       'authDisplayName': authDisplayName,
