@@ -204,11 +204,19 @@ class UserRepositoryImpl implements IUserRepository {
       return !snapshot.exists;
     } on FirebaseException catch (e) {
       if (e.code == 'permission-denied') {
-        final duplicate = await _users
-            .where('usernameNormalized', isEqualTo: normalizedUsername)
-            .limit(1)
-            .get();
-        return duplicate.docs.isEmpty;
+        try {
+          final duplicate = await _users
+              .where('usernameNormalized', isEqualTo: normalizedUsername)
+              .limit(1)
+              .get();
+          return duplicate.docs.isEmpty;
+        } on FirebaseException catch (nested) {
+          if (nested.code == 'permission-denied') {
+            // Non possiamo verificare in lettura globale: non blocchiamo onboarding.
+            return true;
+          }
+          rethrow;
+        }
       }
       rethrow;
     }

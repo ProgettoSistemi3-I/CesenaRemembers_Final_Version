@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../../domain/usecases/user_use_cases.dart';
@@ -73,15 +74,21 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
     });
 
     try {
-      final available = await _userUseCases.isUsernameAvailable(
-        normalizedUsername,
-      );
-      if (!available) {
-        setState(() {
-          _error = 'Username già in uso. Scegline un altro.';
-          _isSaving = false;
-        });
-        return;
+      // Best-effort check: se le rules bloccano query globali non interrompiamo
+      // il flusso, lasciando al salvataggio finale la validazione definitiva.
+      try {
+        final available = await _userUseCases.isUsernameAvailable(
+          normalizedUsername,
+        );
+        if (!available) {
+          setState(() {
+            _error = 'Username già in uso. Scegline un altro.';
+            _isSaving = false;
+          });
+          return;
+        }
+      } catch (_) {
+        // Ignoriamo errori di availability check (es. permission-denied).
       }
 
       await _userUseCases.completeInitialProfile(
@@ -91,12 +98,20 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
         displayName: displayName,
         avatarId: avatarOptions[_selectedAvatarIndex].id,
       );
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
     } catch (e) {
       final message = e.toString();
       setState(() {
-        _error = message.contains('USERNAME_NOT_AVAILABLE')
-            ? 'Username già in uso. Scegline un altro.'
-            : 'Impossibile salvare il profilo. Riprova tra qualche secondo.';
+        if (message.contains('USERNAME_NOT_AVAILABLE')) {
+          _error = 'Username già in uso. Scegline un altro.';
+        } else if (e is FirebaseException && e.code == 'permission-denied') {
+          _error =
+              'Permessi Firestore insufficienti per completare il profilo. Controlla le regole del progetto.';
+        } else {
+          _error = 'Impossibile salvare il profilo. Riprova tra qualche secondo.';
+        }
         _isSaving = false;
       });
     }
