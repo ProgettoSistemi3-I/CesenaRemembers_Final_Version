@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../domain/usecases/auth_use_cases.dart';
@@ -144,10 +145,11 @@ class SettingsController extends ChangeNotifier {
 
     final uid = _currentUid;
     try {
-      // Prima cancelliamo i dati applicativi per minimizzare la retention.
-      await _userUseCases.deleteUserData(uid: uid);
-      // Poi eliminiamo il record auth.
+      // Eliminiamo prima l'account auth per evitare perdita dati se la delete
+      // viene bloccata da "requires-recent-login".
       await _deleteCurrentUserUseCase();
+      // Cleanup best-effort dei dati applicativi residui.
+      await _userUseCases.deleteUserData(uid: uid);
       return true;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'requires-recent-login') {
@@ -161,6 +163,10 @@ class SettingsController extends ChangeNotifier {
         errorMessage = 'Eliminazione account fallita: ${e.message ?? e.code}';
       }
       return false;
+    } on FirebaseException {
+      // L'account auth è già stato eliminato. Evitiamo di mostrare errore
+      // bloccante all'utente: eventuali residui dati verranno puliti lato server.
+      return true;
     } catch (e) {
       errorMessage = 'Eliminazione account fallita: $e';
       return false;
