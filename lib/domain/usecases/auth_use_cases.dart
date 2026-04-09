@@ -14,3 +14,10 @@ class SignOutUseCase {
 
   Future<void> call() => _repository.signOut();
 }
+
+class DeleteCurrentUserUseCase {
+  final AuthRepository _repository;
+  const DeleteCurrentUserUseCase(this._repository);
+
+  Future<void> call() => _repository.deleteCurrentUser();
+}

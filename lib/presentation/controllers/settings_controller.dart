@@ -9,6 +9,7 @@ import '../services/location_preference_store.dart';
 
 class SettingsController extends ChangeNotifier {
   final SignOutUseCase _signOutUseCase;
+  final DeleteCurrentUserUseCase _deleteCurrentUserUseCase;
   final UserUseCases _userUseCases;
   final ThemeController _themeController;
   final LocationPermissionService _locationService;
@@ -21,13 +22,16 @@ class SettingsController extends ChangeNotifier {
   // --- STATO DELLA UI ---
   bool isLoading = true;
   bool isLoggingOut = false;
+  bool isDeletingAccount = false;
   String? errorMessage;
 
   SettingsController({
     required SignOutUseCase signOutUseCase,
+    required DeleteCurrentUserUseCase deleteCurrentUserUseCase,
     required UserUseCases userUseCases,
     required ThemeController themeController,
   }) : _signOutUseCase = signOutUseCase,
+       _deleteCurrentUserUseCase = deleteCurrentUserUseCase,
        _userUseCases = userUseCases,
        _themeController = themeController,
        _locationService = const LocationPermissionService() {
@@ -130,6 +134,39 @@ class SettingsController extends ChangeNotifier {
       isLoggingOut = false;
       notifyListeners();
       return false;
+    }
+  }
+
+  Future<bool> handleDeleteAccount() async {
+    isDeletingAccount = true;
+    errorMessage = null;
+    notifyListeners();
+
+    final uid = _currentUid;
+    try {
+      // Prima cancelliamo i dati applicativi per minimizzare la retention.
+      await _userUseCases.deleteUserData(uid: uid);
+      // Poi eliminiamo il record auth.
+      await _deleteCurrentUserUseCase();
+      return true;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        try {
+          await _signOutUseCase();
+        } catch (_) {}
+        errorMessage =
+            'Per sicurezza devi rifare l’accesso prima di eliminare l’account. '
+            'Esci e rientra, poi ripeti l’operazione.';
+      } else {
+        errorMessage = 'Eliminazione account fallita: ${e.message ?? e.code}';
+      }
+      return false;
+    } catch (e) {
+      errorMessage = 'Eliminazione account fallita: $e';
+      return false;
+    } finally {
+      isDeletingAccount = false;
+      notifyListeners();
     }
   }
 

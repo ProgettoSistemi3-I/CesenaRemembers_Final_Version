@@ -88,5 +88,8 @@ class UserUseCases {
       tourElapsedSeconds: tourElapsedSeconds,
     );
   }
-  
+
+  Future<void> deleteUserData({required String uid}) async {
+    return repository.deleteUserData(uid: uid);
+  }
 }

@@ -294,4 +294,22 @@ class UserRepositoryImpl implements IUserRepository {
       }, SetOptions(merge: true));
     });
   }
+
+  @override
+  Future<void> deleteUserData({required String uid}) async {
+    final userRef = _users.doc(uid);
+    final snapshot = await userRef.get();
+    final normalizedUsername =
+        (snapshot.data()?['usernameNormalized'] as String?)?.trim();
+
+    final batch = firestore.batch();
+    batch.delete(userRef);
+
+    if (normalizedUsername != null && normalizedUsername.isNotEmpty) {
+      final usernameRef = _usernames.doc(normalizedUsername);
+      batch.delete(usernameRef);
+    }
+
+    await batch.commit();
+  }
 }
