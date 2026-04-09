@@ -4,30 +4,9 @@ import '../../../domain/entities/userprofile.dart';
 import '../../../injection_container.dart';
 import '../../controllers/profile_controller.dart';
 import '../../theme/app_palette.dart'; // Import vitale per i colori base (olive, tan)
+import 'avatar_catalog.dart';
 
 part 'profile_page_sections.dart';
-
-// ─────────────────────────────────────────────
-//  Avatar options
-// ─────────────────────────────────────────────
-const List<_AvatarOption> _avatarOptions = [
-  _AvatarOption(Icons.person, Color(0xFFEEEEEE)),
-  _AvatarOption(Icons.military_tech, Color(0xFFFFECB3)),
-  _AvatarOption(Icons.local_fire_department, Color(0xFFFFCDD2)),
-  _AvatarOption(Icons.bolt, Color(0xFFFFF9C4)),
-  _AvatarOption(Icons.shield, Color(0xFFBBDEFB)),
-  _AvatarOption(Icons.star, Color(0xFFC8E6C9)),
-  _AvatarOption(Icons.emoji_events, Color(0xFFE1BEE7)),
-  _AvatarOption(Icons.public, Color(0xFFB2EBF2)),
-  _AvatarOption(Icons.psychology, Color(0xFFD7CCC8)),
-  _AvatarOption(Icons.auto_awesome, Color(0xFFF8BBD0)),
-];
-
-class _AvatarOption {
-  final IconData icon;
-  final Color background;
-  const _AvatarOption(this.icon, this.background);
-}
 
 // ─────────────────────────────────────────────
 //  Page
@@ -44,12 +23,8 @@ class _ProfilePageState extends State<ProfilePage>
   int _selectedAvatarIndex = 1;
 
   bool _isEditingName = false;
-  final TextEditingController _nameController = TextEditingController(
-    text: 'Alessandro',
-  );
-
-  // username non modificabile dall'utente (generato dal sistema)
-  final String _username = '@cesena_explorer_42';
+  bool _isSavingBasics = false;
+  final TextEditingController _nameController = TextEditingController();
 
   late AnimationController _animCtrl;
   late Animation<double> _fadeAnim;
@@ -84,9 +59,9 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   // ── Avatar picker ─────────────────────────
-  void _showAvatarPicker() {
+  Future<void> _showAvatarPicker() async {
     final theme = Theme.of(context);
-    showModalBottomSheet(
+    await showModalBottomSheet<void>(
       context: context,
       backgroundColor:
           theme.colorScheme.surface, // ADATTIVO: Sostituito _warmWhite
@@ -100,18 +75,41 @@ class _ProfilePageState extends State<ProfilePage>
     );
   }
 
+  Future<void> _toggleNameEdit(UserProfile profile) async {
+    if (_isEditingName) {
+      await _saveProfileBasics(profile);
+    }
+    setState(() => _isEditingName = !_isEditingName);
+  }
+
+  Future<void> _saveProfileBasics(UserProfile profile) async {
+    final updatedName = _nameController.text.trim();
+    final selectedAvatarId = avatarOptions[_selectedAvatarIndex].id;
+
+    if (updatedName.isEmpty) {
+      setState(() => _nameController.text = profile.displayName);
+      return;
+    }
+
+    final shouldUpdateName = updatedName != profile.displayName;
+    final shouldUpdateAvatar = selectedAvatarId != profile.avatarId;
+
+    if (!shouldUpdateName && !shouldUpdateAvatar) return;
+
+    setState(() => _isSavingBasics = true);
+    try {
+      await _profileController.updateProfileBasics(
+        displayName: shouldUpdateName ? updatedName : null,
+        avatarId: shouldUpdateAvatar ? selectedAvatarId : null,
+      );
+    } finally {
+      if (mounted) setState(() => _isSavingBasics = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final selected = _avatarOptions[_selectedAvatarIndex];
     final theme = Theme.of(context); // TEMA ADATTIVO
-    final dynamicProfile = _profileController.profile;
-    final profile = dynamicProfile ?? _buildFallbackProfile();
-    final pointsLabel = _formatPoints(profile.xp);
-    final bestScoreLabel = '${profile.maxQuizScore}%';
-    final bestTourTimeLabel = profile.bestTourTimeSeconds > 0
-        ? _formatDuration(profile.bestTourTimeSeconds)
-        : '--';
-
     return Scaffold(
       backgroundColor:
           theme.scaffoldBackgroundColor, // ADATTIVO: Sostituito _cream
@@ -123,6 +121,25 @@ class _ProfilePageState extends State<ProfilePage>
               child: CircularProgressIndicator(color: AppPalette.olive),
             );
           }
+          
+          final dynamicProfile = _profileController.profile;
+          final profile = dynamicProfile ?? _buildFallbackProfile();
+          final selected = avatarById(profile.avatarId);
+          final selectedIndex = avatarOptions.indexWhere(
+            (option) => option.id == profile.avatarId,
+          );
+          if (selectedIndex >= 0 && selectedIndex != _selectedAvatarIndex) {
+            _selectedAvatarIndex = selectedIndex;
+          }
+          if (!_isEditingName && _nameController.text != profile.displayName) {
+            _nameController.text = profile.displayName;
+          }
+          final pointsLabel = _formatPoints(profile.xp);
+          final bestScoreLabel = '${profile.maxQuizScore}%';
+          final bestTourTimeLabel = profile.bestTourTimeSeconds > 0
+              ? _formatDuration(profile.bestTourTimeSeconds)
+              : '--';
+
           return FadeTransition(
             opacity: _fadeAnim,
             child: SlideTransition(
@@ -164,15 +181,24 @@ class _ProfilePageState extends State<ProfilePage>
                             option: selected,
                             nameController: _nameController,
                             isEditingName: _isEditingName,
-                            username: _username,
+                            username: '@${profile.username}',
                             points: pointsLabel,
                             level: profile.level.toString(),
                             toursCompleted: profile.visitedCount.toString(),
-                            onAvatarTap: _showAvatarPicker,
-                            onEditToggle: () => setState(
-                              () => _isEditingName = !_isEditingName,
-                            ),
+                            onAvatarTap: () async {
+                              await _showAvatarPicker();
+                              await _saveProfileBasics(profile);
+                            },
+                            onEditToggle: () => _toggleNameEdit(profile),
                           ),
+
+                          if (_isSavingBasics)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 10),
+                              child: LinearProgressIndicator(
+                                color: AppPalette.olive,
+                              ),
+                            ),
 
                           if (_profileController.errorMessage != null) ...[
                             const SizedBox(height: 10),
