@@ -61,4 +61,42 @@ class FirebaseAuthRepository implements AuthRepository {
     await _googleSignIn.signOut();
     await _firebaseAuth.signOut();
   }
+
+  @override
+  Future<void> deleteCurrentUser() async {
+    final user = _firebaseAuth.currentUser;
+    if (user == null) {
+      throw Exception('Nessun utente autenticato.');
+    }
+
+    try {
+      await user.delete();
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        // Ri-autenticazione silenziosa con Google e nuovo tentativo
+        final googleUser =
+            await _googleSignIn.signInSilently() ??
+            await _googleSignIn.signIn();
+        if (googleUser == null) {
+          throw Exception(
+            'Riautenticazione necessaria ma annullata dall\'utente.',
+          );
+        }
+        final googleAuth = await googleUser.authentication;
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+        await user.reauthenticateWithCredential(credential);
+        await user.delete();
+      } else {
+        rethrow;
+      }
+    }
+
+    // Pulizia sessione Google dopo eliminazione riuscita
+    try {
+      await _googleSignIn.signOut();
+    } catch (_) {}
+  }
 }

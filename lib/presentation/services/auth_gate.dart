@@ -97,7 +97,17 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
               );
             }
 
-            final data = docSnapshot.data?.data();
+            final doc = docSnapshot.data!;
+            if (!doc.exists) {
+              // Il documento è stato eliminato (cancellazione account in corso).
+              // Mostriamo un indicatore di caricamento in attesa che anche
+              // l'utente auth venga rimosso e il flusso torni alla LoginPage.
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+
+            final data = doc.data();
             final profileCompleted = data?['profileCompleted'] == true;
 
             if (!profileCompleted) {

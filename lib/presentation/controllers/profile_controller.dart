@@ -16,17 +16,24 @@ class ProfileController extends ChangeNotifier {
 
   final UserUseCases _userUseCases;
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _profileSub;
+  bool _isDisposed = false;
 
   UserProfile? profile;
   bool isLoading = true;
   String? errorMessage;
+
+  void _safeNotifyListeners() {
+    if (!_isDisposed) {
+      notifyListeners();
+    }
+  }
 
   Future<void> _startProfileListener() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       isLoading = false;
       errorMessage = 'Utente non autenticato.';
-      notifyListeners();
+      _safeNotifyListeners();
       return;
     }
 
@@ -42,7 +49,7 @@ class ProfileController extends ChangeNotifier {
               profile = UserModel.fromJson(data, snapshot.id);
               isLoading = false;
               errorMessage = null;
-              notifyListeners();
+              _safeNotifyListeners();
               return;
             }
             await _loadProfileFromUseCase(user.uid);
@@ -50,7 +57,7 @@ class ProfileController extends ChangeNotifier {
           onError: (error) {
             isLoading = false;
             errorMessage = 'Impossibile sincronizzare il profilo: $error';
-            notifyListeners();
+            _safeNotifyListeners();
           },
         );
   }
@@ -63,7 +70,7 @@ class ProfileController extends ChangeNotifier {
       errorMessage = 'Impossibile caricare il profilo: $e';
     } finally {
       isLoading = false;
-      notifyListeners();
+      _safeNotifyListeners();
     }
   }
 
@@ -80,12 +87,13 @@ class ProfileController extends ChangeNotifier {
       errorMessage = null;
     } catch (e) {
       errorMessage = 'Salvataggio profilo non riuscito: $e';
-      notifyListeners();
+      _safeNotifyListeners();
     }
   }
 
   @override
   void dispose() {
+    _isDisposed = true;
     _profileSub?.cancel();
     super.dispose();
   }

@@ -45,6 +45,9 @@ Future<void> init() async {
   if (!sl.isRegistered<SignOutUseCase>()) {
     sl.registerLazySingleton(() => SignOutUseCase(sl()));
   }
+  if (!sl.isRegistered<DeleteCurrentUserUseCase>()) {
+    sl.registerLazySingleton(() => DeleteCurrentUserUseCase(sl()));
+  }
   if (!sl.isRegistered<UserUseCases>()) {
     sl.registerLazySingleton(() => UserUseCases(sl()));
   }

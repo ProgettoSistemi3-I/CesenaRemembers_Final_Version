@@ -41,6 +41,7 @@ class _SettingsPageState extends State<SettingsPage>
     // INIZIALIZZAZIONE CON IL THEME CONTROLLER GLOBALE!
     _controller = SettingsController(
       signOutUseCase: sl<SignOutUseCase>(),
+      deleteCurrentUserUseCase: sl<DeleteCurrentUserUseCase>(),
       userUseCases: sl<UserUseCases>(),
       themeController:
           sl<ThemeController>(), // Questo fa la magia in tempo reale
@@ -258,7 +259,7 @@ class _SettingsPageState extends State<SettingsPage>
           ),
         ),
         content: Text(
-          'Questa operazione rimuoverà account, progressi e dati associati.',
+          'Questa operazione rimuove account, progressi e dati associati in modo permanente.',
           style: TextStyle(
             color: theme.colorScheme.onSurfaceVariant,
             height: 1.4,
@@ -280,13 +281,27 @@ class _SettingsPageState extends State<SettingsPage>
             ),
             onPressed: () {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Eliminazione account avviata')),
-              );
+              _deleteAccount();
             },
             child: const Text('Elimina'),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _deleteAccount() async {
+    final deleted = await _controller.handleDeleteAccount();
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          deleted
+              ? 'Account eliminato definitivamente.'
+              : 'Impossibile completare ora. Controlla il messaggio di errore.',
+        ),
+        backgroundColor: deleted ? AppPalette.olive : AppPalette.danger,
       ),
     );
   }
@@ -428,11 +443,17 @@ class _SettingsPageState extends State<SettingsPage>
                               ),
                               const _ThinDivider(),
                               _ActionRow(
-                                icon: Icons.delete_outline,
+                                icon: _controller.isDeletingAccount
+                                    ? Icons.hourglass_top
+                                    : Icons.delete_outline,
                                 title: 'Elimina account',
-                                subtitle: 'Rimuovi profilo e dati associati',
+                                subtitle: _controller.isDeletingAccount
+                                    ? 'Eliminazione in corso...'
+                                    : 'Rimuovi profilo e dati associati',
                                 accent: AppPalette.danger,
-                                onTap: _confirmDeleteAccount,
+                                onTap: _controller.isDeletingAccount
+                                    ? () {}
+                                    : _confirmDeleteAccount,
                                 destructive: true,
                               ),
                             ],

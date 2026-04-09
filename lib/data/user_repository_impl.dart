@@ -294,4 +294,26 @@ class UserRepositoryImpl implements IUserRepository {
       }, SetOptions(merge: true));
     });
   }
+
+  @override
+  Future<void> deleteUserData({required String uid}) async {
+    final userRef = _users.doc(uid);
+    final snapshot = await userRef.get();
+    final normalizedUsername =
+        (snapshot.data()?['usernameNormalized'] as String?)?.trim();
+
+    // 1. Elimina il documento utente (operazione critica)
+    await userRef.delete();
+
+    // 2. Pulizia indice username (best-effort, non deve bloccare)
+    if (normalizedUsername != null && normalizedUsername.isNotEmpty) {
+      try {
+        await _usernames.doc(normalizedUsername).delete();
+      } catch (_) {
+        // Se le regole Firestore non consentono la cancellazione del
+        // documento username, proseguiamo comunque: il dato utente
+        // è già stato rimosso con successo.
+      }
+    }
+  }
 }

@@ -8,7 +8,9 @@ import '../services/location_permission_service.dart';
 import '../services/location_preference_store.dart';
 
 class SettingsController extends ChangeNotifier {
+  bool _isDisposed = false;
   final SignOutUseCase _signOutUseCase;
+  final DeleteCurrentUserUseCase _deleteCurrentUserUseCase;
   final UserUseCases _userUseCases;
   final ThemeController _themeController;
   final LocationPermissionService _locationService;
@@ -21,18 +23,33 @@ class SettingsController extends ChangeNotifier {
   // --- STATO DELLA UI ---
   bool isLoading = true;
   bool isLoggingOut = false;
+  bool isDeletingAccount = false;
   String? errorMessage;
 
   SettingsController({
     required SignOutUseCase signOutUseCase,
+    required DeleteCurrentUserUseCase deleteCurrentUserUseCase,
     required UserUseCases userUseCases,
     required ThemeController themeController,
   }) : _signOutUseCase = signOutUseCase,
+       _deleteCurrentUserUseCase = deleteCurrentUserUseCase,
        _userUseCases = userUseCases,
        _themeController = themeController,
        _locationService = const LocationPermissionService() {
-    // Inizializzato
     loadUserPreferences();
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
+  }
+
+  /// Chiama notifyListeners() solo se il controller non è stato disposto.
+  void _safeNotifyListeners() {
+    if (!_isDisposed) {
+      notifyListeners();
+    }
   }
 
   String get _currentUid {
@@ -59,7 +76,7 @@ class SettingsController extends ChangeNotifier {
       errorMessage = 'Errore nel caricamento preferenze: $e';
     } finally {
       isLoading = false;
-      notifyListeners();
+      _safeNotifyListeners();
     }
   }
 
@@ -79,7 +96,7 @@ class SettingsController extends ChangeNotifier {
               'Permesso negato o GPS disattivato. Controlla le impostazioni del telefono.';
           posizione = false;
           LocationPreferenceStore.setGpsEnabled(false);
-          notifyListeners();
+          _safeNotifyListeners();
           return; // Interrompiamo qui, non salviamo su DB
         }
       } else {
@@ -98,7 +115,7 @@ class SettingsController extends ChangeNotifier {
     if (newPosizione != null) {
       LocationPreferenceStore.setGpsEnabled(newPosizione);
     }
-    notifyListeners();
+    _safeNotifyListeners();
 
     try {
       // 2. Salvataggio su Firestore
@@ -120,7 +137,7 @@ class SettingsController extends ChangeNotifier {
   Future<bool> handleLogout() async {
     isLoggingOut = true;
     errorMessage = null;
-    notifyListeners();
+    _safeNotifyListeners();
 
     try {
       await _signOutUseCase();
@@ -128,7 +145,44 @@ class SettingsController extends ChangeNotifier {
     } catch (e) {
       errorMessage = 'Logout fallito: $e';
       isLoggingOut = false;
-      notifyListeners();
+      _safeNotifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> handleDeleteAccount() async {
+    isDeletingAccount = true;
+    errorMessage = null;
+    _safeNotifyListeners();
+
+    final uid = _currentUid;
+
+    // ── Step 1: cancella i dati applicativi su Firestore ──
+    try {
+      await _userUseCases.deleteUserData(uid: uid);
+    } catch (e) {
+      // Firestore non ha eliminato nulla → lo stato è intatto, mostriamo errore.
+      debugPrint('[DELETE‑ACCOUNT] Errore cancellazione Firestore: $e');
+      errorMessage = 'Impossibile eliminare i dati: $e';
+      isDeletingAccount = false;
+      _safeNotifyListeners();
+      return false;
+    }
+
+    // ── Step 2: elimina l'utente Firebase Auth ──
+    try {
+      await _deleteCurrentUserUseCase();
+      // Successo: authStateChanges emetterà null → LoginPage
+      return true;
+    } catch (e) {
+      // Auth non eliminato ma i dati Firestore sono già stati rimossi.
+      // Forziamo il logout per evitare stati inconsistenti.
+      debugPrint('[DELETE‑ACCOUNT] Errore cancellazione auth: $e');
+      try {
+        await _signOutUseCase();
+      } catch (_) {}
+      isDeletingAccount = false;
+      _safeNotifyListeners();
       return false;
     }
   }

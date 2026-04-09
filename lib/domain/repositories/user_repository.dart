@@ -47,4 +47,7 @@ abstract class IUserRepository {
     required int totalQuestions,
     required int tourElapsedSeconds,
   });
+
+  // Elimina tutti i dati utente persistiti (profilo e indice username).
+  Future<void> deleteUserData({required String uid});
 }
