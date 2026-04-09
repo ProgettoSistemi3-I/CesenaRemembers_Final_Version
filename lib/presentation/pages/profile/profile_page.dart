@@ -104,14 +104,6 @@ class _ProfilePageState extends State<ProfilePage>
   Widget build(BuildContext context) {
     final selected = _avatarOptions[_selectedAvatarIndex];
     final theme = Theme.of(context); // TEMA ADATTIVO
-    final dynamicProfile = _profileController.profile;
-    final profile = dynamicProfile ?? _buildFallbackProfile();
-    final pointsLabel = _formatPoints(profile.xp);
-    final bestScoreLabel = '${profile.maxQuizScore}%';
-    final bestTourTimeLabel = profile.bestTourTimeSeconds > 0
-        ? _formatDuration(profile.bestTourTimeSeconds)
-        : '--';
-
     return Scaffold(
       backgroundColor:
           theme.scaffoldBackgroundColor, // ADATTIVO: Sostituito _cream
@@ -123,6 +115,15 @@ class _ProfilePageState extends State<ProfilePage>
               child: CircularProgressIndicator(color: AppPalette.olive),
             );
           }
+          
+          final dynamicProfile = _profileController.profile;
+          final profile = dynamicProfile ?? _buildFallbackProfile();
+          final pointsLabel = _formatPoints(profile.xp);
+          final bestScoreLabel = '${profile.maxQuizScore}%';
+          final bestTourTimeLabel = profile.bestTourTimeSeconds > 0
+              ? _formatDuration(profile.bestTourTimeSeconds)
+              : '--';
+
           return FadeTransition(
             opacity: _fadeAnim,
             child: SlideTransition(
