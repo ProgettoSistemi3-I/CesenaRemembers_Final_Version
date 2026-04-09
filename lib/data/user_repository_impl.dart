@@ -51,61 +51,129 @@ class UserRepositoryImpl implements IUserRepository {
     final userRef = _users.doc(uid);
     final usernameRef = _usernames.doc(normalizedUsername);
 
-    await firestore.runTransaction((transaction) async {
-      final existingUsername = await transaction.get(usernameRef);
-      if (existingUsername.exists) {
-        final ownerUid = existingUsername.data()?['uid'];
-        if (ownerUid != uid) {
-          throw Exception('USERNAME_NOT_AVAILABLE');
+    try {
+      await firestore.runTransaction((transaction) async {
+        final existingUsername = await transaction.get(usernameRef);
+        if (existingUsername.exists) {
+          final ownerUid = existingUsername.data()?['uid'];
+          if (ownerUid != uid) {
+            throw Exception('USERNAME_NOT_AVAILABLE');
+          }
         }
-      }
 
-      final existingUser = await transaction.get(userRef);
-      final existingData = existingUser.data() ?? <String, dynamic>{};
+        final existingUser = await transaction.get(userRef);
+        final existingData = existingUser.data() ?? <String, dynamic>{};
 
-      final alreadyCompleted = existingData['profileCompleted'] == true;
-      if (alreadyCompleted) {
+        final alreadyCompleted = existingData['profileCompleted'] == true;
+        if (alreadyCompleted) {
+          return;
+        }
+
+        transaction.set(usernameRef, {
+          'uid': uid,
+          'username': username.trim(),
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        transaction.set(
+          userRef,
+          _buildCompletedProfilePayload(
+            existingData: existingData,
+            email: email,
+            username: username,
+            normalizedUsername: normalizedUsername,
+            displayName: displayName,
+            avatarId: avatarId,
+          ),
+          SetOptions(merge: true),
+        );
+      });
+    } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied' || e.code == 'unavailable') {
+        await _completeInitialProfileFallback(
+          uid: uid,
+          email: email,
+          username: username,
+          normalizedUsername: normalizedUsername,
+          displayName: displayName,
+          avatarId: avatarId,
+        );
         return;
       }
+      rethrow;
+    }
+  }
 
-      transaction.set(usernameRef, {
-        'uid': uid,
-        'username': username.trim(),
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+  Future<void> _completeInitialProfileFallback({
+    required String uid,
+    required String email,
+    required String username,
+    required String normalizedUsername,
+    required String displayName,
+    required String avatarId,
+  }) async {
+    final userRef = _users.doc(uid);
+    final snapshot = await userRef.get();
+    final existingData = snapshot.data() ?? <String, dynamic>{};
 
-      transaction.set(userRef, {
-        'email': email,
-        'displayName': displayName.trim(),
-        'username': username.trim(),
-        'usernameNormalized': normalizedUsername,
-        'avatarId': avatarId,
-        'profileCompleted': true,
-        'profileCompletedAt': FieldValue.serverTimestamp(),
-        'xp': (existingData['xp'] as num?)?.toInt() ?? 0,
-        'visitedPoiIds': List<String>.from(existingData['visitedPoiIds'] ?? []),
-        'unlockedAchievements': List<String>.from(
-          existingData['unlockedAchievements'] ?? [],
-        ),
-        'maxQuizScore': (existingData['maxQuizScore'] as num?)?.toInt() ?? 0,
-        'totalQuizCompleted':
-            (existingData['totalQuizCompleted'] as num?)?.toInt() ?? 0,
-        'totalCorrectAnswers':
-            (existingData['totalCorrectAnswers'] as num?)?.toInt() ?? 0,
-        'bestTourTimeSeconds':
-            (existingData['bestTourTimeSeconds'] as num?)?.toInt() ?? 0,
-        'leaderboardScore':
-            (existingData['leaderboardScore'] as num?)?.toInt() ?? 0,
-        'preferences': {
-          'notifiche': existingData['preferences']?['notifiche'] ?? true,
-          'modalitaNotte':
-              existingData['preferences']?['modalitaNotte'] ?? false,
-          'posizioneGps': existingData['preferences']?['posizioneGps'] ?? true,
-        },
-        'createdAt': existingData['createdAt'] ?? FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
-    });
+    if (existingData['profileCompleted'] == true) {
+      return;
+    }
+
+    await userRef.set(
+      _buildCompletedProfilePayload(
+        existingData: existingData,
+        email: email,
+        username: username,
+        normalizedUsername: normalizedUsername,
+        displayName: displayName,
+        avatarId: avatarId,
+      ),
+      SetOptions(merge: true),
+    );
+  }
+
+  Map<String, dynamic> _buildCompletedProfilePayload({
+    required Map<String, dynamic> existingData,
+    required String email,
+    required String username,
+    required String normalizedUsername,
+    required String displayName,
+    required String avatarId,
+  }) {
+    final existingPrefs = Map<String, dynamic>.from(
+      existingData['preferences'] as Map<String, dynamic>? ?? const {},
+    );
+
+    return {
+      'email': email,
+      'displayName': displayName.trim(),
+      'username': username.trim(),
+      'usernameNormalized': normalizedUsername,
+      'avatarId': avatarId,
+      'profileCompleted': true,
+      'profileCompletedAt': FieldValue.serverTimestamp(),
+      'xp': (existingData['xp'] as num?)?.toInt() ?? 0,
+      'visitedPoiIds': List<String>.from(existingData['visitedPoiIds'] ?? []),
+      'unlockedAchievements': List<String>.from(
+        existingData['unlockedAchievements'] ?? [],
+      ),
+      'maxQuizScore': (existingData['maxQuizScore'] as num?)?.toInt() ?? 0,
+      'totalQuizCompleted': (existingData['totalQuizCompleted'] as num?)?.toInt() ??
+          0,
+      'totalCorrectAnswers':
+          (existingData['totalCorrectAnswers'] as num?)?.toInt() ?? 0,
+      'bestTourTimeSeconds':
+          (existingData['bestTourTimeSeconds'] as num?)?.toInt() ?? 0,
+      'leaderboardScore': (existingData['leaderboardScore'] as num?)?.toInt() ?? 0,
+      'preferences': {
+        'notifiche': existingPrefs['notifiche'] ?? true,
+        'modalitaNotte': existingPrefs['modalitaNotte'] ?? false,
+        'posizioneGps': existingPrefs['posizioneGps'] ?? true,
+      },
+      'createdAt': existingData['createdAt'] ?? FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
   }
 
   @override
@@ -131,8 +199,19 @@ class UserRepositoryImpl implements IUserRepository {
   @override
   Future<bool> isUsernameAvailable(String username) async {
     final normalizedUsername = username.trim().toLowerCase();
-    final snapshot = await _usernames.doc(normalizedUsername).get();
-    return !snapshot.exists;
+    try {
+      final snapshot = await _usernames.doc(normalizedUsername).get();
+      return !snapshot.exists;
+    } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        final duplicate = await _users
+            .where('usernameNormalized', isEqualTo: normalizedUsername)
+            .limit(1)
+            .get();
+        return duplicate.docs.isEmpty;
+      }
+      rethrow;
+    }
   }
 
   @override

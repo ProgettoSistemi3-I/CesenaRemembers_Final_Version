@@ -91,10 +91,12 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
         displayName: displayName,
         avatarId: avatarOptions[_selectedAvatarIndex].id,
       );
-    } catch (_) {
+    } catch (e) {
+      final message = e.toString();
       setState(() {
-        _error =
-            'Impossibile salvare il profilo. Riprova tra qualche secondo.';
+        _error = message.contains('USERNAME_NOT_AVAILABLE')
+            ? 'Username già in uso. Scegline un altro.'
+            : 'Impossibile salvare il profilo. Riprova tra qualche secondo.';
         _isSaving = false;
       });
     }
