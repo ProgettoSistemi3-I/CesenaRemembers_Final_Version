@@ -67,6 +67,23 @@ class ProfileController extends ChangeNotifier {
     }
   }
 
+  Future<void> updateProfileBasics({String? displayName, String? avatarId}) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    try {
+      await _userUseCases.updateProfileBasics(
+        uid: user.uid,
+        displayName: displayName,
+        avatarId: avatarId,
+      );
+      errorMessage = null;
+    } catch (e) {
+      errorMessage = 'Salvataggio profilo non riuscito: $e';
+      notifyListeners();
+    }
+  }
+
   @override
   void dispose() {
     _profileSub?.cancel();
