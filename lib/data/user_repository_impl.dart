@@ -101,48 +101,11 @@ class UserRepositoryImpl implements IUserRepository {
         );
       });
     } on FirebaseException catch (e) {
-      if (e.code == 'permission-denied' || e.code == 'unavailable') {
-        await _completeInitialProfileFallback(
-          uid: uid,
-          email: email,
-          username: username,
-          normalizedUsername: normalizedUsername,
-          displayName: displayName,
-          avatarId: avatarId,
-        );
-        return;
+      if (e.code == 'permission-denied') {
+        throw Exception('USERNAME_INDEX_PERMISSION_DENIED');
       }
       rethrow;
     }
-  }
-
-  Future<void> _completeInitialProfileFallback({
-    required String uid,
-    required String email,
-    required String username,
-    required String normalizedUsername,
-    required String displayName,
-    required String avatarId,
-  }) async {
-    final userRef = _users.doc(uid);
-    final snapshot = await userRef.get();
-    final existingData = snapshot.data() ?? <String, dynamic>{};
-
-    if (existingData['profileCompleted'] == true) {
-      return;
-    }
-
-    await userRef.set(
-      _buildCompletedProfilePayload(
-        existingData: existingData,
-        email: email,
-        username: username,
-        normalizedUsername: normalizedUsername,
-        displayName: displayName,
-        avatarId: avatarId,
-      ),
-      SetOptions(merge: true),
-    );
   }
 
   Map<String, dynamic> _buildCompletedProfilePayload({
@@ -213,28 +176,9 @@ class UserRepositoryImpl implements IUserRepository {
 
   @override
   Future<bool> isUsernameAvailable(String username) async {
-    final normalizedUsername = username.trim().toLowerCase();
-    try {
-      final snapshot = await _usernames.doc(normalizedUsername).get();
-      return !snapshot.exists;
-    } on FirebaseException catch (e) {
-      if (e.code == 'permission-denied') {
-        try {
-          final duplicate = await _users
-              .where('usernameNormalized', isEqualTo: normalizedUsername)
-              .limit(1)
-              .get();
-          return duplicate.docs.isEmpty;
-        } on FirebaseException catch (nested) {
-          if (nested.code == 'permission-denied') {
-            // Non possiamo verificare in lettura globale: non blocchiamo onboarding.
-            return true;
-          }
-          rethrow;
-        }
-      }
-      rethrow;
-    }
+    final normalizedUsername = ProfileValidation.normalizeUsername(username);
+    final snapshot = await _usernames.doc(normalizedUsername).get();
+    return !snapshot.exists;
   }
 
   @override

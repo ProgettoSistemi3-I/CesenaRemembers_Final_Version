@@ -107,6 +107,9 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
       setState(() {
         if (message.contains('USERNAME_NOT_AVAILABLE')) {
           _error = 'Username già in uso. Scegline un altro.';
+        } else if (message.contains('USERNAME_INDEX_PERMISSION_DENIED')) {
+          _error =
+              'Configurazione Firestore non valida: servono permessi di lettura/scrittura su usernames/{username}.';
         } else if (message.contains('INVALID_DISPLAY_NAME')) {
           _error =
               'Il nome in app deve avere ${ProfileValidation.minDisplayNameLength}-${ProfileValidation.maxDisplayNameLength} caratteri.';
