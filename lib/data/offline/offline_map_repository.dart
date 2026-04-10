@@ -34,10 +34,12 @@ class OfflineMapRepository {
   static const int _maxZoom = 18;
   static const int _parallelism = 16;
 
-  static const double _minLat = 44.115527;
-  static const double _maxLat = 44.157398;
-  static const double _minLon = 12.226407;
-  static const double _maxLon = 12.263139;
+  // Bounds calibrati sui POI attuali con un margine uniforme, così il
+  // contenuto resta centrato e coerente con la mappa online.
+  static const double _minLat = 44.1254;
+  static const double _maxLat = 44.1514;
+  static const double _minLon = 12.2331;
+  static const double _maxLon = 12.2611;
 
   final http.Client _httpClient;
   final ValueNotifier<bool> availability = ValueNotifier<bool>(false);

@@ -43,8 +43,8 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   final TourScoringService _tourScoringService = const TourScoringService();
 
   static final LatLngBounds _cesenaBounds = LatLngBounds(
-    const LatLng(44.0700, 12.1700), // SW
-    const LatLng(44.2050, 12.3350), // NE
+    const LatLng(44.1254, 12.2331), // SW
+    const LatLng(44.1514, 12.2611), // NE
   );
 
   // Cache per non ricaricare tutto ogni volta che si cambia tab
@@ -460,7 +460,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
       MapStyle.offline => offlineTemplate,
       MapStyle.standard => standardMapUrl,
     };
-    const LatLng defaultCesenaCenter = LatLng(44.1391, 12.2431);
+    const LatLng defaultCesenaCenter = LatLng(44.1384, 12.2471);
 
     const locationSettings = LocationSettings(
       accuracy: LocationAccuracy.bestForNavigation,
