@@ -16,9 +16,11 @@ import '../../../domain/services/tour_scoring_service.dart';
 import '../../../domain/usecases/poi_use_cases.dart';
 import '../../../domain/usecases/user_use_cases.dart';
 import '../../../injection_container.dart';
+import '../../../data/offline/offline_map_repository.dart';
 import '../../controllers/tour_session_controller.dart';
 import '../../services/poi_marker_factory.dart';
 import '../../services/location_preference_store.dart';
+import '../../services/local_file_tile_provider.dart';
 import '../../services/shell_navigation_store.dart';
 import '../../services/tour_stop_mapper.dart';
 import '../../services/tour_stop_visuals.dart';
@@ -41,8 +43,8 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   final TourScoringService _tourScoringService = const TourScoringService();
 
   static final LatLngBounds _cesenaBounds = LatLngBounds(
-    const LatLng(44.0700, 12.1700),
-    const LatLng(44.2050, 12.3350),
+    const LatLng(44.0700, 12.1700), // SW
+    const LatLng(44.2050, 12.3350), // NE
   );
 
   // Cache per non ricaricare tutto ogni volta che si cambia tab
@@ -52,6 +54,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   late TourSessionController _tourController;
   StreamSubscription<ServiceStatus>? _serviceStatusSub;
   StreamSubscription<void>? _tourUpdatesSub;
+  late final OfflineMapRepository _offlineMapRepository;
 
   AlignOnUpdate _alignPositionOnUpdate = AlignOnUpdate.always;
   double _currentRotation = 0.0;
@@ -77,18 +80,24 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
 
   static const _urlSatellite =
       'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-  bool _isSatelliteMap = false;
+  MapStyle _selectedMapStyle = MapStyle.standard;
+  bool _hasOfflineMaps = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _offlineMapRepository = sl<OfflineMapRepository>();
+    _offlineMapRepository.availability.addListener(
+      _onOfflineAvailabilityChanged,
+    );
     _tourController = TourSessionController(availableStops: const []);
     _bindTourUpdates();
     LocationPreferenceStore.gpsEnabled.addListener(_onGpsPreferenceChanged);
 
     _initLocationLogic();
     _loadPois();
+    _loadOfflineAvailability();
   }
 
   @override
@@ -98,6 +107,9 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     _tourUpdatesSub?.cancel();
     LocationPreferenceStore.gpsEnabled.removeListener(_onGpsPreferenceChanged);
     _tourController.dispose();
+    _offlineMapRepository.availability.removeListener(
+      _onOfflineAvailabilityChanged,
+    );
     _mapController.dispose();
     super.dispose();
   }
@@ -106,6 +118,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _verifyLocationState(requestPerms: false);
+      _loadOfflineAvailability();
     }
   }
 
@@ -267,6 +280,28 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> _loadOfflineAvailability() async {
+    final hasOffline = await _offlineMapRepository.hasOfflineMap();
+    if (!mounted) return;
+    setState(() {
+      _hasOfflineMaps = hasOffline;
+      if (!hasOffline && _selectedMapStyle == MapStyle.offline) {
+        _selectedMapStyle = MapStyle.standard;
+      }
+    });
+  }
+
+  void _onOfflineAvailabilityChanged() {
+    if (!mounted) return;
+    final hasOffline = _offlineMapRepository.availability.value;
+    setState(() {
+      _hasOfflineMaps = hasOffline;
+      if (!hasOffline && _selectedMapStyle == MapStyle.offline) {
+        _selectedMapStyle = MapStyle.standard;
+      }
+    });
+  }
+
   List<Marker> _buildMarkers() {
     return _pois
         .map(
@@ -384,7 +419,9 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
           ),
           backgroundColor: AppPalette.olive,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
         ),
       );
@@ -397,7 +434,9 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
           ),
           backgroundColor: AppPalette.danger,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
         ),
       );
@@ -412,7 +451,15 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     final standardMapUrl = theme.brightness == Brightness.dark
         ? _urlStandardDark
         : _urlStandard;
-    final currentMapUrl = _isSatelliteMap ? _urlSatellite : standardMapUrl;
+    final offlineTemplate = _offlineMapRepository.offlineMapTemplate;
+    final localTileProvider = LocalFileTileProvider(
+      cacheRootPath: _offlineMapRepository.localCachePath,
+    );
+    final currentMapUrl = switch (_selectedMapStyle) {
+      MapStyle.satellite => _urlSatellite,
+      MapStyle.offline => offlineTemplate,
+      MapStyle.standard => standardMapUrl,
+    };
     const LatLng defaultCesenaCenter = LatLng(44.1391, 12.2431);
 
     const locationSettings = LocationSettings(
@@ -489,10 +536,15 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
             children: [
               TileLayer(
                 urlTemplate: currentMapUrl,
-                subdomains: const ['a', 'b', 'c', 'd'],
+                subdomains: _selectedMapStyle == MapStyle.offline
+                    ? const []
+                    : const ['a', 'b', 'c', 'd'],
                 userAgentPackageName: 'com.geoapp.prototype',
                 maxZoom: 19,
                 tileBounds: _cesenaBounds,
+                tileProvider: _selectedMapStyle == MapStyle.offline
+                    ? localTileProvider
+                    : null,
               ),
               // PALLINO POSIZIONE
               if (canUseLocation)
@@ -644,15 +696,20 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                   bottom: isTourActive ? cardBottom : 20,
                   child: MapTypeButton(
                     isOpen: _isMapMenuOpen,
-                    isSatelliteSelected: _isSatelliteMap,
+                    selectedMapStyle: _selectedMapStyle,
+                    offlineEnabled: _hasOfflineMaps,
                     onToggle: () =>
                         setState(() => _isMapMenuOpen = !_isMapMenuOpen),
                     onSelectStandard: () => setState(() {
-                      _isSatelliteMap = false;
+                      _selectedMapStyle = MapStyle.standard;
                       _isMapMenuOpen = false;
                     }),
                     onSelectSatellite: () => setState(() {
-                      _isSatelliteMap = true;
+                      _selectedMapStyle = MapStyle.satellite;
+                      _isMapMenuOpen = false;
+                    }),
+                    onSelectOffline: () => setState(() {
+                      _selectedMapStyle = MapStyle.offline;
                       _isMapMenuOpen = false;
                     }),
                   ),

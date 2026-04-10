@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
 
+import 'data/offline/offline_map_repository.dart';
 import 'data/firebase_auth_repository.dart';
 import 'data/poi_repository_impl.dart';
 import 'data/user_repository_impl.dart';
@@ -20,6 +21,11 @@ Future<void> init() async {
     sl.registerLazySingleton<FirebaseFirestore>(
       () => FirebaseFirestore.instance,
     );
+  }
+  if (!sl.isRegistered<OfflineMapRepository>()) {
+    final repository = OfflineMapRepository();
+    await repository.init();
+    sl.registerLazySingleton<OfflineMapRepository>(() => repository);
   }
 
   // --- REPOSITORY ---
