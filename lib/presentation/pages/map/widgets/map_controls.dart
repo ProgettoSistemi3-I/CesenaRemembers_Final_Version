@@ -38,17 +38,21 @@ class MapTypeButton extends StatelessWidget {
   const MapTypeButton({
     super.key,
     required this.isOpen,
-    required this.isSatelliteSelected,
+    required this.selectedMapStyle,
+    required this.offlineEnabled,
     required this.onToggle,
     required this.onSelectStandard,
     required this.onSelectSatellite,
+    required this.onSelectOffline,
   });
 
   final bool isOpen;
-  final bool isSatelliteSelected;
+  final MapStyle selectedMapStyle;
+  final bool offlineEnabled;
   final VoidCallback onToggle;
   final VoidCallback onSelectStandard;
   final VoidCallback onSelectSatellite;
+  final VoidCallback onSelectOffline;
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +117,7 @@ class MapTypeButton extends StatelessWidget {
               square(
                 title: 'Standard',
                 icon: Icons.map,
-                isSelected: !isSatelliteSelected,
+                isSelected: selectedMapStyle == MapStyle.standard,
                 bgColor: theme.brightness == Brightness.dark
                     ? theme.colorScheme.surfaceContainerHighest
                     : Colors.grey.shade100, // ADATTIVO
@@ -123,11 +127,21 @@ class MapTypeButton extends StatelessWidget {
               square(
                 title: 'Satellite',
                 icon: Icons.satellite_alt,
-                isSelected: isSatelliteSelected,
+                isSelected: selectedMapStyle == MapStyle.satellite,
                 bgColor: theme.brightness == Brightness.dark
                     ? AppPalette.moss.withValues(alpha: 0.2)
                     : Colors.green.shade100, // ADATTIVO
                 onTap: onSelectSatellite,
+              ),
+              const SizedBox(width: 12),
+              square(
+                title: 'Offline',
+                icon: Icons.offline_pin_outlined,
+                isSelected: selectedMapStyle == MapStyle.offline,
+                bgColor: offlineEnabled
+                    ? Colors.orange.shade100
+                    : theme.colorScheme.surfaceContainerHighest,
+                onTap: offlineEnabled ? onSelectOffline : () {},
               ),
             ],
           ),
@@ -147,6 +161,8 @@ class MapTypeButton extends StatelessWidget {
     );
   }
 }
+
+enum MapStyle { standard, satellite, offline }
 
 class StartTourButton extends StatelessWidget {
   const StartTourButton({super.key, required this.onTap});

@@ -16,6 +16,7 @@ import '../../../domain/services/tour_scoring_service.dart';
 import '../../../domain/usecases/poi_use_cases.dart';
 import '../../../domain/usecases/user_use_cases.dart';
 import '../../../injection_container.dart';
+import '../../../data/offline/offline_map_repository.dart';
 import '../../controllers/tour_session_controller.dart';
 import '../../services/poi_marker_factory.dart';
 import '../../services/location_preference_store.dart';
@@ -77,7 +78,8 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
 
   static const _urlSatellite =
       'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-  bool _isSatelliteMap = false;
+  MapStyle _selectedMapStyle = MapStyle.standard;
+  bool _hasOfflineMaps = false;
 
   @override
   void initState() {
@@ -89,6 +91,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
 
     _initLocationLogic();
     _loadPois();
+    _loadOfflineAvailability();
   }
 
   @override
@@ -106,6 +109,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _verifyLocationState(requestPerms: false);
+      _loadOfflineAvailability();
     }
   }
 
@@ -267,6 +271,17 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> _loadOfflineAvailability() async {
+    final hasOffline = await sl<OfflineMapRepository>().hasOfflineMap();
+    if (!mounted) return;
+    setState(() {
+      _hasOfflineMaps = hasOffline;
+      if (!hasOffline && _selectedMapStyle == MapStyle.offline) {
+        _selectedMapStyle = MapStyle.standard;
+      }
+    });
+  }
+
   List<Marker> _buildMarkers() {
     return _pois
         .map(
@@ -412,7 +427,12 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     final standardMapUrl = theme.brightness == Brightness.dark
         ? _urlStandardDark
         : _urlStandard;
-    final currentMapUrl = _isSatelliteMap ? _urlSatellite : standardMapUrl;
+    final offlineTemplate = sl<OfflineMapRepository>().offlineMapTemplate;
+    final currentMapUrl = switch (_selectedMapStyle) {
+      MapStyle.satellite => _urlSatellite,
+      MapStyle.offline => offlineTemplate,
+      MapStyle.standard => standardMapUrl,
+    };
     const LatLng defaultCesenaCenter = LatLng(44.1391, 12.2431);
 
     const locationSettings = LocationSettings(
@@ -644,15 +664,20 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                   bottom: isTourActive ? cardBottom : 20,
                   child: MapTypeButton(
                     isOpen: _isMapMenuOpen,
-                    isSatelliteSelected: _isSatelliteMap,
+                    selectedMapStyle: _selectedMapStyle,
+                    offlineEnabled: _hasOfflineMaps,
                     onToggle: () =>
                         setState(() => _isMapMenuOpen = !_isMapMenuOpen),
                     onSelectStandard: () => setState(() {
-                      _isSatelliteMap = false;
+                      _selectedMapStyle = MapStyle.standard;
                       _isMapMenuOpen = false;
                     }),
                     onSelectSatellite: () => setState(() {
-                      _isSatelliteMap = true;
+                      _selectedMapStyle = MapStyle.satellite;
+                      _isMapMenuOpen = false;
+                    }),
+                    onSelectOffline: () => setState(() {
+                      _selectedMapStyle = MapStyle.offline;
                       _isMapMenuOpen = false;
                     }),
                   ),

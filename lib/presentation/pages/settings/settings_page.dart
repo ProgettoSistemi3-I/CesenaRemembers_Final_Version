@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../domain/usecases/auth_use_cases.dart';
 import '../../../domain/usecases/user_use_cases.dart';
 import '../../../injection_container.dart';
+import '../../controllers/offline_maps_controller.dart';
 import '../../controllers/settings_controller.dart';
 import '../../controllers/settings_ui_controller.dart';
 import '../../services/shell_navigation_store.dart';
@@ -27,6 +28,7 @@ class _SettingsPageState extends State<SettingsPage>
   // --- IL NOSTRO CONTROLLER (MOTORE) ---
   late final SettingsController _controller;
   late final SettingsUiController _uiController;
+  late final OfflineMapsController _offlineMapsController;
 
   // --- VARIABILI VISIVE (Non salvate sul DB per ora) ---
   late AnimationController _animCtrl;
@@ -50,6 +52,9 @@ class _SettingsPageState extends State<SettingsPage>
 
     _controller.addListener(_onControllerError);
     _uiController = SettingsUiController();
+    _offlineMapsController = OfflineMapsController(repository: sl())
+      ..addListener(_onOfflineDownloadFinished)
+      ..init();
 
     // Animazioni
     _animCtrl = AnimationController(
@@ -108,11 +113,61 @@ class _SettingsPageState extends State<SettingsPage>
     }
   }
 
+  void _onOfflineDownloadFinished() {
+    if (!_offlineMapsController.enabled || _offlineMapsController.isBusy) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('✅ Download mappe offline completato'),
+        backgroundColor: AppPalette.olive,
+      ),
+    );
+  }
+
+  Future<void> _onOfflineToggleChanged(bool value) async {
+    if (_offlineMapsController.isBusy) return;
+    if (value) {
+      await _offlineMapsController.enableOfflineMaps();
+      return;
+    }
+
+    final shouldDelete =
+        await showDialog<bool>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: const Text('Eliminare mappe offline?'),
+            content: const Text(
+              'Disattivando il download offline verranno eliminati i tile scaricati dal dispositivo.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: const Text('Annulla'),
+              ),
+              FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppPalette.danger,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: const Text('Elimina'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+
+    if (!shouldDelete) return;
+    await _offlineMapsController.disableOfflineMaps();
+  }
+
   @override
   void dispose() {
     _controller.removeListener(_onControllerError);
     _controller.dispose();
     _uiController.dispose();
+    _offlineMapsController
+      ..removeListener(_onOfflineDownloadFinished)
+      ..dispose();
     _animCtrl.dispose();
     _scrollController.dispose();
     ShellNavigationStore.focusGpsToggleInSettings.removeListener(
@@ -358,7 +413,11 @@ class _SettingsPageState extends State<SettingsPage>
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor, // ADATTIVO!
       body: ListenableBuilder(
-        listenable: Listenable.merge([_controller, _uiController]),
+        listenable: Listenable.merge([
+          _controller,
+          _uiController,
+          _offlineMapsController,
+        ]),
         builder: (context, _) {
           if (_controller.isLoading) {
             return const Center(
@@ -526,6 +585,16 @@ class _SettingsPageState extends State<SettingsPage>
                           // --- DATI ---
                           const _SectionLabel('Dati'),
                           const SizedBox(height: 12),
+                          if (_offlineMapsController.isBusy ||
+                              _offlineMapsController.enabled)
+                            _OfflineDownloadBanner(
+                              progress: _offlineMapsController.progress,
+                              message: _offlineMapsController.statusMessage,
+                              isBusy: _offlineMapsController.isBusy,
+                            ),
+                          if (_offlineMapsController.isBusy ||
+                              _offlineMapsController.enabled)
+                            const SizedBox(height: 10),
                           _SettingsCard(
                             children: [
                               _SwitchRow(
@@ -533,9 +602,8 @@ class _SettingsPageState extends State<SettingsPage>
                                 title: 'Download offline',
                                 subtitle: 'Scarica mappe, testi e tappe',
                                 accent: AppPalette.olive,
-                                value: _uiController.offlineDownloadsEnabled,
-                                onChanged:
-                                    _uiController.setOfflineDownloadsEnabled,
+                                value: _offlineMapsController.enabled,
+                                onChanged: _onOfflineToggleChanged,
                               ),
                               const _ThinDivider(),
                               _ActionRow(
