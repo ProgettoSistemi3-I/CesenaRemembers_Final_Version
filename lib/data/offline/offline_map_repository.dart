@@ -26,11 +26,12 @@ enum OfflineMapStatus { idle, downloading, completed, deleting, failed }
 class OfflineMapRepository {
   static const String _manifestFileName = 'manifest.json';
   static const String _cacheFolderName = 'offline_maps';
-  static const String _offlineMapTemplate =
-      'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+  static const String _mapStyle = 'basic-v2';
+  static const String _mapTilerApiHost = 'https://api.maptiler.com/maps';
 
   static const int _minZoom = 12;
   static const int _maxZoom = 18;
+  static const int _parallelism = 8;
 
   static const double _minLat = 44.0700;
   static const double _maxLat = 44.2050;
@@ -39,11 +40,15 @@ class OfflineMapRepository {
 
   final http.Client _httpClient;
   final ValueNotifier<bool> availability = ValueNotifier<bool>(false);
+  final String _mapTilerApiKey;
 
   Directory? _cacheRoot;
 
-  OfflineMapRepository({http.Client? httpClient})
-    : _httpClient = httpClient ?? http.Client();
+  OfflineMapRepository({http.Client? httpClient, String? mapTilerApiKey})
+    : _httpClient = httpClient ?? http.Client(),
+      _mapTilerApiKey =
+          mapTilerApiKey ??
+          const String.fromEnvironment('MAPTILER_API_KEY', defaultValue: '');
 
   Future<void> init() async {
     final appDir = await getApplicationDocumentsDirectory();
@@ -74,6 +79,12 @@ class OfflineMapRepository {
   }
 
   Stream<OfflineMapProgress> downloadOfflineMap() async* {
+    if (_mapTilerApiKey.trim().isEmpty) {
+      throw StateError(
+        'MAPTILER_API_KEY non configurata. Usa --dart-define=MAPTILER_API_KEY=la_tua_chiave',
+      );
+    }
+
     final root = _requireRoot();
     final allTiles = _buildCesenaTiles();
 
@@ -84,37 +95,12 @@ class OfflineMapRepository {
       status: OfflineMapStatus.downloading,
     );
 
-    for (final tile in allTiles) {
-      final tileFile = File('${root.path}/${tile.z}/${tile.x}/${tile.y}.png');
+    for (var i = 0; i < allTiles.length; i += _parallelism) {
+      final chunk = allTiles.skip(i).take(_parallelism).toList(growable: false);
 
-      if (await tileFile.exists()) {
-        downloaded++;
-        yield OfflineMapProgress(
-          downloaded: downloaded,
-          total: allTiles.length,
-          status: OfflineMapStatus.downloading,
-        );
-        continue;
-      }
+      await Future.wait(chunk.map((tile) => _downloadTile(root, tile)));
+      downloaded = math.min(downloaded + chunk.length, allTiles.length);
 
-      await tileFile.parent.create(recursive: true);
-      final uri = Uri.parse(
-        _offlineMapTemplate
-            .replaceAll('{z}', tile.z.toString())
-            .replaceAll('{x}', tile.x.toString())
-            .replaceAll('{y}', tile.y.toString()),
-      );
-
-      try {
-        final response = await _httpClient.get(uri);
-        if (response.statusCode == 200) {
-          await tileFile.writeAsBytes(response.bodyBytes);
-        }
-      } catch (_) {
-        // Ignoriamo il singolo tile fallito, ma continuiamo il download.
-      }
-
-      downloaded++;
       yield OfflineMapProgress(
         downloaded: downloaded,
         total: allTiles.length,
@@ -127,7 +113,7 @@ class OfflineMapRepository {
       'downloadedAt': DateTime.now().toIso8601String(),
       'minZoom': _minZoom,
       'maxZoom': _maxZoom,
-      'source': _offlineMapTemplate,
+      'source': 'maptiler:$_mapStyle',
     });
     availability.value = true;
 
@@ -189,6 +175,34 @@ class OfflineMapRepository {
     final latRad = lat * math.pi / 180;
     final value = (1 - math.log(math.tan(latRad) + 1 / math.cos(latRad)) / math.pi) / 2;
     return (value * n).floor();
+  }
+
+  Future<void> _downloadTile(Directory root, _TileCoords tile) async {
+    final tileFile = File('${root.path}/${tile.z}/${tile.x}/${tile.y}.png');
+    if (await tileFile.exists()) return;
+
+    await tileFile.parent.create(recursive: true);
+    final uri = Uri.parse(
+      '$_mapTilerApiHost/$_mapStyle/${tile.z}/${tile.x}/${tile.y}.png?key=$_mapTilerApiKey',
+    );
+
+    Future<http.Response?> send() async {
+      try {
+        return _httpClient.get(uri, headers: const {'User-Agent': 'CesenaRemembers/1.0'});
+      } catch (_) {
+        return null;
+      }
+    }
+
+    var response = await send();
+    if (response?.statusCode == 429) {
+      await Future<void>.delayed(const Duration(milliseconds: 350));
+      response = await send();
+    }
+
+    if (response?.statusCode == 200 && response != null) {
+      await tileFile.writeAsBytes(response.bodyBytes);
+    }
   }
 }
 

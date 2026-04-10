@@ -57,10 +57,10 @@ class OfflineMapsController extends ChangeNotifier {
         }
         notifyListeners();
       },
-      onError: (_) {
+      onError: (error) {
         _isBusy = false;
         _enabled = false;
-        _statusMessage = 'Errore durante il download mappe.';
+        _statusMessage = 'Errore durante il download mappe: $error';
         notifyListeners();
         completer.complete(false);
       },
