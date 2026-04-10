@@ -133,16 +133,16 @@ class MapTypeButton extends StatelessWidget {
                     : Colors.green.shade100, // ADATTIVO
                 onTap: onSelectSatellite,
               ),
-              const SizedBox(width: 12),
-              square(
-                title: 'Offline',
-                icon: Icons.offline_pin_outlined,
-                isSelected: selectedMapStyle == MapStyle.offline,
-                bgColor: offlineEnabled
-                    ? Colors.orange.shade100
-                    : theme.colorScheme.surfaceContainerHighest,
-                onTap: offlineEnabled ? onSelectOffline : () {},
-              ),
+              if (offlineEnabled) ...[
+                const SizedBox(width: 12),
+                square(
+                  title: 'Offline',
+                  icon: Icons.offline_pin_outlined,
+                  isSelected: selectedMapStyle == MapStyle.offline,
+                  bgColor: Colors.orange.shade100,
+                  onTap: onSelectOffline,
+                ),
+              ],
             ],
           ),
           const SizedBox(height: 12),

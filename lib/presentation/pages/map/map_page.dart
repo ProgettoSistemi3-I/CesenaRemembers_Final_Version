@@ -20,6 +20,7 @@ import '../../../data/offline/offline_map_repository.dart';
 import '../../controllers/tour_session_controller.dart';
 import '../../services/poi_marker_factory.dart';
 import '../../services/location_preference_store.dart';
+import '../../services/local_file_tile_provider.dart';
 import '../../services/shell_navigation_store.dart';
 import '../../services/tour_stop_mapper.dart';
 import '../../services/tour_stop_visuals.dart';
@@ -427,7 +428,11 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     final standardMapUrl = theme.brightness == Brightness.dark
         ? _urlStandardDark
         : _urlStandard;
-    final offlineTemplate = sl<OfflineMapRepository>().offlineMapTemplate;
+    final offlineRepository = sl<OfflineMapRepository>();
+    final offlineTemplate = offlineRepository.offlineMapTemplate;
+    final localTileProvider = LocalFileTileProvider(
+      cacheRootPath: offlineRepository.localCachePath,
+    );
     final currentMapUrl = switch (_selectedMapStyle) {
       MapStyle.satellite => _urlSatellite,
       MapStyle.offline => offlineTemplate,
@@ -509,10 +514,15 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
             children: [
               TileLayer(
                 urlTemplate: currentMapUrl,
-                subdomains: const ['a', 'b', 'c', 'd'],
+                subdomains: _selectedMapStyle == MapStyle.offline
+                    ? const []
+                    : const ['a', 'b', 'c', 'd'],
                 userAgentPackageName: 'com.geoapp.prototype',
                 maxZoom: 19,
                 tileBounds: _cesenaBounds,
+                tileProvider: _selectedMapStyle == MapStyle.offline
+                    ? localTileProvider
+                    : null,
               ),
               // PALLINO POSIZIONE
               if (canUseLocation)

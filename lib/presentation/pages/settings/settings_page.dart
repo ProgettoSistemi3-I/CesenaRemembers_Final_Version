@@ -29,6 +29,7 @@ class _SettingsPageState extends State<SettingsPage>
   late final SettingsController _controller;
   late final SettingsUiController _uiController;
   late final OfflineMapsController _offlineMapsController;
+  bool _showOfflineCompleteSnack = false;
 
   // --- VARIABILI VISIVE (Non salvate sul DB per ora) ---
   late AnimationController _animCtrl;
@@ -114,7 +115,9 @@ class _SettingsPageState extends State<SettingsPage>
   }
 
   void _onOfflineDownloadFinished() {
+    if (!_showOfflineCompleteSnack) return;
     if (!_offlineMapsController.enabled || _offlineMapsController.isBusy) return;
+    _showOfflineCompleteSnack = false;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('✅ Download mappe offline completato'),
@@ -126,7 +129,11 @@ class _SettingsPageState extends State<SettingsPage>
   Future<void> _onOfflineToggleChanged(bool value) async {
     if (_offlineMapsController.isBusy) return;
     if (value) {
-      await _offlineMapsController.enableOfflineMaps();
+      _showOfflineCompleteSnack = true;
+      final downloadCompleted = await _offlineMapsController.enableOfflineMaps();
+      if (!downloadCompleted) {
+        _showOfflineCompleteSnack = false;
+      }
       return;
     }
 
@@ -157,6 +164,7 @@ class _SettingsPageState extends State<SettingsPage>
         false;
 
     if (!shouldDelete) return;
+    _showOfflineCompleteSnack = false;
     await _offlineMapsController.disableOfflineMaps();
   }
 

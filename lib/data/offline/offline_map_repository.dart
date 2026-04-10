@@ -60,6 +60,8 @@ class OfflineMapRepository {
   String get offlineMapTemplate =>
       'file://${_cacheRoot?.path ?? ''}/{z}/{x}/{y}.png';
 
+  String get localCachePath => _requireRoot().path;
+
   Future<void> clearOfflineMap() async {
     final root = _requireRoot();
     if (await root.exists()) {
