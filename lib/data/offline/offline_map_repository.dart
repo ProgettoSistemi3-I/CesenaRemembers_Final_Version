@@ -33,10 +33,10 @@ class OfflineMapRepository {
   static const int _maxZoom = 18;
   static const int _parallelism = 8;
 
-  static const double _minLat = 44.0700;
-  static const double _maxLat = 44.2050;
-  static const double _minLon = 12.1700;
-  static const double _maxLon = 12.3350;
+  static const double _minLat = 44.1260;
+  static const double _maxLat = 44.1498;
+  static const double _minLon = 12.2348;
+  static const double _maxLon = 12.2589;
 
   final http.Client _httpClient;
   final ValueNotifier<bool> availability = ValueNotifier<bool>(false);
