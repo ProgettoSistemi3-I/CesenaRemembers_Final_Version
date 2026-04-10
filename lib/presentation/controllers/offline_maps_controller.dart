@@ -13,7 +13,7 @@ class OfflineMapsController extends ChangeNotifier {
   bool _enabled = false;
   bool _isBusy = false;
   double _progress = 0;
-  String _statusMessage = 'Mappe offline non scaricate';
+  String _statusMessage = 'Mappa offline non scaricata';
 
   // Completer interno per tenere traccia di download in corso
   Completer<bool>? _activeCompleter;
@@ -27,7 +27,7 @@ class OfflineMapsController extends ChangeNotifier {
   Future<void> init() async {
     _enabled = await _repository.hasOfflineMap();
     if (_enabled) {
-      _statusMessage = "Mappe offline pronte all'uso";
+      _statusMessage = "Mappa offline disponibile nel menu mappe";
       _progress = 1;
     }
     notifyListeners();
@@ -38,7 +38,7 @@ class OfflineMapsController extends ChangeNotifier {
 
     _isBusy = true;
     _progress = 0;
-    _statusMessage = 'Download mappe in corso...';
+    _statusMessage = 'Download mappa in corso...';
     notifyListeners();
 
     // Cancella eventuale subscription precedente
@@ -54,14 +54,15 @@ class OfflineMapsController extends ChangeNotifier {
 
         if (event.status == OfflineMapStatus.downloading) {
           _statusMessage =
-              'Scaricamento tile ${event.downloaded}/${event.total}';
+              'Scaricamento mappa ${event.downloaded}/${event.total}';
         }
 
         if (event.status == OfflineMapStatus.completed) {
           _enabled = true;
           _isBusy = false;
           _progress = 1;
-          _statusMessage = 'Download completato. Mappe disponibili offline.';
+          _statusMessage =
+              'Download completato. Mappa offline disponibile nel menu mappe.';
           _activeCompleter = null;
           if (!completer.isCompleted) completer.complete(true);
         }
@@ -87,7 +88,7 @@ class OfflineMapsController extends ChangeNotifier {
     if (_isBusy) return;
 
     _isBusy = true;
-    _statusMessage = 'Eliminazione mappe offline...';
+    _statusMessage = 'Eliminazione mappa offline...';
     _progress = 0;
     notifyListeners();
 
@@ -98,7 +99,7 @@ class OfflineMapsController extends ChangeNotifier {
 
     _enabled = false;
     _isBusy = false;
-    _statusMessage = 'Mappe offline eliminate';
+    _statusMessage = 'Mappa offline eliminata';
     _progress = 0;
     notifyListeners();
   }
