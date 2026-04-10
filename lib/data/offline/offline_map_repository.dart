@@ -30,7 +30,7 @@ class OfflineMapRepository {
       'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
   static const int _minZoom = 12;
-  static const int _maxZoom = 16;
+  static const int _maxZoom = 18;
 
   static const double _minLat = 44.0700;
   static const double _maxLat = 44.2050;
@@ -38,6 +38,7 @@ class OfflineMapRepository {
   static const double _maxLon = 12.3350;
 
   final http.Client _httpClient;
+  final ValueNotifier<bool> availability = ValueNotifier<bool>(false);
 
   Directory? _cacheRoot;
 
@@ -50,6 +51,7 @@ class OfflineMapRepository {
     if (!await _cacheRoot!.exists()) {
       await _cacheRoot!.create(recursive: true);
     }
+    availability.value = await hasOfflineMap();
   }
 
   Future<bool> hasOfflineMap() async {
@@ -68,6 +70,7 @@ class OfflineMapRepository {
       await root.delete(recursive: true);
     }
     await root.create(recursive: true);
+    availability.value = false;
   }
 
   Stream<OfflineMapProgress> downloadOfflineMap() async* {
@@ -126,6 +129,7 @@ class OfflineMapRepository {
       'maxZoom': _maxZoom,
       'source': _offlineMapTemplate,
     });
+    availability.value = true;
 
     yield OfflineMapProgress(
       downloaded: downloaded,

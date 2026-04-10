@@ -54,6 +54,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   late TourSessionController _tourController;
   StreamSubscription<ServiceStatus>? _serviceStatusSub;
   StreamSubscription<void>? _tourUpdatesSub;
+  late final OfflineMapRepository _offlineMapRepository;
 
   AlignOnUpdate _alignPositionOnUpdate = AlignOnUpdate.always;
   double _currentRotation = 0.0;
@@ -86,6 +87,8 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _offlineMapRepository = sl<OfflineMapRepository>();
+    _offlineMapRepository.availability.addListener(_onOfflineAvailabilityChanged);
     _tourController = TourSessionController(availableStops: const []);
     _bindTourUpdates();
     LocationPreferenceStore.gpsEnabled.addListener(_onGpsPreferenceChanged);
@@ -102,6 +105,9 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     _tourUpdatesSub?.cancel();
     LocationPreferenceStore.gpsEnabled.removeListener(_onGpsPreferenceChanged);
     _tourController.dispose();
+    _offlineMapRepository.availability.removeListener(
+      _onOfflineAvailabilityChanged,
+    );
     _mapController.dispose();
     super.dispose();
   }
@@ -273,8 +279,19 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   }
 
   Future<void> _loadOfflineAvailability() async {
-    final hasOffline = await sl<OfflineMapRepository>().hasOfflineMap();
+    final hasOffline = await _offlineMapRepository.hasOfflineMap();
     if (!mounted) return;
+    setState(() {
+      _hasOfflineMaps = hasOffline;
+      if (!hasOffline && _selectedMapStyle == MapStyle.offline) {
+        _selectedMapStyle = MapStyle.standard;
+      }
+    });
+  }
+
+  void _onOfflineAvailabilityChanged() {
+    if (!mounted) return;
+    final hasOffline = _offlineMapRepository.availability.value;
     setState(() {
       _hasOfflineMaps = hasOffline;
       if (!hasOffline && _selectedMapStyle == MapStyle.offline) {
@@ -428,10 +445,9 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     final standardMapUrl = theme.brightness == Brightness.dark
         ? _urlStandardDark
         : _urlStandard;
-    final offlineRepository = sl<OfflineMapRepository>();
-    final offlineTemplate = offlineRepository.offlineMapTemplate;
+    final offlineTemplate = _offlineMapRepository.offlineMapTemplate;
     final localTileProvider = LocalFileTileProvider(
-      cacheRootPath: offlineRepository.localCachePath,
+      cacheRootPath: _offlineMapRepository.localCachePath,
     );
     final currentMapUrl = switch (_selectedMapStyle) {
       MapStyle.satellite => _urlSatellite,
