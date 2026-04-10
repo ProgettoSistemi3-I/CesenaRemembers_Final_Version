@@ -8,7 +8,6 @@ abstract class IUserRepository {
   Future<void> ensureUserDocument({
     required String uid,
     required String email,
-    String? authDisplayName,
   });
 
   // Crea il profilo iniziale con username univoco.

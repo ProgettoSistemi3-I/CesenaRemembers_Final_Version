@@ -56,7 +56,6 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
     _ensureFuture = _userUseCases.ensureUserDocument(
       uid: widget.appUser.id,
       email: widget.appUser.email,
-      authDisplayName: widget.appUser.displayName,
     );
   }
 

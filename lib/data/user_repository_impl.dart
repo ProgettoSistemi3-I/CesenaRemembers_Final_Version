@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../domain/entities/userprofile.dart';
 import '../domain/repositories/user_repository.dart';
+import '../domain/validation/profile_validation.dart';
 import '../models/user_model.dart';
 
 class UserRepositoryImpl implements IUserRepository {
@@ -29,7 +30,6 @@ class UserRepositoryImpl implements IUserRepository {
   Future<void> ensureUserDocument({
     required String uid,
     required String email,
-    String? authDisplayName,
   }) async {
     final doc = await _users.doc(uid).get();
     if (doc.exists) {
@@ -39,7 +39,6 @@ class UserRepositoryImpl implements IUserRepository {
     }
     await _users.doc(uid).set({
       'email': email,
-      'authDisplayName': authDisplayName,
       'updatedAt': FieldValue.serverTimestamp(),
       'createdAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
@@ -53,7 +52,14 @@ class UserRepositoryImpl implements IUserRepository {
     required String displayName,
     required String avatarId,
   }) async {
-    final normalizedUsername = username.trim().toLowerCase();
+    if (!ProfileValidation.isValidDisplayName(displayName)) {
+      throw Exception('INVALID_DISPLAY_NAME');
+    }
+    if (!ProfileValidation.isValidUsername(username)) {
+      throw Exception('INVALID_USERNAME');
+    }
+
+    final normalizedUsername = ProfileValidation.normalizeUsername(username);
     final userRef = _users.doc(uid);
     final usernameRef = _usernames.doc(normalizedUsername);
 
@@ -95,48 +101,11 @@ class UserRepositoryImpl implements IUserRepository {
         );
       });
     } on FirebaseException catch (e) {
-      if (e.code == 'permission-denied' || e.code == 'unavailable') {
-        await _completeInitialProfileFallback(
-          uid: uid,
-          email: email,
-          username: username,
-          normalizedUsername: normalizedUsername,
-          displayName: displayName,
-          avatarId: avatarId,
-        );
-        return;
+      if (e.code == 'permission-denied') {
+        throw Exception('USERNAME_INDEX_PERMISSION_DENIED');
       }
       rethrow;
     }
-  }
-
-  Future<void> _completeInitialProfileFallback({
-    required String uid,
-    required String email,
-    required String username,
-    required String normalizedUsername,
-    required String displayName,
-    required String avatarId,
-  }) async {
-    final userRef = _users.doc(uid);
-    final snapshot = await userRef.get();
-    final existingData = snapshot.data() ?? <String, dynamic>{};
-
-    if (existingData['profileCompleted'] == true) {
-      return;
-    }
-
-    await userRef.set(
-      _buildCompletedProfilePayload(
-        existingData: existingData,
-        email: email,
-        username: username,
-        normalizedUsername: normalizedUsername,
-        displayName: displayName,
-        avatarId: avatarId,
-      ),
-      SetOptions(merge: true),
-    );
   }
 
   Map<String, dynamic> _buildCompletedProfilePayload({
@@ -165,13 +134,14 @@ class UserRepositoryImpl implements IUserRepository {
         existingData['unlockedAchievements'] ?? [],
       ),
       'maxQuizScore': (existingData['maxQuizScore'] as num?)?.toInt() ?? 0,
-      'totalQuizCompleted': (existingData['totalQuizCompleted'] as num?)?.toInt() ??
-          0,
+      'totalQuizCompleted':
+          (existingData['totalQuizCompleted'] as num?)?.toInt() ?? 0,
       'totalCorrectAnswers':
           (existingData['totalCorrectAnswers'] as num?)?.toInt() ?? 0,
       'bestTourTimeSeconds':
           (existingData['bestTourTimeSeconds'] as num?)?.toInt() ?? 0,
-      'leaderboardScore': (existingData['leaderboardScore'] as num?)?.toInt() ?? 0,
+      'leaderboardScore':
+          (existingData['leaderboardScore'] as num?)?.toInt() ?? 0,
       'preferences': {
         'notifiche': existingPrefs['notifiche'] ?? true,
         'modalitaNotte': existingPrefs['modalitaNotte'] ?? false,
@@ -193,6 +163,9 @@ class UserRepositoryImpl implements IUserRepository {
     };
 
     if (displayName != null && displayName.trim().isNotEmpty) {
+      if (!ProfileValidation.isValidDisplayName(displayName)) {
+        throw Exception('INVALID_DISPLAY_NAME');
+      }
       updates['displayName'] = displayName.trim();
     }
     if (avatarId != null && avatarId.trim().isNotEmpty) {
@@ -204,28 +177,9 @@ class UserRepositoryImpl implements IUserRepository {
 
   @override
   Future<bool> isUsernameAvailable(String username) async {
-    final normalizedUsername = username.trim().toLowerCase();
-    try {
-      final snapshot = await _usernames.doc(normalizedUsername).get();
-      return !snapshot.exists;
-    } on FirebaseException catch (e) {
-      if (e.code == 'permission-denied') {
-        try {
-          final duplicate = await _users
-              .where('usernameNormalized', isEqualTo: normalizedUsername)
-              .limit(1)
-              .get();
-          return duplicate.docs.isEmpty;
-        } on FirebaseException catch (nested) {
-          if (nested.code == 'permission-denied') {
-            // Non possiamo verificare in lettura globale: non blocchiamo onboarding.
-            return true;
-          }
-          rethrow;
-        }
-      }
-      rethrow;
-    }
+    final normalizedUsername = ProfileValidation.normalizeUsername(username);
+    final snapshot = await _usernames.doc(normalizedUsername).get();
+    return !snapshot.exists;
   }
 
   @override
@@ -260,7 +214,9 @@ class UserRepositoryImpl implements IUserRepository {
     await firestore.runTransaction((transaction) async {
       final snapshot = await transaction.get(userRef);
       final data = snapshot.data() ?? <String, dynamic>{};
-      final visitedPoiIds = List<String>.from(data['visitedPoiIds'] ?? const []);
+      final visitedPoiIds = List<String>.from(
+        data['visitedPoiIds'] ?? const [],
+      );
 
       if (visitedPoiIds.contains(poiId)) {
         return;
@@ -268,7 +224,8 @@ class UserRepositoryImpl implements IUserRepository {
 
       final currentXp = (data['xp'] as num?)?.toInt() ?? 0;
       final nextXp = currentXp + xpGained;
-      final currentLeaderboard = (data['leaderboardScore'] as num?)?.toInt() ?? 0;
+      final currentLeaderboard =
+          (data['leaderboardScore'] as num?)?.toInt() ?? 0;
       final currentMaxQuizScore = (data['maxQuizScore'] as num?)?.toInt() ?? 0;
       final currentQuizCompleted =
           (data['totalQuizCompleted'] as num?)?.toInt() ?? 0;
@@ -292,8 +249,8 @@ class UserRepositoryImpl implements IUserRepository {
             : currentMaxQuizScore,
         'totalQuizCompleted': currentQuizCompleted + 1,
         'totalCorrectAnswers': currentCorrectAnswers + correctAnswers,
-        'bestTourTimeSeconds': currentBestTourTime == 0 ||
-                tourElapsedSeconds < currentBestTourTime
+        'bestTourTimeSeconds':
+            currentBestTourTime == 0 || tourElapsedSeconds < currentBestTourTime
             ? tourElapsedSeconds
             : currentBestTourTime,
         'updatedAt': FieldValue.serverTimestamp(),

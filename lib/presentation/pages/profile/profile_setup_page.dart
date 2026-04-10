@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../../../domain/validation/profile_validation.dart';
 import '../../../domain/usecases/user_use_cases.dart';
 import '../../../injection_container.dart';
 import '../../theme/app_palette.dart';
@@ -46,24 +47,24 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
     super.dispose();
   }
 
-  String _normalizeUsername(String value) {
-    final trimmed = value.trim().toLowerCase();
-    return trimmed.replaceAll(RegExp(r'[^a-z0-9_.]'), '');
-  }
-
   Future<void> _submit() async {
     final displayName = _nameController.text.trim();
-    final normalizedUsername = _normalizeUsername(_usernameController.text);
+    final normalizedUsername = ProfileValidation.normalizeUsername(
+      _usernameController.text,
+    );
 
-    if (displayName.length < 2) {
-      setState(() => _error = 'Il nome in app deve avere almeno 2 caratteri.');
+    if (!ProfileValidation.isValidDisplayName(displayName)) {
+      setState(
+        () => _error =
+            'Il nome in app deve avere ${ProfileValidation.minDisplayNameLength}-${ProfileValidation.maxDisplayNameLength} caratteri.',
+      );
       return;
     }
 
-    if (normalizedUsername.length < 3 || normalizedUsername.length > 20) {
+    if (!ProfileValidation.isValidUsername(normalizedUsername)) {
       setState(
-        () =>
-            _error = 'Username non valido (usa 3-20 caratteri: a-z, 0-9, _ o .).',
+        () => _error =
+            'Username non valido (usa ${ProfileValidation.minUsernameLength}-${ProfileValidation.maxUsernameLength} caratteri: a-z, 0-9, _ o .).',
       );
       return;
     }
@@ -106,6 +107,15 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
       setState(() {
         if (message.contains('USERNAME_NOT_AVAILABLE')) {
           _error = 'Username già in uso. Scegline un altro.';
+        } else if (message.contains('USERNAME_INDEX_PERMISSION_DENIED')) {
+          _error =
+              'Configurazione Firestore non valida: servono permessi di lettura/scrittura su usernames/{username}.';
+        } else if (message.contains('INVALID_DISPLAY_NAME')) {
+          _error =
+              'Il nome in app deve avere ${ProfileValidation.minDisplayNameLength}-${ProfileValidation.maxDisplayNameLength} caratteri.';
+        } else if (message.contains('INVALID_USERNAME')) {
+          _error =
+              'Username non valido (usa ${ProfileValidation.minUsernameLength}-${ProfileValidation.maxUsernameLength} caratteri).';
         } else if (e is FirebaseException && e.code == 'permission-denied') {
           _error =
               'Permessi Firestore insufficienti per completare il profilo. Controlla le regole del progetto.';
