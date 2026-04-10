@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../domain/entities/userprofile.dart';
 import '../domain/repositories/user_repository.dart';
+import '../domain/validation/profile_validation.dart';
 import '../models/user_model.dart';
 
 class UserRepositoryImpl implements IUserRepository {
@@ -29,7 +30,6 @@ class UserRepositoryImpl implements IUserRepository {
   Future<void> ensureUserDocument({
     required String uid,
     required String email,
-    String? authDisplayName,
   }) async {
     final doc = await _users.doc(uid).get();
     if (doc.exists) {
@@ -39,7 +39,6 @@ class UserRepositoryImpl implements IUserRepository {
     }
     await _users.doc(uid).set({
       'email': email,
-      'authDisplayName': authDisplayName,
       'updatedAt': FieldValue.serverTimestamp(),
       'createdAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
@@ -53,7 +52,14 @@ class UserRepositoryImpl implements IUserRepository {
     required String displayName,
     required String avatarId,
   }) async {
-    final normalizedUsername = username.trim().toLowerCase();
+    if (!ProfileValidation.isValidDisplayName(displayName)) {
+      throw Exception('INVALID_DISPLAY_NAME');
+    }
+    if (!ProfileValidation.isValidUsername(username)) {
+      throw Exception('INVALID_USERNAME');
+    }
+
+    final normalizedUsername = ProfileValidation.normalizeUsername(username);
     final userRef = _users.doc(uid);
     final usernameRef = _usernames.doc(normalizedUsername);
 
@@ -193,6 +199,9 @@ class UserRepositoryImpl implements IUserRepository {
     };
 
     if (displayName != null && displayName.trim().isNotEmpty) {
+      if (!ProfileValidation.isValidDisplayName(displayName)) {
+        throw Exception('INVALID_DISPLAY_NAME');
+      }
       updates['displayName'] = displayName.trim();
     }
     if (avatarId != null && avatarId.trim().isNotEmpty) {

@@ -14,12 +14,10 @@ class UserUseCases {
   Future<void> ensureUserDocument({
     required String uid,
     required String email,
-    String? authDisplayName,
   }) async {
     return repository.ensureUserDocument(
       uid: uid,
       email: email,
-      authDisplayName: authDisplayName,
     );
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../domain/entities/userprofile.dart';
+import '../../../domain/validation/profile_validation.dart';
 import '../../../injection_container.dart';
 import '../../controllers/profile_controller.dart';
 import '../../theme/app_palette.dart'; // Import vitale per i colori base (olive, tan)
@@ -87,6 +88,13 @@ class _ProfilePageState extends State<ProfilePage>
     final selectedAvatarId = avatarOptions[_selectedAvatarIndex].id;
 
     if (updatedName.isEmpty) {
+      setState(() => _nameController.text = profile.displayName);
+      return;
+    }
+    if (!ProfileValidation.isValidDisplayName(updatedName)) {
+      _profileController.errorMessage =
+          'Il nome in app deve avere ${ProfileValidation.minDisplayNameLength}-${ProfileValidation.maxDisplayNameLength} caratteri.';
+      _profileController.notifyListeners();
       setState(() => _nameController.text = profile.displayName);
       return;
     }
