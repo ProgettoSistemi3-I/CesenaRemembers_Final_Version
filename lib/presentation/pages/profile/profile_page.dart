@@ -129,7 +129,7 @@ class _ProfilePageState extends State<ProfilePage>
               child: CircularProgressIndicator(color: AppPalette.olive),
             );
           }
-          
+
           final dynamicProfile = _profileController.profile;
           final profile = dynamicProfile ?? _buildFallbackProfile();
           final selected = avatarById(profile.avatarId);
@@ -273,6 +273,14 @@ class _ProfilePageState extends State<ProfilePage>
                                 color: AppPalette.moss,
                               ),
                             ],
+                          ),
+
+                          const SizedBox(height: 28),
+                          const _SectionLabel('Classifica globale XP'),
+                          const SizedBox(height: 14),
+                          _LeaderboardCard(
+                            entries: _profileController.leaderboard,
+                            currentUserId: profile.uid,
                           ),
 
                           const SizedBox(height: 28),

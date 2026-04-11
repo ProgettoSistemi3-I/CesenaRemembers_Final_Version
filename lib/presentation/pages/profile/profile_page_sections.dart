@@ -335,6 +335,144 @@ class _BadgesRow extends StatelessWidget {
   }
 }
 
+class _LeaderboardCard extends StatelessWidget {
+  const _LeaderboardCard({required this.entries, required this.currentUserId});
+
+  final List<LeaderboardEntry> entries;
+  final String currentUserId;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    if (entries.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Text(
+          'Ancora nessun utente in classifica.',
+          style: TextStyle(
+            color: theme.colorScheme.onSurfaceVariant,
+            fontSize: 13,
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: theme.brightness == Brightness.light ? 0.04 : 0.16,
+            ),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        children: entries
+            .take(10)
+            .map(
+              (entry) => _LeaderboardTile(
+                entry: entry,
+                isCurrentUser: entry.uid == currentUserId,
+              ),
+            )
+            .toList(growable: false),
+      ),
+    );
+  }
+}
+
+class _LeaderboardTile extends StatelessWidget {
+  const _LeaderboardTile({required this.entry, required this.isCurrentUser});
+
+  final LeaderboardEntry entry;
+  final bool isCurrentUser;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final avatar = avatarById(entry.avatarId);
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      decoration: BoxDecoration(
+        color: isCurrentUser
+            ? AppPalette.olive.withValues(alpha: 0.10)
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 28,
+            child: Text(
+              '#${entry.rank}',
+              style: TextStyle(
+                color: AppPalette.olive,
+                fontWeight: FontWeight.w800,
+                fontSize: 13,
+              ),
+            ),
+          ),
+          CircleAvatar(
+            radius: 16,
+            backgroundColor: avatar.background,
+            child: Icon(
+              avatar.icon,
+              size: 16,
+              color: Colors.black.withValues(alpha: 0.55),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  entry.displayName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                  ),
+                ),
+                Text(
+                  entry.username.isNotEmpty ? '@${entry.username}' : '@utente',
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontSize: 11.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            '${entry.xp} XP',
+            style: const TextStyle(
+              color: AppPalette.olive,
+              fontWeight: FontWeight.w700,
+              fontSize: 12.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _BadgeData {
   final IconData icon;
   final String label;

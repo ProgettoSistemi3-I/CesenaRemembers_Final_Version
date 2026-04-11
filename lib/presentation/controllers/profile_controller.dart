@@ -16,9 +16,11 @@ class ProfileController extends ChangeNotifier {
 
   final UserUseCases _userUseCases;
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _profileSub;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _leaderboardSub;
   bool _isDisposed = false;
 
   UserProfile? profile;
+  List<LeaderboardEntry> leaderboard = const [];
   bool isLoading = true;
   String? errorMessage;
 
@@ -38,6 +40,7 @@ class ProfileController extends ChangeNotifier {
     }
 
     await _profileSub?.cancel();
+    await _leaderboardSub?.cancel();
     _profileSub = FirebaseFirestore.instance
         .collection('users')
         .doc(user.uid)
@@ -60,6 +63,32 @@ class ProfileController extends ChangeNotifier {
             _safeNotifyListeners();
           },
         );
+
+    _leaderboardSub = FirebaseFirestore.instance
+        .collection('users')
+        .orderBy('xp', descending: true)
+        .limit(20)
+        .snapshots()
+        .listen(
+          (snapshot) {
+            leaderboard = snapshot.docs
+                .asMap()
+                .entries
+                .map(
+                  (entry) => LeaderboardEntry.fromMap(
+                    entry.value.id,
+                    entry.value.data(),
+                    entry.key + 1,
+                  ),
+                )
+                .toList(growable: false);
+            _safeNotifyListeners();
+          },
+          onError: (_) {
+            // Evitiamo di sovrascrivere errori bloccanti del profilo:
+            // la classifica è best-effort e non deve rompere la schermata.
+          },
+        );
   }
 
   Future<void> _loadProfileFromUseCase(String uid) async {
@@ -74,7 +103,10 @@ class ProfileController extends ChangeNotifier {
     }
   }
 
-  Future<void> updateProfileBasics({String? displayName, String? avatarId}) async {
+  Future<void> updateProfileBasics({
+    String? displayName,
+    String? avatarId,
+  }) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
@@ -95,6 +127,44 @@ class ProfileController extends ChangeNotifier {
   void dispose() {
     _isDisposed = true;
     _profileSub?.cancel();
+    _leaderboardSub?.cancel();
     super.dispose();
+  }
+}
+
+class LeaderboardEntry {
+  const LeaderboardEntry({
+    required this.uid,
+    required this.displayName,
+    required this.username,
+    required this.avatarId,
+    required this.xp,
+    required this.rank,
+  });
+
+  final String uid;
+  final String displayName;
+  final String username;
+  final String avatarId;
+  final int xp;
+  final int rank;
+
+  factory LeaderboardEntry.fromMap(
+    String uid,
+    Map<String, dynamic> data,
+    int rank,
+  ) {
+    return LeaderboardEntry(
+      uid: uid,
+      displayName: (data['displayName'] as String?)?.trim().isNotEmpty == true
+          ? (data['displayName'] as String).trim()
+          : 'Utente',
+      username: (data['username'] as String?)?.trim() ?? '',
+      avatarId: (data['avatarId'] as String?)?.trim().isNotEmpty == true
+          ? (data['avatarId'] as String).trim()
+          : 'military_tech',
+      xp: (data['xp'] as num?)?.toInt() ?? 0,
+      rank: rank,
+    );
   }
 }
