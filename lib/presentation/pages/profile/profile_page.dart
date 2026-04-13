@@ -4,14 +4,13 @@ import '../../../domain/entities/userprofile.dart';
 import '../../../domain/validation/profile_validation.dart';
 import '../../../injection_container.dart';
 import '../../controllers/profile_controller.dart';
-import '../../theme/app_palette.dart'; // Import vitale per i colori base (olive, tan)
+import '../../controllers/social_controller.dart';
+import '../../theme/app_palette.dart';
+import '../social/public_profile_page.dart';
 import 'avatar_catalog.dart';
 
 part 'profile_page_sections.dart';
 
-// ─────────────────────────────────────────────
-//  Page
-// ─────────────────────────────────────────────
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
@@ -59,13 +58,11 @@ class _ProfilePageState extends State<ProfilePage>
     super.dispose();
   }
 
-  // ── Avatar picker ─────────────────────────
   Future<void> _showAvatarPicker() async {
     final theme = Theme.of(context);
     await showModalBottomSheet<void>(
       context: context,
-      backgroundColor:
-          theme.colorScheme.surface, // ADATTIVO: Sostituito _warmWhite
+      backgroundColor: theme.colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -115,12 +112,117 @@ class _ProfilePageState extends State<ProfilePage>
     }
   }
 
+  // --- METODI PER AMICIZIE E NOTIFICHE ---
+  void _showFriendsList(UserProfile profile, ThemeData theme) async {
+    final users = await sl<SocialController>().loadUsersList(profile.friends);
+    if (!mounted) return;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: theme.colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _buildUserListSheet('I tuoi Amici', users, theme),
+    );
+  }
+
+  void _showRequestsList(UserProfile profile, ThemeData theme) async {
+    final users = await sl<SocialController>().loadUsersList(
+      profile.receivedFriendRequests,
+    );
+    if (!mounted) return;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: theme.colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _buildUserListSheet('Richieste ricevute', users, theme),
+    );
+  }
+
+  Widget _buildUserListSheet(
+    String title,
+    List<UserProfile> users,
+    ThemeData theme,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 10),
+          if (users.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Text(
+                'Nessuna lista da mostrare.',
+                style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+              ),
+            )
+          else
+            Expanded(
+              child: ListView.builder(
+                itemCount: users.length,
+                itemBuilder: (context, i) {
+                  final u = users[i];
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: AppPalette.tan,
+                      child: Icon(
+                        avatarById(u.avatarId).icon,
+                        size: 18,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    title: Text(
+                      u.displayName,
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: Text(
+                      '@${u.username}',
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context); // Chiude la bottom sheet
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PublicProfilePage(
+                            uid: u.uid,
+                            fallbackName: u.displayName,
+                            fallbackUsername: u.username,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context); // TEMA ADATTIVO
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor:
-          theme.scaffoldBackgroundColor, // ADATTIVO: Sostituito _cream
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: AnimatedBuilder(
         animation: _profileController,
         builder: (context, _) {
@@ -154,10 +256,8 @@ class _ProfilePageState extends State<ProfilePage>
               position: _slideAnim,
               child: CustomScrollView(
                 slivers: [
-                  // ── App bar
                   SliverAppBar(
-                    backgroundColor: theme
-                        .scaffoldBackgroundColor, // ADATTIVO: Sostituito _cream
+                    backgroundColor: theme.scaffoldBackgroundColor,
                     elevation: 0,
                     expandedHeight: 0,
                     floating: true,
@@ -165,26 +265,55 @@ class _ProfilePageState extends State<ProfilePage>
                     title: Text(
                       'Il mio profilo',
                       style: TextStyle(
-                        color: theme
-                            .colorScheme
-                            .onSurface, // ADATTIVO: Sostituito _textDark
+                        color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w700,
                         fontSize: 17,
                         letterSpacing: 0.3,
                       ),
                     ),
                     centerTitle: true,
+                    actions: [
+                      // --- LA CAMPANELLA DELLE NOTIFICHE ---
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              Icons.notifications_none,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                            onPressed: () => _showRequestsList(profile, theme),
+                          ),
+                          if (profile.receivedFriendRequests.isNotEmpty)
+                            Positioned(
+                              right: 12,
+                              top: 12,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  color: AppPalette.danger,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Text(
+                                  '${profile.receivedFriendRequests.length}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
                   ),
-
-                  // ── Body
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Column(
                         children: [
                           const SizedBox(height: 28),
-
-                          // ── Hero card (avatar + nome + username)
                           _HeroCard(
                             option: selected,
                             nameController: _nameController,
@@ -192,14 +321,18 @@ class _ProfilePageState extends State<ProfilePage>
                             username: '@${profile.username}',
                             points: pointsLabel,
                             level: profile.level.toString(),
-                            toursCompleted: profile.visitedCount.toString(),
+                            friendsCount: profile.friends.length
+                                .toString(), // Passiamo il conto degli amici
                             onAvatarTap: () async {
                               await _showAvatarPicker();
                               await _saveProfileBasics(profile);
                             },
                             onEditToggle: () => _toggleNameEdit(profile),
+                            onFriendsTap: () => _showFriendsList(
+                              profile,
+                              theme,
+                            ), // Passiamo l'azione
                           ),
-
                           if (_isSavingBasics)
                             const Padding(
                               padding: EdgeInsets.only(top: 10),
@@ -207,7 +340,6 @@ class _ProfilePageState extends State<ProfilePage>
                                 color: AppPalette.olive,
                               ),
                             ),
-
                           if (_profileController.errorMessage != null) ...[
                             const SizedBox(height: 10),
                             Text(
@@ -218,15 +350,9 @@ class _ProfilePageState extends State<ProfilePage>
                               ),
                             ),
                           ],
-
                           const SizedBox(height: 28),
-
-                          // ── Divisore sezione stats
                           const _SectionLabel('Statistiche'),
-
                           const SizedBox(height: 14),
-
-                          // ── Stats grid 2×2
                           GridView.count(
                             crossAxisCount: 2,
                             shrinkWrap: true,
@@ -239,8 +365,7 @@ class _ProfilePageState extends State<ProfilePage>
                                 icon: Icons.verified_user_outlined,
                                 label: 'Traguardi',
                                 value: '${profile.achievementsCount}',
-                                color: AppPalette
-                                    .olive, // Manteniamo i colori del brand
+                                color: AppPalette.olive,
                               ),
                               _StatCard(
                                 icon: Icons.speed_outlined,
@@ -274,24 +399,10 @@ class _ProfilePageState extends State<ProfilePage>
                               ),
                             ],
                           ),
-
                           const SizedBox(height: 28),
-                          const _SectionLabel('Classifica globale XP'),
-                          const SizedBox(height: 14),
-                          _LeaderboardCard(
-                            entries: _profileController.leaderboard,
-                            currentUserId: profile.uid,
-                          ),
-
-                          const SizedBox(height: 28),
-
-                          // ── Divisore sezione badges
                           const _SectionLabel('Ultimi badge'),
-
                           const SizedBox(height: 14),
-
                           _BadgesRow(),
-
                           const SizedBox(height: 40),
                         ],
                       ),

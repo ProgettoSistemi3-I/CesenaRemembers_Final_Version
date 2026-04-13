@@ -1,3 +1,4 @@
+import 'dart:async';
 import '../entities/userprofile.dart';
 import '../repositories/user_repository.dart';
 
@@ -6,19 +7,26 @@ class UserUseCases {
 
   const UserUseCases(this.repository);
 
-  // 1. Ottieni il profilo
+  // Ottiene l'UID dell'utente loggato senza toccare Firebase
+  String? getCurrentUserUid() {
+    return repository.getCurrentUserUid();
+  }
+
+  // 1. Ottieni il profilo (singola volta)
   Future<UserProfile> getUserProfile(String uid) async {
     return await repository.getUserProfile(uid);
+  }
+
+  // Stream in tempo reale del profilo
+  Stream<UserProfile?> getUserProfileStream(String uid) {
+    return repository.getUserProfileStream(uid);
   }
 
   Future<void> ensureUserDocument({
     required String uid,
     required String email,
   }) async {
-    return repository.ensureUserDocument(
-      uid: uid,
-      email: email,
-    );
+    return repository.ensureUserDocument(uid: uid, email: email);
   }
 
   Future<void> completeInitialProfile({
@@ -51,6 +59,16 @@ class UserUseCases {
 
   Future<bool> isUsernameAvailable(String username) async {
     return repository.isUsernameAvailable(username);
+  }
+
+  // 4. Ricerca utenti
+  Future<List<UserProfile>> searchUsers(String query) async {
+    return await repository.searchUsers(query);
+  }
+
+  // Stream classifica
+  Stream<List<Map<String, dynamic>>> getLeaderboardStream({int limit = 50}) {
+    return repository.getLeaderboardStream(limit: limit);
   }
 
   // 2. Aggiorna le preferenze
@@ -90,4 +108,18 @@ class UserUseCases {
   Future<void> deleteUserData({required String uid}) async {
     return repository.deleteUserData(uid: uid);
   }
+
+  //social
+  Future<void> sendFriendRequest(String cUid, String tUid) =>
+      repository.sendFriendRequest(cUid, tUid);
+  Future<void> cancelFriendRequest(String cUid, String tUid) =>
+      repository.cancelFriendRequest(cUid, tUid);
+  Future<void> acceptFriendRequest(String cUid, String rUid) =>
+      repository.acceptFriendRequest(cUid, rUid);
+  Future<void> rejectFriendRequest(String cUid, String rUid) =>
+      repository.rejectFriendRequest(cUid, rUid);
+  Future<void> removeFriend(String cUid, String fUid) =>
+      repository.removeFriend(cUid, fUid);
+  Future<List<UserProfile>> getUsersByIds(List<String> uids) =>
+      repository.getUsersByIds(uids);
 }

@@ -15,6 +15,9 @@ class UserProfile {
   final int totalQuizCompleted;
   final int totalCorrectAnswers;
   final int bestTourTimeSeconds;
+  final List<String> friends;
+  final List<String> sentFriendRequests;
+  final List<String> receivedFriendRequests;
 
   UserProfile({
     required this.uid,
@@ -33,6 +36,9 @@ class UserProfile {
     this.totalQuizCompleted = 0,
     this.totalCorrectAnswers = 0,
     this.bestTourTimeSeconds = 0,
+    this.friends = const [],
+    this.sentFriendRequests = const [],
+    this.receivedFriendRequests = const [],
   });
 
   // Getter comodi per la UI

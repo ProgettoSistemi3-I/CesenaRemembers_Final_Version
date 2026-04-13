@@ -6,10 +6,11 @@ class _HeroCard extends StatelessWidget {
   final bool isEditingName;
   final String username;
   final String points;
-  final String toursCompleted;
+  final String friendsCount; // NUOVO
   final String level;
   final VoidCallback onAvatarTap;
   final VoidCallback onEditToggle;
+  final VoidCallback onFriendsTap; // NUOVO
 
   const _HeroCard({
     required this.option,
@@ -17,21 +18,22 @@ class _HeroCard extends StatelessWidget {
     required this.isEditingName,
     required this.username,
     required this.points,
-    required this.toursCompleted,
+    required this.friendsCount,
     required this.level,
     required this.onAvatarTap,
     required this.onEditToggle,
+    required this.onFriendsTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context); // TEMA ADATTIVO
+    final theme = Theme.of(context);
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface, // ADATTIVO
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -67,9 +69,7 @@ class _HeroCard extends StatelessWidget {
                     child: Icon(
                       option.icon,
                       size: 58,
-                      color: Colors.black.withValues(
-                        alpha: 0.5,
-                      ), // Le icone restano scure sul bg colorato
+                      color: Colors.black.withValues(alpha: 0.5),
                     ),
                   ),
                 ),
@@ -102,7 +102,7 @@ class _HeroCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
-                      color: theme.colorScheme.onSurface, // ADATTIVO
+                      color: theme.colorScheme.onSurface,
                       letterSpacing: 0.2,
                     ),
                     decoration: InputDecoration(
@@ -129,7 +129,7 @@ class _HeroCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
-                    color: theme.colorScheme.onSurface, // ADATTIVO
+                    color: theme.colorScheme.onSurface,
                     letterSpacing: 0.2,
                   ),
                 ),
@@ -141,7 +141,7 @@ class _HeroCard extends StatelessWidget {
                   size: 18,
                   color: isEditingName
                       ? AppPalette.olive
-                      : theme.colorScheme.onSurfaceVariant, // ADATTIVO
+                      : theme.colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -154,30 +154,31 @@ class _HeroCard extends StatelessWidget {
             username,
             style: TextStyle(
               fontSize: 13,
-              color: theme.colorScheme.onSurfaceVariant, // ADATTIVO
+              color: theme.colorScheme.onSurfaceVariant,
               letterSpacing: 0.3,
             ),
           ),
 
           const SizedBox(height: 18),
-
-          // Divisore
           Container(
             height: 1,
             color: theme.colorScheme.surfaceContainerHighest.withValues(
               alpha: 0.5,
             ),
-          ), // ADATTIVO
-
+          ),
           const SizedBox(height: 16),
 
-          // Mini stats inline
+          // Mini stats inline (ORA CON GLI AMICI)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _MiniStat(label: 'Punti', value: points),
+              _MiniStat(
+                label: 'Amici',
+                value: friendsCount,
+                onTap: onFriendsTap,
+              ), // CLICCABILE!
               const _VerticalDivider(),
-              _MiniStat(label: 'Tappe completate', value: toursCompleted),
+              _MiniStat(label: 'Punti', value: points),
               const _VerticalDivider(),
               _MiniStat(label: 'Livello', value: level),
             ],
@@ -188,42 +189,48 @@ class _HeroCard extends StatelessWidget {
   }
 }
 
+// ORA È CLICCABILE!
 class _MiniStat extends StatelessWidget {
   final String label;
   final String value;
-  const _MiniStat({required this.label, required this.value});
+  final VoidCallback? onTap;
+
+  const _MiniStat({required this.label, required this.value, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.w800,
-            color: AppPalette.olive,
-            letterSpacing: 0.2,
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque, // Rende l'area cliccabile più grande
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w800,
+              color: AppPalette.olive,
+              letterSpacing: 0.2,
+            ),
           ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            color: theme.colorScheme.onSurfaceVariant, // ADATTIVO
-            letterSpacing: 0.3,
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: theme.colorScheme.onSurfaceVariant,
+              letterSpacing: 0.3,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
 
 class _VerticalDivider extends StatelessWidget {
   const _VerticalDivider();
-
   @override
   Widget build(BuildContext context) => Container(
     height: 28,
@@ -231,7 +238,7 @@ class _VerticalDivider extends StatelessWidget {
     color: Theme.of(
       context,
     ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-  ); // ADATTIVO
+  );
 }
 
 class _StatCard extends StatelessWidget {
@@ -253,13 +260,13 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface, // ADATTIVO
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
             color: theme.brightness == Brightness.light
                 ? color.withValues(alpha: 0.07)
-                : Colors.black.withValues(alpha: 0.2), // ADATTIVO
+                : Colors.black.withValues(alpha: 0.2),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -293,7 +300,7 @@ class _StatCard extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 11.5,
-                  color: theme.colorScheme.onSurfaceVariant, // ADATTIVO
+                  color: theme.colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -310,11 +317,7 @@ class _BadgesRow extends StatelessWidget {
     _BadgeData(Icons.military_tech, 'Pioniere', AppPalette.olive),
     _BadgeData(Icons.explore, 'Esploratore', AppPalette.tan),
     _BadgeData(Icons.history_edu, 'Storico', AppPalette.moss),
-    _BadgeData(
-      Icons.lock_outline,
-      '?',
-      Colors.grey,
-    ), // Usa un grigio standard per il placeholder
+    _BadgeData(Icons.lock_outline, '?', Colors.grey),
   ];
 
   @override
@@ -335,144 +338,6 @@ class _BadgesRow extends StatelessWidget {
   }
 }
 
-class _LeaderboardCard extends StatelessWidget {
-  const _LeaderboardCard({required this.entries, required this.currentUserId});
-
-  final List<LeaderboardEntry> entries;
-  final String currentUserId;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    if (entries.isEmpty) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Text(
-          'Ancora nessun utente in classifica.',
-          style: TextStyle(
-            color: theme.colorScheme.onSurfaceVariant,
-            fontSize: 13,
-          ),
-        ),
-      );
-    }
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(
-              alpha: theme.brightness == Brightness.light ? 0.04 : 0.16,
-            ),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        children: entries
-            .take(10)
-            .map(
-              (entry) => _LeaderboardTile(
-                entry: entry,
-                isCurrentUser: entry.uid == currentUserId,
-              ),
-            )
-            .toList(growable: false),
-      ),
-    );
-  }
-}
-
-class _LeaderboardTile extends StatelessWidget {
-  const _LeaderboardTile({required this.entry, required this.isCurrentUser});
-
-  final LeaderboardEntry entry;
-  final bool isCurrentUser;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final avatar = avatarById(entry.avatarId);
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-      decoration: BoxDecoration(
-        color: isCurrentUser
-            ? AppPalette.olive.withValues(alpha: 0.10)
-            : Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 28,
-            child: Text(
-              '#${entry.rank}',
-              style: TextStyle(
-                color: AppPalette.olive,
-                fontWeight: FontWeight.w800,
-                fontSize: 13,
-              ),
-            ),
-          ),
-          CircleAvatar(
-            radius: 16,
-            backgroundColor: avatar.background,
-            child: Icon(
-              avatar.icon,
-              size: 16,
-              color: Colors.black.withValues(alpha: 0.55),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  entry.displayName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: theme.colorScheme.onSurface,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 13,
-                  ),
-                ),
-                Text(
-                  entry.username.isNotEmpty ? '@${entry.username}' : '@utente',
-                  style: TextStyle(
-                    color: theme.colorScheme.onSurfaceVariant,
-                    fontSize: 11.5,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Text(
-            '${entry.xp} XP',
-            style: const TextStyle(
-              color: AppPalette.olive,
-              fontWeight: FontWeight.w700,
-              fontSize: 12.5,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _BadgeData {
   final IconData icon;
   final String label;
@@ -487,8 +352,6 @@ class _BadgeTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    // Logica per adattare il grigio del lucchetto al tema corrente
     final isPlaceholder = data.label == '?';
     final iconColor = isPlaceholder
         ? theme.colorScheme.onSurfaceVariant
@@ -500,7 +363,7 @@ class _BadgeTile extends StatelessWidget {
           width: 60,
           height: 60,
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface, // ADATTIVO
+            color: theme.colorScheme.surface,
             shape: BoxShape.circle,
             border: Border.all(
               color: iconColor.withValues(alpha: 0.35),
@@ -510,7 +373,7 @@ class _BadgeTile extends StatelessWidget {
               BoxShadow(
                 color: theme.brightness == Brightness.light
                     ? iconColor.withValues(alpha: 0.08)
-                    : Colors.transparent, // ADATTIVO
+                    : Colors.transparent,
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
@@ -523,7 +386,7 @@ class _BadgeTile extends StatelessWidget {
           data.label,
           style: TextStyle(
             fontSize: 10.5,
-            color: theme.colorScheme.onSurfaceVariant, // ADATTIVO
+            color: theme.colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w500,
           ),
           textAlign: TextAlign.center,
@@ -557,7 +420,7 @@ class _SectionLabel extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: Theme.of(context).colorScheme.onSurface, // ADATTIVO
+              color: Theme.of(context).colorScheme.onSurface,
               letterSpacing: 0.3,
             ),
           ),
@@ -575,40 +438,33 @@ class _AvatarPickerSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context); // ADATTIVO
-
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Handle
           Center(
             child: Container(
               width: 36,
               height: 4,
               margin: const EdgeInsets.only(bottom: 20),
               decoration: BoxDecoration(
-                color: theme.colorScheme.onSurface.withValues(
-                  alpha: 0.1,
-                ), // ADATTIVO
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),
-
           Text(
             'Scegli avatar',
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w700,
-              color: theme.colorScheme.onSurface, // ADATTIVO
+              color: theme.colorScheme.onSurface,
             ),
           ),
-
           const SizedBox(height: 20),
-
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -647,9 +503,7 @@ class _AvatarPickerSheet extends StatelessWidget {
                   child: Icon(
                     opt.icon,
                     size: 30,
-                    color: Colors.black.withValues(
-                      alpha: 0.5,
-                    ), // Le icone restano scure
+                    color: Colors.black.withValues(alpha: 0.5),
                   ),
                 ),
               );

@@ -1,12 +1,7 @@
 import 'dart:async';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-
 import '../../domain/entities/userprofile.dart';
 import '../../domain/usecases/user_use_cases.dart';
-import '../../models/user_model.dart';
 
 class ProfileController extends ChangeNotifier {
   ProfileController({required UserUseCases userUseCases})
@@ -15,12 +10,10 @@ class ProfileController extends ChangeNotifier {
   }
 
   final UserUseCases _userUseCases;
-  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _profileSub;
-  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _leaderboardSub;
+  StreamSubscription<UserProfile?>? _profileSub;
   bool _isDisposed = false;
 
   UserProfile? profile;
-  List<LeaderboardEntry> leaderboard = const [];
   bool isLoading = true;
   String? errorMessage;
 
@@ -30,63 +23,38 @@ class ProfileController extends ChangeNotifier {
     }
   }
 
-  Future<void> _startProfileListener() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
+  void _startProfileListener() {
+    // Otteniamo l'UID tramite lo Use Case
+    final uid = _userUseCases.getCurrentUserUid();
+
+    if (uid == null) {
       isLoading = false;
       errorMessage = 'Utente non autenticato.';
       _safeNotifyListeners();
       return;
     }
 
-    await _profileSub?.cancel();
-    await _leaderboardSub?.cancel();
-    _profileSub = FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .snapshots()
+    _profileSub?.cancel();
+
+    // Ascoltiamo lo stream dal Domain Layer
+    _profileSub = _userUseCases
+        .getUserProfileStream(uid)
         .listen(
-          (snapshot) async {
-            final data = snapshot.data();
-            if (snapshot.exists && data != null) {
-              profile = UserModel.fromJson(data, snapshot.id);
+          (userProfile) async {
+            if (userProfile != null) {
+              profile = userProfile;
               isLoading = false;
               errorMessage = null;
               _safeNotifyListeners();
-              return;
+            } else {
+              // Fallback
+              await _loadProfileFromUseCase(uid);
             }
-            await _loadProfileFromUseCase(user.uid);
           },
           onError: (error) {
             isLoading = false;
-            errorMessage = 'Impossibile sincronizzare il profilo: $error';
+            errorMessage = 'Impossibile sincronizzare il profilo.';
             _safeNotifyListeners();
-          },
-        );
-
-    _leaderboardSub = FirebaseFirestore.instance
-        .collection('users')
-        .orderBy('xp', descending: true)
-        .limit(20)
-        .snapshots()
-        .listen(
-          (snapshot) {
-            leaderboard = snapshot.docs
-                .asMap()
-                .entries
-                .map(
-                  (entry) => LeaderboardEntry.fromMap(
-                    entry.value.id,
-                    entry.value.data(),
-                    entry.key + 1,
-                  ),
-                )
-                .toList(growable: false);
-            _safeNotifyListeners();
-          },
-          onError: (_) {
-            // Evitiamo di sovrascrivere errori bloccanti del profilo:
-            // la classifica è best-effort e non deve rompere la schermata.
           },
         );
   }
@@ -96,7 +64,7 @@ class ProfileController extends ChangeNotifier {
       profile = await _userUseCases.getUserProfile(uid);
       errorMessage = null;
     } catch (e) {
-      errorMessage = 'Impossibile caricare il profilo: $e';
+      errorMessage = 'Impossibile caricare il profilo.';
     } finally {
       isLoading = false;
       _safeNotifyListeners();
@@ -107,18 +75,18 @@ class ProfileController extends ChangeNotifier {
     String? displayName,
     String? avatarId,
   }) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+    final uid = _userUseCases.getCurrentUserUid();
+    if (uid == null) return;
 
     try {
       await _userUseCases.updateProfileBasics(
-        uid: user.uid,
+        uid: uid,
         displayName: displayName,
         avatarId: avatarId,
       );
       errorMessage = null;
     } catch (e) {
-      errorMessage = 'Salvataggio profilo non riuscito: $e';
+      errorMessage = 'Salvataggio profilo non riuscito.';
       _safeNotifyListeners();
     }
   }
@@ -127,44 +95,6 @@ class ProfileController extends ChangeNotifier {
   void dispose() {
     _isDisposed = true;
     _profileSub?.cancel();
-    _leaderboardSub?.cancel();
     super.dispose();
-  }
-}
-
-class LeaderboardEntry {
-  const LeaderboardEntry({
-    required this.uid,
-    required this.displayName,
-    required this.username,
-    required this.avatarId,
-    required this.xp,
-    required this.rank,
-  });
-
-  final String uid;
-  final String displayName;
-  final String username;
-  final String avatarId;
-  final int xp;
-  final int rank;
-
-  factory LeaderboardEntry.fromMap(
-    String uid,
-    Map<String, dynamic> data,
-    int rank,
-  ) {
-    return LeaderboardEntry(
-      uid: uid,
-      displayName: (data['displayName'] as String?)?.trim().isNotEmpty == true
-          ? (data['displayName'] as String).trim()
-          : 'Utente',
-      username: (data['username'] as String?)?.trim() ?? '',
-      avatarId: (data['avatarId'] as String?)?.trim().isNotEmpty == true
-          ? (data['avatarId'] as String).trim()
-          : 'military_tech',
-      xp: (data['xp'] as num?)?.toInt() ?? 0,
-      rank: rank,
-    );
   }
 }

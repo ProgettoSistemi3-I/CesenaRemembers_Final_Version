@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // LEGALE QUI: DATA LAYER
 
 import '../domain/entities/userprofile.dart';
 import '../domain/repositories/user_repository.dart';
@@ -16,6 +17,11 @@ class UserRepositoryImpl implements IUserRepository {
       firestore.collection('usernames');
 
   @override
+  String? getCurrentUserUid() {
+    return FirebaseAuth.instance.currentUser?.uid;
+  }
+
+  @override
   Future<UserProfile> getUserProfile(String uid) async {
     final snapshot = await _users.doc(uid).get();
 
@@ -27,14 +33,22 @@ class UserRepositoryImpl implements IUserRepository {
   }
 
   @override
+  Stream<UserProfile?> getUserProfileStream(String uid) {
+    return _users.doc(uid).snapshots().map((snapshot) {
+      if (snapshot.exists && snapshot.data() != null) {
+        return UserModel.fromJson(snapshot.data()!, snapshot.id);
+      }
+      return null;
+    });
+  }
+
+  @override
   Future<void> ensureUserDocument({
     required String uid,
     required String email,
   }) async {
     final doc = await _users.doc(uid).get();
     if (doc.exists) {
-      // Il documento esiste già – non riscriviamo per evitare snapshot
-      // intermedi che farebbero lampeggiare la schermata di setup profilo.
       return;
     }
     await _users.doc(uid).set({
@@ -153,6 +167,39 @@ class UserRepositoryImpl implements IUserRepository {
   }
 
   @override
+  Future<List<UserProfile>> searchUsers(String query) async {
+    final cleanQuery = query.trim().toLowerCase();
+    if (cleanQuery.isEmpty) return [];
+
+    try {
+      final snapshot = await _users
+          .where('username', isGreaterThanOrEqualTo: cleanQuery)
+          .where('username', isLessThanOrEqualTo: '$cleanQuery\uf8ff')
+          .limit(10)
+          .get();
+
+      return snapshot.docs
+          .map((doc) => UserModel.fromJson(doc.data(), doc.id))
+          .toList();
+    } catch (e) {
+      throw Exception('Errore durante la ricerca utenti: $e');
+    }
+  }
+
+  @override
+  Stream<List<Map<String, dynamic>>> getLeaderboardStream({int limit = 50}) {
+    return _users.orderBy('xp', descending: true).limit(limit).snapshots().map((
+      snapshot,
+    ) {
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['uid'] = doc.id;
+        return data;
+      }).toList();
+    });
+  }
+
+  @override
   Future<void> updateProfileBasics({
     required String uid,
     String? displayName,
@@ -262,21 +309,155 @@ class UserRepositoryImpl implements IUserRepository {
   Future<void> deleteUserData({required String uid}) async {
     final userRef = _users.doc(uid);
     final snapshot = await userRef.get();
-    final normalizedUsername =
-        (snapshot.data()?['usernameNormalized'] as String?)?.trim();
 
-    // 1. Elimina il documento utente (operazione critica)
+    if (!snapshot.exists) return;
+
+    final data = snapshot.data()!;
+    final normalizedUsername = (data['usernameNormalized'] as String?)?.trim();
+
+    final List<String> myFriends = List<String>.from(data['friends'] ?? []);
+    final List<String> iSentRequestsTo = List<String>.from(
+      data['sentFriendRequests'] ?? [],
+    );
+    final List<String> theySentRequestsToMe = List<String>.from(
+      data['receivedFriendRequests'] ?? [],
+    );
+
+    // 1. Rimuoviamo il nostro UID dagli altri in modo indipendente.
+    // Usiamo Future.wait per eseguirli tutti insieme velocemente, ma con .catchError
+    // per far sì che se un amico non esiste più, non blocchi gli altri!
+    final List<Future> cleanupTasks = [];
+
+    for (String friendUid in myFriends) {
+      cleanupTasks.add(
+        _users
+            .doc(friendUid)
+            .update({
+              'friends': FieldValue.arrayRemove([uid]),
+            })
+            .catchError((_) {}),
+      );
+    }
+    for (String targetUid in iSentRequestsTo) {
+      cleanupTasks.add(
+        _users
+            .doc(targetUid)
+            .update({
+              'receivedFriendRequests': FieldValue.arrayRemove([uid]),
+            })
+            .catchError((_) {}),
+      );
+    }
+    for (String requesterUid in theySentRequestsToMe) {
+      cleanupTasks.add(
+        _users
+            .doc(requesterUid)
+            .update({
+              'sentFriendRequests': FieldValue.arrayRemove([uid]),
+            })
+            .catchError((_) {}),
+      );
+    }
+
+    // Aspettiamo che Firebase pulisca tutti i documenti degli altri
+    await Future.wait(cleanupTasks);
+
+    // 2. Eliminiamo il nostro documento principale
     await userRef.delete();
 
-    // 2. Pulizia indice username (best-effort, non deve bloccare)
+    // 3. Eliminiamo l'indice dell'username
     if (normalizedUsername != null && normalizedUsername.isNotEmpty) {
       try {
         await _usernames.doc(normalizedUsername).delete();
-      } catch (_) {
-        // Se le regole Firestore non consentono la cancellazione del
-        // documento username, proseguiamo comunque: il dato utente
-        // è già stato rimosso con successo.
-      }
+      } catch (_) {}
     }
+  }
+
+  @override
+  Future<void> sendFriendRequest(String currentUid, String targetUid) async {
+    await firestore.runTransaction((tx) async {
+      tx.update(_users.doc(currentUid), {
+        'sentFriendRequests': FieldValue.arrayUnion([targetUid]),
+      });
+      tx.update(_users.doc(targetUid), {
+        'receivedFriendRequests': FieldValue.arrayUnion([currentUid]),
+      });
+    });
+  }
+
+  @override
+  Future<void> cancelFriendRequest(String currentUid, String targetUid) async {
+    await firestore.runTransaction((tx) async {
+      tx.update(_users.doc(currentUid), {
+        'sentFriendRequests': FieldValue.arrayRemove([targetUid]),
+      });
+      tx.update(_users.doc(targetUid), {
+        'receivedFriendRequests': FieldValue.arrayRemove([currentUid]),
+      });
+    });
+  }
+
+  @override
+  Future<void> acceptFriendRequest(
+    String currentUid,
+    String requesterUid,
+  ) async {
+    await firestore.runTransaction((tx) async {
+      tx.update(_users.doc(currentUid), {
+        'receivedFriendRequests': FieldValue.arrayRemove([requesterUid]),
+        'friends': FieldValue.arrayUnion([requesterUid]),
+      });
+      tx.update(_users.doc(requesterUid), {
+        'sentFriendRequests': FieldValue.arrayRemove([currentUid]),
+        'friends': FieldValue.arrayUnion([currentUid]),
+      });
+    });
+  }
+
+  @override
+  Future<void> rejectFriendRequest(
+    String currentUid,
+    String requesterUid,
+  ) async {
+    await firestore.runTransaction((tx) async {
+      tx.update(_users.doc(currentUid), {
+        'receivedFriendRequests': FieldValue.arrayRemove([requesterUid]),
+      });
+      tx.update(_users.doc(requesterUid), {
+        'sentFriendRequests': FieldValue.arrayRemove([currentUid]),
+      });
+    });
+  }
+
+  @override
+  Future<void> removeFriend(String currentUid, String friendUid) async {
+    await firestore.runTransaction((tx) async {
+      tx.update(_users.doc(currentUid), {
+        'friends': FieldValue.arrayRemove([friendUid]),
+      });
+      tx.update(_users.doc(friendUid), {
+        'friends': FieldValue.arrayRemove([currentUid]),
+      });
+    });
+  }
+
+  @override
+  Future<List<UserProfile>> getUsersByIds(List<String> uids) async {
+    if (uids.isEmpty) return [];
+    List<UserProfile> result = [];
+    // Firestore accetta query 'in' fino a 10 elementi per volta
+    for (var i = 0; i < uids.length; i += 10) {
+      final chunk = uids.sublist(
+        i,
+        i + 10 > uids.length ? uids.length : i + 10,
+      );
+      final snap = await _users
+          .where(FieldPath.documentId, whereIn: chunk)
+          .get();
+      result.addAll(
+        snap.docs.map((doc) => UserModel.fromJson(doc.data(), doc.id)),
+      );
+    }
+    return result;
   }
 }

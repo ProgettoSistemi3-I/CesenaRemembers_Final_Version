@@ -70,23 +70,27 @@ class FirebaseAuthRepository implements AuthRepository {
     }
 
     try {
+      // Tenta l'eliminazione diretta
       await user.delete();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'requires-recent-login') {
-        // Ri-autenticazione silenziosa con Google e nuovo tentativo
+        // Ri-autenticazione silenziosa (o esplicita) se Firebase la richiede per sicurezza
         final googleUser =
             await _googleSignIn.signInSilently() ??
             await _googleSignIn.signIn();
+
         if (googleUser == null) {
           throw Exception(
             'Riautenticazione necessaria ma annullata dall\'utente.',
           );
         }
+
         final googleAuth = await googleUser.authentication;
-        final credential = GoogleAuthProvider.credential(
+        final AuthCredential credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
+
         await user.reauthenticateWithCredential(credential);
         await user.delete();
       } else {
@@ -94,9 +98,17 @@ class FirebaseAuthRepository implements AuthRepository {
       }
     }
 
-    // Pulizia sessione Google dopo eliminazione riuscita
+    // PULIZIA PROFONDA DELLA SESSIONE GOOGLE (Risolve il bug del ri-login automatico)
     try {
-      await _googleSignIn.signOut();
-    } catch (_) {}
+      if (await _googleSignIn.isSignedIn()) {
+        // Usare DISCONNECT, non signOut!
+        await _googleSignIn.disconnect();
+      }
+    } catch (_) {
+      // Fallback: se disconnect fallisce per qualche strana ragione, proviamo signOut
+      try {
+        await _googleSignIn.signOut();
+      } catch (_) {}
+    }
   }
 }

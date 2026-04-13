@@ -3,6 +3,7 @@ import '../pages/map/map_page.dart';
 import '../pages/profile/profile_page.dart';
 import '../pages/settings/settings_page.dart';
 import 'shell_navigation_store.dart';
+import '../pages/social/social_page.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -15,7 +16,12 @@ class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
 
   // Le pagine vengono mantenute in vita (non ricostruite ad ogni switch)
-  final List<Widget> _pages = const [MapPage(), ProfilePage(), SettingsPage()];
+  final List<Widget> _pages = const [
+    MapPage(),
+    SocialPage(), // <--- NUOVA PAGINA QUI!
+    ProfilePage(),
+    SettingsPage(),
+  ];
 
   @override
   void initState() {
@@ -46,11 +52,18 @@ class _MainShellState extends State<MainShell> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: _onTapBottomBar,
+        type: BottomNavigationBarType
+            .fixed, // <--- Aggiungi questo per evitare che le icone spariscano se > 3
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.map_outlined),
             activeIcon: Icon(Icons.map),
             label: 'Mappa',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people_outline), // Icona Social
+            activeIcon: Icon(Icons.people),
+            label: 'Community',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.emoji_events_outlined),

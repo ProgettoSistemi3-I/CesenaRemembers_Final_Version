@@ -16,7 +16,7 @@ const String _googleLogoSvg = '''
 ''';
 
 // ─────────────────────────────────────────────
-//  Palette coerente con il resto dell'app
+//  Palette coerente con il resto dell'capp
 // ─────────────────────────────────────────────
 const _cream = Color(0xFFF7F3EE);
 const _warmWhite = Color(0xFFFFFFFF);

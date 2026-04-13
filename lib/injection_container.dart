@@ -12,6 +12,7 @@ import 'domain/usecases/auth_use_cases.dart';
 import 'domain/usecases/poi_use_cases.dart';
 import 'domain/usecases/user_use_cases.dart';
 import 'presentation/theme/theme_controller.dart';
+import 'presentation/controllers/social_controller.dart'; // Percorso corretto senza package:
 
 final sl = GetIt.instance;
 
@@ -62,4 +63,6 @@ Future<void> init() async {
   if (!sl.isRegistered<ThemeController>()) {
     sl.registerLazySingleton(() => ThemeController());
   }
+
+  sl.registerFactory(() => SocialController(userUseCases: sl()));
 }

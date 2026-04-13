@@ -18,6 +18,9 @@ class UserModel extends UserProfile {
     super.totalQuizCompleted,
     super.totalCorrectAnswers,
     super.bestTourTimeSeconds,
+    super.friends,
+    super.receivedFriendRequests,
+    super.sentFriendRequests,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json, String documentId) {
@@ -30,7 +33,9 @@ class UserModel extends UserProfile {
       profileCompleted: json['profileCompleted'] ?? false,
       xp: json['xp'] ?? 0,
       visitedPoiIds: List<String>.from(json['visitedPoiIds'] ?? []),
-      unlockedAchievements: List<String>.from(json['unlockedAchievements'] ?? []),
+      unlockedAchievements: List<String>.from(
+        json['unlockedAchievements'] ?? [],
+      ),
       notificheEnabled: json['preferences']?['notifiche'] ?? true,
       darkModeEnabled: json['preferences']?['modalitaNotte'] ?? false,
       gpsEnabled: json['preferences']?['posizioneGps'] ?? true,
@@ -38,6 +43,11 @@ class UserModel extends UserProfile {
       totalQuizCompleted: json['totalQuizCompleted'] ?? 0,
       totalCorrectAnswers: json['totalCorrectAnswers'] ?? 0,
       bestTourTimeSeconds: json['bestTourTimeSeconds'] ?? 0,
+      friends: List<String>.from(json['friends'] ?? []),
+      sentFriendRequests: List<String>.from(json['sentFriendRequests'] ?? []),
+      receivedFriendRequests: List<String>.from(
+        json['receivedFriendRequests'] ?? [],
+      ),
     );
   }
 
@@ -61,7 +71,7 @@ class UserModel extends UserProfile {
         'notifiche': notificheEnabled,
         'modalitaNotte': darkModeEnabled,
         'posizioneGps': gpsEnabled,
-      }
+      },
     };
   }
 }
