@@ -4,6 +4,7 @@ import '../../../domain/entities/userprofile.dart';
 import '../../../domain/usecases/user_use_cases.dart';
 import '../../../injection_container.dart';
 import '../../controllers/social_controller.dart';
+import '../../services/shell_navigation_store.dart'; // NUOVO IMPORT
 import '../../theme/app_palette.dart';
 import '../profile/avatar_catalog.dart';
 
@@ -36,17 +37,26 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
   }
 
   Future<void> _loadProfile() async {
-    final profile = await sl<UserUseCases>().getUserProfile(widget.uid);
-    if (mounted) {
-      setState(() {
-        _targetProfile = profile;
-        _isLoading = false;
-      });
+    try {
+      final profile = await sl<UserUseCases>().getUserProfile(widget.uid);
+      if (mounted) {
+        setState(() {
+          _targetProfile = profile;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Errore nel caricamento del profilo.')),
+        );
+      }
     }
   }
 
   void _onFriendAction(String action) async {
     final myUid = _socialCtrl.currentUserId;
+    if (_targetProfile == null) return;
 
     // Aggiornamento ottimistico della UI
     setState(() {
@@ -64,8 +74,116 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
       }
     });
 
-    // Chiamata backend tramite controller
     await _socialCtrl.handleFriendAction(action, widget.uid);
+  }
+
+  // Visualizza la lista amici dell'utente
+  void _showFriendsList(List<String> friendUids, ThemeData theme) async {
+    final users = await _socialCtrl.loadUsersList(friendUids);
+    if (!mounted) return;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: theme.colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _buildUserListSheet(
+        'Amici di ${_targetProfile!.displayName}',
+        users,
+        theme,
+      ),
+    );
+  }
+
+  Widget _buildUserListSheet(
+    String title,
+    List<UserProfile> users,
+    ThemeData theme,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 10),
+          if (users.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Text(
+                'Nessun utente trovato.',
+                style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+              ),
+            )
+          else
+            Expanded(
+              child: ListView.builder(
+                itemCount: users.length,
+                itemBuilder: (context, i) {
+                  final u = users[i];
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: AppPalette.tan,
+                      child: Icon(
+                        avatarById(u.avatarId).icon,
+                        size: 18,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    title: Text(
+                      u.displayName,
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: Text(
+                      '@${u.username}',
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context); // Chiude la bottom sheet
+
+                      // --- LA TUA LOGICA CORRETTA ---
+                      if (u.uid == _socialCtrl.currentUserId) {
+                        // Chiudiamo tutte le eventuali pagine pubbliche in sovraimpressione...
+                        Navigator.of(
+                          context,
+                        ).popUntil((route) => route.isFirst);
+                        // ...e cambiamo la tab in basso per mostrare il tuo profilo personale (indice 2)
+                        ShellNavigationStore.goToTab(2);
+                        return;
+                      }
+
+                      // Navigazione ricorsiva per gli ALTRI utenti
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PublicProfilePage(
+                            uid: u.uid,
+                            fallbackName: u.displayName,
+                            fallbackUsername: u.username,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -75,10 +193,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
     if (_isLoading) {
       return Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: AppBar(
-          backgroundColor: theme.scaffoldBackgroundColor,
-          elevation: 0,
-        ),
+        appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
         body: const Center(
           child: CircularProgressIndicator(color: AppPalette.olive),
         ),
@@ -89,7 +204,6 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
     final avatar = avatarById(profile.avatarId);
     final myUid = _socialCtrl.currentUserId;
 
-    // --- LOGICA STATO AMICIZIA ---
     bool isFriend = profile.friends.contains(myUid);
     bool requestSent = profile.receivedFriendRequests.contains(myUid);
     bool requestReceived = profile.sentFriendRequests.contains(myUid);
@@ -119,7 +233,6 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           children: [
-            // --- HERO CARD (Profilo e Azioni) ---
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
@@ -178,10 +291,8 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
 
                   const SizedBox(height: 20),
 
-                  // --- BOTTONE AMICIZIA DINAMICO ---
-                  if (myUid !=
-                      profile
-                          .uid) // Mostriamo i pulsanti solo se non è il proprio profilo
+                  // Bottoni Amicizia
+                  if (myUid != profile.uid)
                     if (isFriend)
                       OutlinedButton.icon(
                         onPressed: () => _onFriendAction('remove'),
@@ -261,6 +372,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                     ),
                   ),
                   const SizedBox(height: 16),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -268,6 +380,17 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                         'Amici',
                         profile.friends.length.toString(),
                         theme,
+                        onTap: isFriend
+                            ? () => _showFriendsList(profile.friends, theme)
+                            : () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Devi essere amico per vedere la sua lista amici.',
+                                    ),
+                                  ),
+                                );
+                              },
                       ),
                       Container(
                         height: 28,
@@ -292,34 +415,9 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
             ),
 
             const SizedBox(height: 28),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Row(
-                children: [
-                  Container(
-                    width: 3,
-                    height: 16,
-                    margin: const EdgeInsets.only(right: 8),
-                    decoration: BoxDecoration(
-                      color: AppPalette.olive,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  Text(
-                    'Statistiche',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: theme.colorScheme.onSurface,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            const _SectionLabel('Statistiche'),
             const SizedBox(height: 14),
 
-            // --- GRIGLIA STATISTICHE ---
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
@@ -364,7 +462,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                   theme,
                 ),
                 _buildStatCard(
-                  'Risposte corrette',
+                  'Risposte esatte',
                   '${profile.totalCorrectAnswers}',
                   Icons.check_circle_outline,
                   AppPalette.moss,
@@ -379,26 +477,35 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
     );
   }
 
-  Widget _buildMiniStat(String label, String value, ThemeData theme) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.w800,
-            color: AppPalette.olive,
+  Widget _buildMiniStat(
+    String label,
+    String value,
+    ThemeData theme, {
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w800,
+              color: AppPalette.olive,
+            ),
           ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            color: theme.colorScheme.onSurfaceVariant,
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -456,6 +563,41 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  final String text;
+  const _SectionLabel(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Row(
+        children: [
+          Container(
+            width: 3,
+            height: 16,
+            margin: const EdgeInsets.only(right: 8),
+            decoration: BoxDecoration(
+              color: AppPalette.olive,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
+              letterSpacing: 0.3,
+            ),
           ),
         ],
       ),

@@ -21,7 +21,6 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
   int _selectedAvatarIndex = 1;
-
   bool _isEditingName = false;
   bool _isSavingBasics = false;
   final TextEditingController _nameController = TextEditingController();
@@ -74,9 +73,7 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   Future<void> _toggleNameEdit(UserProfile profile) async {
-    if (_isEditingName) {
-      await _saveProfileBasics(profile);
-    }
+    if (_isEditingName) await _saveProfileBasics(profile);
     setState(() => _isEditingName = !_isEditingName);
   }
 
@@ -90,29 +87,30 @@ class _ProfilePageState extends State<ProfilePage>
     }
     if (!ProfileValidation.isValidDisplayName(updatedName)) {
       _profileController.errorMessage =
-          'Il nome in app deve avere ${ProfileValidation.minDisplayNameLength}-${ProfileValidation.maxDisplayNameLength} caratteri.';
+          'Il nome deve avere ${ProfileValidation.minDisplayNameLength}-${ProfileValidation.maxDisplayNameLength} caratteri.';
       _profileController.notifyListeners();
       setState(() => _nameController.text = profile.displayName);
       return;
     }
 
-    final shouldUpdateName = updatedName != profile.displayName;
-    final shouldUpdateAvatar = selectedAvatarId != profile.avatarId;
-
-    if (!shouldUpdateName && !shouldUpdateAvatar) return;
+    if (updatedName == profile.displayName &&
+        selectedAvatarId == profile.avatarId)
+      return;
 
     setState(() => _isSavingBasics = true);
     try {
       await _profileController.updateProfileBasics(
-        displayName: shouldUpdateName ? updatedName : null,
-        avatarId: shouldUpdateAvatar ? selectedAvatarId : null,
+        displayName: updatedName != profile.displayName ? updatedName : null,
+        avatarId: selectedAvatarId != profile.avatarId
+            ? selectedAvatarId
+            : null,
       );
     } finally {
       if (mounted) setState(() => _isSavingBasics = false);
     }
   }
 
-  // --- METODI PER AMICIZIE E NOTIFICHE ---
+  // --- AMICIZIE E NOTIFICHE ---
   void _showFriendsList(UserProfile profile, ThemeData theme) async {
     final users = await sl<SocialController>().loadUsersList(profile.friends);
     if (!mounted) return;
@@ -137,7 +135,8 @@ class _ProfilePageState extends State<ProfilePage>
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => _buildUserListSheet('Richieste ricevute', users, theme),
+      builder: (_) =>
+          _buildUserListSheet('Richieste d\'amicizia', users, theme),
     );
   }
 
@@ -164,7 +163,7 @@ class _ProfilePageState extends State<ProfilePage>
             Padding(
               padding: const EdgeInsets.all(20),
               child: Text(
-                'Nessuna lista da mostrare.',
+                'Nessun utente trovato.',
                 style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
               ),
             )
@@ -197,7 +196,7 @@ class _ProfilePageState extends State<ProfilePage>
                       ),
                     ),
                     onTap: () {
-                      Navigator.pop(context); // Chiude la bottom sheet
+                      Navigator.pop(context);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -233,22 +232,18 @@ class _ProfilePageState extends State<ProfilePage>
           }
 
           final dynamicProfile = _profileController.profile;
-          final profile = dynamicProfile ?? _buildFallbackProfile();
+          final profile =
+              dynamicProfile ??
+              UserProfile(
+                uid: '',
+                email: '',
+                displayName: _nameController.text,
+              );
           final selected = avatarById(profile.avatarId);
-          final selectedIndex = avatarOptions.indexWhere(
-            (option) => option.id == profile.avatarId,
-          );
-          if (selectedIndex >= 0 && selectedIndex != _selectedAvatarIndex) {
-            _selectedAvatarIndex = selectedIndex;
-          }
+
           if (!_isEditingName && _nameController.text != profile.displayName) {
             _nameController.text = profile.displayName;
           }
-          final pointsLabel = _formatPoints(profile.xp);
-          final bestScoreLabel = '${profile.maxQuizScore}%';
-          final bestTourTimeLabel = profile.bestTourTimeSeconds > 0
-              ? _formatDuration(profile.bestTourTimeSeconds)
-              : '--';
 
           return FadeTransition(
             opacity: _fadeAnim,
@@ -259,7 +254,6 @@ class _ProfilePageState extends State<ProfilePage>
                   SliverAppBar(
                     backgroundColor: theme.scaffoldBackgroundColor,
                     elevation: 0,
-                    expandedHeight: 0,
                     floating: true,
                     snap: true,
                     title: Text(
@@ -268,12 +262,10 @@ class _ProfilePageState extends State<ProfilePage>
                         color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w700,
                         fontSize: 17,
-                        letterSpacing: 0.3,
                       ),
                     ),
                     centerTitle: true,
                     actions: [
-                      // --- LA CAMPANELLA DELLE NOTIFICHE ---
                       Stack(
                         alignment: Alignment.center,
                         children: [
@@ -319,19 +311,16 @@ class _ProfilePageState extends State<ProfilePage>
                             nameController: _nameController,
                             isEditingName: _isEditingName,
                             username: '@${profile.username}',
-                            points: pointsLabel,
+                            points: profile.xp.toString(),
                             level: profile.level.toString(),
-                            friendsCount: profile.friends.length
-                                .toString(), // Passiamo il conto degli amici
+                            friendsCount: profile.friends.length.toString(),
                             onAvatarTap: () async {
                               await _showAvatarPicker();
                               await _saveProfileBasics(profile);
                             },
                             onEditToggle: () => _toggleNameEdit(profile),
-                            onFriendsTap: () => _showFriendsList(
-                              profile,
-                              theme,
-                            ), // Passiamo l'azione
+                            onFriendsTap: () =>
+                                _showFriendsList(profile, theme),
                           ),
                           if (_isSavingBasics)
                             const Padding(
@@ -340,16 +329,6 @@ class _ProfilePageState extends State<ProfilePage>
                                 color: AppPalette.olive,
                               ),
                             ),
-                          if (_profileController.errorMessage != null) ...[
-                            const SizedBox(height: 10),
-                            Text(
-                              _profileController.errorMessage!,
-                              style: const TextStyle(
-                                color: AppPalette.danger,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
                           const SizedBox(height: 28),
                           const _SectionLabel('Statistiche'),
                           const SizedBox(height: 14),
@@ -370,7 +349,7 @@ class _ProfilePageState extends State<ProfilePage>
                               _StatCard(
                                 icon: Icons.speed_outlined,
                                 label: 'Miglior punteggio',
-                                value: bestScoreLabel,
+                                value: '${profile.maxQuizScore}%',
                                 color: AppPalette.tan,
                               ),
                               _StatCard(
@@ -387,13 +366,15 @@ class _ProfilePageState extends State<ProfilePage>
                               ),
                               _StatCard(
                                 icon: Icons.timer_outlined,
-                                label: 'Miglior tempo tour',
-                                value: bestTourTimeLabel,
+                                label: 'Miglior tempo',
+                                value: profile.bestTourTimeSeconds > 0
+                                    ? '${profile.bestTourTimeSeconds ~/ 60}m ${profile.bestTourTimeSeconds % 60}s'
+                                    : '--',
                                 color: AppPalette.olive,
                               ),
                               _StatCard(
                                 icon: Icons.check_circle_outline,
-                                label: 'Risposte corrette',
+                                label: 'Risposte esatte',
                                 value: '${profile.totalCorrectAnswers}',
                                 color: AppPalette.moss,
                               ),
@@ -415,19 +396,5 @@ class _ProfilePageState extends State<ProfilePage>
         },
       ),
     );
-  }
-
-  UserProfile _buildFallbackProfile() {
-    return UserProfile(uid: '', email: '', displayName: _nameController.text);
-  }
-
-  String _formatPoints(int xp) {
-    return xp.toString();
-  }
-
-  String _formatDuration(int seconds) {
-    final mins = seconds ~/ 60;
-    final sec = seconds % 60;
-    return '${mins}m ${sec.toString().padLeft(2, '0')}s';
   }
 }

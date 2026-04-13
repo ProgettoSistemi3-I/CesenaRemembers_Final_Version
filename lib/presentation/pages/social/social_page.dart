@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../injection_container.dart';
 import '../../controllers/social_controller.dart';
+import '../../services/shell_navigation_store.dart'; // NUOVO IMPORT
 import '../../theme/app_palette.dart';
 import '../profile/avatar_catalog.dart';
 import 'public_profile_page.dart';
@@ -30,7 +31,13 @@ class _SocialPageState extends State<SocialPage> {
   }
 
   void _openProfile(String uid, String name, String username) {
-    if (uid == _controller.currentUserId) return;
+    // --- LA TUA LOGICA CORRETTA APPLICATA ANCHE QUI ---
+    if (uid == _controller.currentUserId) {
+      // Se clicchi te stesso (nella classifica o in ricerca), vai al tuo Profilo
+      ShellNavigationStore.goToTab(2);
+      return;
+    }
+
     Navigator.push(
       context,
       MaterialPageRoute(
