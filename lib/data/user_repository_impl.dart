@@ -69,8 +69,14 @@ class UserRepositoryImpl implements IUserRepository {
     if (!ProfileValidation.isValidDisplayName(displayName)) {
       throw Exception('INVALID_DISPLAY_NAME');
     }
+    if (ProfileValidation.hasOffensiveDisplayName(displayName)) {
+      throw Exception('OFFENSIVE_DISPLAY_NAME');
+    }
     if (!ProfileValidation.isValidUsername(username)) {
       throw Exception('INVALID_USERNAME');
+    }
+    if (ProfileValidation.hasOffensiveUsername(username)) {
+      throw Exception('OFFENSIVE_USERNAME');
     }
 
     final normalizedUsername = ProfileValidation.normalizeUsername(username);
@@ -213,6 +219,9 @@ class UserRepositoryImpl implements IUserRepository {
     if (displayName != null && displayName.trim().isNotEmpty) {
       if (!ProfileValidation.isValidDisplayName(displayName)) {
         throw Exception('INVALID_DISPLAY_NAME');
+      }
+      if (ProfileValidation.hasOffensiveDisplayName(displayName)) {
+        throw Exception('OFFENSIVE_DISPLAY_NAME');
       }
       updates['displayName'] = displayName.trim();
     }

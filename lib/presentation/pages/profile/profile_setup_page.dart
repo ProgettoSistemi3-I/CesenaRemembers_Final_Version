@@ -60,11 +60,25 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
       );
       return;
     }
+    if (ProfileValidation.hasOffensiveDisplayName(displayName)) {
+      setState(
+        () => _error =
+            'Il nome in app contiene termini non consentiti. Scegline uno diverso.',
+      );
+      return;
+    }
 
     if (!ProfileValidation.isValidUsername(normalizedUsername)) {
       setState(
         () => _error =
             'Username non valido (usa ${ProfileValidation.minUsernameLength}-${ProfileValidation.maxUsernameLength} caratteri: a-z, 0-9, _ o .).',
+      );
+      return;
+    }
+    if (ProfileValidation.hasOffensiveUsername(normalizedUsername)) {
+      setState(
+        () => _error =
+            'Username contiene termini non consentiti. Scegline uno diverso.',
       );
       return;
     }
@@ -116,6 +130,11 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
         } else if (message.contains('INVALID_USERNAME')) {
           _error =
               'Username non valido (usa ${ProfileValidation.minUsernameLength}-${ProfileValidation.maxUsernameLength} caratteri).';
+        } else if (message.contains('OFFENSIVE_DISPLAY_NAME')) {
+          _error =
+              'Il nome in app contiene termini non consentiti. Scegline uno diverso.';
+        } else if (message.contains('OFFENSIVE_USERNAME')) {
+          _error = 'Username contiene termini non consentiti. Scegline uno diverso.';
         } else if (e is FirebaseException && e.code == 'permission-denied') {
           _error =
               'Permessi Firestore insufficienti per completare il profilo. Controlla le regole del progetto.';

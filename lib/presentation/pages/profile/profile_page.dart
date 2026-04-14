@@ -92,6 +92,13 @@ class _ProfilePageState extends State<ProfilePage>
       setState(() => _nameController.text = profile.displayName);
       return;
     }
+    if (ProfileValidation.hasOffensiveDisplayName(updatedName)) {
+      _profileController.errorMessage =
+          'Il nome contiene termini non consentiti. Inseriscine uno diverso.';
+      _profileController.notifyListeners();
+      setState(() => _nameController.text = profile.displayName);
+      return;
+    }
 
     if (updatedName == profile.displayName &&
         selectedAvatarId == profile.avatarId) {

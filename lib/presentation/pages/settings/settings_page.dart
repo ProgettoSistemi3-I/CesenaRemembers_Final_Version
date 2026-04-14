@@ -613,17 +613,6 @@ class _SettingsPageState extends State<SettingsPage>
                                 value: _offlineMapsController.enabled,
                                 onChanged: _onOfflineToggleChanged,
                               ),
-                              const _ThinDivider(),
-                              _ActionRow(
-                                icon: Icons.cleaning_services_outlined,
-                                title: 'Cancella cache',
-                                subtitle: 'Libera spazio occupato',
-                                accent: AppPalette.tan,
-                                onTap: () => _showActionSheet(
-                                  'Cancella cache',
-                                  'Vuoi eseguire la pulizia dei file temporanei?',
-                                ),
-                              ),
                             ],
                           ),
                           const SizedBox(height: 22),
