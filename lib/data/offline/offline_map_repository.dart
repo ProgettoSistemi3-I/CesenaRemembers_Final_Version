@@ -131,7 +131,7 @@ class OfflineMapRepository {
 
       Future<void> poolDone() async {
         try {
-          await _runWorkerPool(
+          await _downloadTilesWithRetries(
             root: root,
             tiles: pendingTiles,
             onTileComplete: () => progressController.add(++downloaded),
@@ -184,24 +184,60 @@ class OfflineMapRepository {
     }
   }
 
-  Future<void> _runWorkerPool({
+  Future<void> _downloadTilesWithRetries({
+    required Directory root,
+    required List<_TileCoords> tiles,
+    required void Function() onTileComplete,
+  }) async {
+    if (tiles.isEmpty) return;
+
+    var pending = List<_TileCoords>.from(tiles);
+    const maxRounds = 3;
+
+    for (var round = 1; round <= maxRounds; round++) {
+      final failures = await _runWorkerPoolCollectFailures(
+        root: root,
+        tiles: pending,
+        onTileComplete: onTileComplete,
+      );
+
+      if (failures.isEmpty) return;
+
+      if (round == maxRounds) {
+        throw Exception(
+          'Download tile fallito dopo $maxRounds tentativi (${failures.length} tile).',
+        );
+      }
+
+      pending = failures;
+      await Future<void>.delayed(Duration(milliseconds: 700 * round));
+    }
+  }
+
+  Future<List<_TileCoords>> _runWorkerPoolCollectFailures({
     required Directory root,
     required List<_TileCoords> tiles,
     required void Function() onTileComplete,
   }) async {
     var index = 0;
+    final failures = <_TileCoords>[];
 
     Future<void> worker() async {
       while (true) {
         if (index >= tiles.length) return;
         final tile = tiles[index++];
 
-        await _downloadTile(root, tile);
-        onTileComplete();
+        try {
+          await _downloadTile(root, tile);
+          onTileComplete();
+        } catch (_) {
+          failures.add(tile);
+        }
       }
     }
 
     await Future.wait(List.generate(_parallelism, (_) => worker()));
+    return failures;
   }
 
   Directory _requireRoot() {

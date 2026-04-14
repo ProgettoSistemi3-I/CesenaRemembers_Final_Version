@@ -228,7 +228,7 @@ class _SwitchRow extends StatelessWidget {
   final String subtitle;
   final Color accent;
   final bool value;
-  final ValueChanged<bool> onChanged;
+  final ValueChanged<bool>? onChanged;
 
   const _SwitchRow({
     required this.icon,

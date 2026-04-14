@@ -610,8 +610,12 @@ class _SettingsPageState extends State<SettingsPage>
                                 title: 'Download offline',
                                 subtitle: 'Scarica mappe, testi e tappe',
                                 accent: AppPalette.olive,
-                                value: _offlineMapsController.enabled,
-                                onChanged: _onOfflineToggleChanged,
+                                value:
+                                    _offlineMapsController.enabled ||
+                                    _offlineMapsController.isBusy,
+                                onChanged: _offlineMapsController.isBusy
+                                    ? null
+                                    : _onOfflineToggleChanged,
                               ),
                             ],
                           ),
