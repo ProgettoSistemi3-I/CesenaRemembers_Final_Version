@@ -94,8 +94,9 @@ class _ProfilePageState extends State<ProfilePage>
     }
 
     if (updatedName == profile.displayName &&
-        selectedAvatarId == profile.avatarId)
+        selectedAvatarId == profile.avatarId) {
       return;
+    }
 
     setState(() => _isSavingBasics = true);
     try {

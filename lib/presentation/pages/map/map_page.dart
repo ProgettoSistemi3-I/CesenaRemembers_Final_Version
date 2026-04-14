@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -41,6 +40,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   final TourStopMapper _tourStopMapper = const TourStopMapper();
   final TourStopVisuals _tourStopVisuals = const TourStopVisuals();
   final TourScoringService _tourScoringService = const TourScoringService();
+  final UserUseCases _userUseCases = sl<UserUseCases>();
 
   static final LatLngBounds _cesenaBounds = LatLngBounds(
     const LatLng(44.1054, 12.2131), // SW
@@ -392,8 +392,8 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   ) async {
     if (_isSavingQuizResult) return;
 
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+    final uid = _userUseCases.getCurrentUserUid();
+    if (uid == null) return;
 
     _isSavingQuizResult = true;
 
@@ -403,8 +403,8 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     );
 
     try {
-      await sl<UserUseCases>().registerQuizCompletion(
-        uid: user.uid,
+      await _userUseCases.registerQuizCompletion(
+        uid: uid,
         poiId: poiId,
         xpGained: score.totalXp,
         correctAnswers: result.score,

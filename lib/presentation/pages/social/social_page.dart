@@ -326,17 +326,19 @@ class _SocialPageState extends State<SocialPage> {
   }
 
   Widget _buildSearchResults(ThemeData theme) {
-    if (_controller.isSearching)
+    if (_controller.isSearching) {
       return const Center(
         child: CircularProgressIndicator(color: AppPalette.olive),
       );
-    if (_controller.searchResults.isEmpty)
+    }
+    if (_controller.searchResults.isEmpty) {
       return Center(
         child: Text(
           'Nessun utente trovato.',
           style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
         ),
       );
+    }
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),

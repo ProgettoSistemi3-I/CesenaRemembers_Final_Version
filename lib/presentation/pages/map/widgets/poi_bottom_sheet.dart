@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
 
 import '../../../../domain/entities/tour_stop.dart';
 import '../../../controllers/poi_quiz_controller.dart';

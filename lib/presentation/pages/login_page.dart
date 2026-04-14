@@ -120,7 +120,7 @@ class _LoginPageState extends State<LoginPage>
             fit: BoxFit.cover,
             color: Colors.black.withOpacity(0.62),
             colorBlendMode: BlendMode.darken,
-            errorBuilder: (_, __, ___) => Container(
+            errorBuilder: (_, _, _) => Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Color(0xFF2B2B2B), Color(0xFF000000)],

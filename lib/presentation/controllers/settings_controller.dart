@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../domain/usecases/auth_use_cases.dart';
 import '../../domain/usecases/user_use_cases.dart';
@@ -53,9 +52,9 @@ class SettingsController extends ChangeNotifier {
   }
 
   String get _currentUid {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) throw Exception("Errore critico: utente non loggato.");
-    return user.uid;
+    final uid = _userUseCases.getCurrentUserUid();
+    if (uid == null) throw Exception("Errore critico: utente non loggato.");
+    return uid;
   }
 
   Future<void> loadUserPreferences() async {

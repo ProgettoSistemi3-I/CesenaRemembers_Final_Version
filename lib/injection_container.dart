@@ -61,7 +61,7 @@ Future<void> init() async {
 
   // --- THEME CONTROLLER ---
   if (!sl.isRegistered<ThemeController>()) {
-    sl.registerLazySingleton(() => ThemeController());
+    sl.registerLazySingleton(() => ThemeController(userUseCases: sl()));
   }
 
   sl.registerFactory(() => SocialController(userUseCases: sl()));
