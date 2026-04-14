@@ -116,7 +116,8 @@ class _SettingsPageState extends State<SettingsPage>
 
   void _onOfflineDownloadFinished() {
     if (!_showOfflineCompleteSnack) return;
-    if (!_offlineMapsController.enabled || _offlineMapsController.isBusy) return;
+    if (!_offlineMapsController.enabled || _offlineMapsController.isBusy)
+      return;
     _showOfflineCompleteSnack = false;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -130,7 +131,8 @@ class _SettingsPageState extends State<SettingsPage>
     if (_offlineMapsController.isBusy) return;
     if (value) {
       _showOfflineCompleteSnack = true;
-      final downloadCompleted = await _offlineMapsController.enableOfflineMaps();
+      final downloadCompleted = await _offlineMapsController
+          .enableOfflineMaps();
       if (!downloadCompleted) {
         _showOfflineCompleteSnack = false;
       }

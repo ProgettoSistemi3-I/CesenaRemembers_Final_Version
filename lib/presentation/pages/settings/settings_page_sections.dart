@@ -281,7 +281,7 @@ class _SwitchRow extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeThumbColor: AppPalette.olive,
+            activeColor: AppPalette.olive,
             activeTrackColor: AppPalette.olive.withValues(alpha: 0.25),
           ),
         ],
