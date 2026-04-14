@@ -32,7 +32,7 @@ class OfflineMapRepository {
 
   static const int _minZoom = 12;
   static const int _maxZoom = 18;
-  static const int _parallelism = 16;
+  static const int _parallelism = 12;
 
   // Bounds calibrati sui POI attuali con un margine uniforme, così il
   // contenuto resta centrato e coerente con la mappa online.
@@ -45,6 +45,8 @@ class OfflineMapRepository {
   final ValueNotifier<bool> availability = ValueNotifier<bool>(false);
 
   Directory? _cacheRoot;
+
+  bool _isDownloading = false;
 
   OfflineMapRepository({http.Client? httpClient})
     : _httpClient = httpClient ?? http.Client();
@@ -78,55 +80,93 @@ class OfflineMapRepository {
   }
 
   Stream<OfflineMapProgress> downloadOfflineMap() async* {
+    if (_isDownloading) {
+      throw StateError('Download mappa offline già in corso.');
+    }
+
     if (_mapTilerApiKey.trim().isEmpty) {
       throw StateError('MapTiler API key non configurata.');
     }
 
-    final root = _requireRoot();
-    final allTiles = _buildCesenaTiles();
-    final total = allTiles.length;
+    _isDownloading = true;
 
-    var downloaded = 0;
-    final progressController = StreamController<int>();
+    try {
+      final root = _requireRoot();
+      final allTiles = _buildCesenaTiles();
+      final total = allTiles.length;
 
-    yield OfflineMapProgress(
-      downloaded: 0,
-      total: total,
-      status: OfflineMapStatus.downloading,
-    );
+      var downloaded = await _countExistingTiles(root, allTiles);
 
-    final poolDone = _runWorkerPool(
-      root: root,
-      tiles: allTiles,
-      onTileComplete: () => progressController.add(++downloaded),
-    );
-
-    await for (final count in progressController.stream) {
       yield OfflineMapProgress(
-        downloaded: count,
+        downloaded: downloaded,
         total: total,
         status: OfflineMapStatus.downloading,
       );
-      if (count >= total) break;
+
+      if (downloaded >= total) {
+        await _persistReadyManifest(totalTiles: total);
+        availability.value = true;
+        yield OfflineMapProgress(
+          downloaded: total,
+          total: total,
+          status: OfflineMapStatus.completed,
+        );
+        return;
+      }
+
+      final pendingTiles = allTiles.where((tile) {
+        final path = '${root.path}/${tile.z}/${tile.x}/${tile.y}.png';
+        return !File(path).existsSync();
+      }).toList(growable: false);
+
+      final progressController = StreamController<int>();
+
+      Future<void> poolDone() async {
+        try {
+          await _runWorkerPool(
+            root: root,
+            tiles: pendingTiles,
+            onTileComplete: () => progressController.add(++downloaded),
+          );
+        } catch (error, stackTrace) {
+          progressController.addError(error, stackTrace);
+        } finally {
+          if (!progressController.isClosed) {
+            await progressController.close();
+          }
+        }
+      }
+
+      final workerFuture = poolDone();
+
+      await for (final count in progressController.stream) {
+        yield OfflineMapProgress(
+          downloaded: count,
+          total: total,
+          status: OfflineMapStatus.downloading,
+        );
+      }
+
+      await workerFuture;
+
+      await _persistReadyManifest(totalTiles: total);
+      availability.value = true;
+
+      yield OfflineMapProgress(
+        downloaded: total,
+        total: total,
+        status: OfflineMapStatus.completed,
+      );
+    } catch (_) {
+      availability.value = false;
+      await _writeManifest(<String, dynamic>{
+        'isReady': false,
+        'updatedAt': DateTime.now().toIso8601String(),
+      });
+      rethrow;
+    } finally {
+      _isDownloading = false;
     }
-
-    await poolDone;
-    await progressController.close();
-
-    await _writeManifest(<String, dynamic>{
-      'isReady': true,
-      'downloadedAt': DateTime.now().toIso8601String(),
-      'minZoom': _minZoom,
-      'maxZoom': _maxZoom,
-      'source': 'maptiler:$_mapStyle',
-    });
-    availability.value = true;
-
-    yield OfflineMapProgress(
-      downloaded: total,
-      total: total,
-      status: OfflineMapStatus.completed,
-    );
   }
 
   Future<void> _runWorkerPool({
@@ -175,6 +215,31 @@ class OfflineMapRepository {
     await file.writeAsString(jsonEncode(data));
   }
 
+  Future<void> _persistReadyManifest({required int totalTiles}) async {
+    await _writeManifest(<String, dynamic>{
+      'isReady': true,
+      'downloadedAt': DateTime.now().toIso8601String(),
+      'minZoom': _minZoom,
+      'maxZoom': _maxZoom,
+      'totalTiles': totalTiles,
+      'source': 'maptiler:$_mapStyle',
+    });
+  }
+
+  Future<int> _countExistingTiles(
+    Directory root,
+    List<_TileCoords> tiles,
+  ) async {
+    var existing = 0;
+    for (final tile in tiles) {
+      final file = File('${root.path}/${tile.z}/${tile.x}/${tile.y}.png');
+      if (await file.exists()) {
+        existing++;
+      }
+    }
+    return existing;
+  }
+
   List<_TileCoords> _buildCesenaTiles() {
     final result = <_TileCoords>[];
     for (var z = _minZoom; z <= _maxZoom; z++) {
@@ -216,33 +281,33 @@ class OfflineMapRepository {
       '?key=$_mapTilerApiKey',
     );
 
-    Future<http.Response?> send() async {
+    http.Response? response;
+
+    for (var attempt = 0; attempt < 3; attempt++) {
       try {
-        return await _httpClient.get(
-          uri,
-          headers: const {'User-Agent': 'CesenaRemembers/1.0'},
-        );
+        response = await _httpClient
+            .get(
+              uri,
+              headers: const {'User-Agent': 'CesenaRemembers/1.0'},
+            )
+            .timeout(const Duration(seconds: 12));
       } catch (_) {
-        return null;
+        response = null;
+      }
+
+      if (response?.statusCode == 200 && response!.bodyBytes.isNotEmpty) {
+        await tileFile.writeAsBytes(response.bodyBytes, flush: false);
+        return;
+      }
+
+      if (attempt < 2) {
+        await Future<void>.delayed(Duration(milliseconds: 500 * (attempt + 1)));
       }
     }
 
-    var response = await send();
-
-    if (response?.statusCode == 429) {
-      await Future<void>.delayed(const Duration(seconds: 1));
-      response = await send();
-    }
-    if (response?.statusCode == 429) {
-      await Future<void>.delayed(const Duration(seconds: 3));
-      response = await send();
-    }
-
-    if (response != null &&
-        response.statusCode == 200 &&
-        response.bodyBytes.isNotEmpty) {
-      await tileFile.writeAsBytes(response.bodyBytes);
-    }
+    throw Exception(
+      'Download tile fallito [z=${tile.z}, x=${tile.x}, y=${tile.y}] status=${response?.statusCode}',
+    );
   }
 }
 

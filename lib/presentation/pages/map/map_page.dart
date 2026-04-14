@@ -97,7 +97,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
 
     _initLocationLogic();
     _loadPois();
-    _loadOfflineAvailability();
+    _loadOfflineAvailability(forceRefresh: true);
   }
 
   @override
@@ -280,8 +280,10 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _loadOfflineAvailability() async {
-    final hasOffline = await _offlineMapRepository.hasOfflineMap();
+  Future<void> _loadOfflineAvailability({bool forceRefresh = false}) async {
+    final hasOffline = forceRefresh
+        ? await _offlineMapRepository.hasOfflineMap()
+        : _offlineMapRepository.availability.value;
     if (!mounted) return;
     setState(() {
       _hasOfflineMaps = hasOffline;

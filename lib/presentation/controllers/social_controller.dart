@@ -39,6 +39,7 @@ class LeaderboardEntry {
 class SocialController extends ChangeNotifier {
   final UserUseCases _userUseCases;
   StreamSubscription<List<Map<String, dynamic>>>? _leaderboardSub;
+  Timer? _searchDebounce;
   bool _isDisposed = false;
 
   List<LeaderboardEntry> leaderboard = [];
@@ -47,6 +48,7 @@ class SocialController extends ChangeNotifier {
   List<UserProfile> searchResults = [];
   bool isSearching = false;
   String? errorMessage;
+  String _lastIssuedQuery = '';
 
   // Esponiamo l'ID corrente alla UI senza usare FirebaseAuth
   String get currentUserId => _userUseCases.getCurrentUserUid() ?? '';
@@ -95,29 +97,42 @@ class SocialController extends ChangeNotifier {
   }
 
   Future<void> search(String query) async {
-    if (query.trim().isEmpty) {
+    _searchDebounce?.cancel();
+    final normalizedQuery = query.trim().toLowerCase();
+
+    if (normalizedQuery.isEmpty || normalizedQuery.length < 2) {
+      _lastIssuedQuery = '';
       searchResults = [];
+      isSearching = false;
+      errorMessage = null;
       _safeNotifyListeners();
       return;
     }
 
-    isSearching = true;
-    errorMessage = null;
-    _safeNotifyListeners();
+    _searchDebounce = Timer(const Duration(milliseconds: 350), () async {
+      if (_isDisposed) return;
+      if (normalizedQuery == _lastIssuedQuery) return;
 
-    try {
-      searchResults = await _userUseCases.searchUsers(query);
-    } catch (e) {
-      errorMessage = 'Errore durante la ricerca.';
-    } finally {
-      isSearching = false;
+      _lastIssuedQuery = normalizedQuery;
+      isSearching = true;
+      errorMessage = null;
       _safeNotifyListeners();
-    }
+
+      try {
+        searchResults = await _userUseCases.searchUsers(normalizedQuery);
+      } catch (e) {
+        errorMessage = 'Errore durante la ricerca.';
+      } finally {
+        isSearching = false;
+        _safeNotifyListeners();
+      }
+    });
   }
 
   @override
   void dispose() {
     _isDisposed = true;
+    _searchDebounce?.cancel();
     _leaderboardSub?.cancel();
     super.dispose();
   }
