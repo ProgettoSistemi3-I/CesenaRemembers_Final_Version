@@ -1,3 +1,5 @@
+import 'offensive_language_filter.dart';
+
 class ProfileValidation {
   static const int minDisplayNameLength = 2;
   static const int maxDisplayNameLength = 30;
@@ -18,5 +20,15 @@ class ProfileValidation {
     final normalized = normalizeUsername(value);
     return normalized.length >= minUsernameLength &&
         normalized.length <= maxUsernameLength;
+  }
+
+  static bool hasOffensiveDisplayName(String value) {
+    return OffensiveLanguageFilter.containsOffensiveLanguage(value.trim());
+  }
+
+  static bool hasOffensiveUsername(String value) {
+    return OffensiveLanguageFilter.containsOffensiveLanguage(
+      normalizeUsername(value),
+    );
   }
 }

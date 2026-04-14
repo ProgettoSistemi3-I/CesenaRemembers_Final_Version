@@ -50,13 +50,14 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   // Cache per non ricaricare tutto ogni volta che si cambia tab
   static List<Poi>? _cachedPois;
   static List<TourStop>? _cachedStops;
+  static bool _hasRequestedInitialLocationPermission = false;
 
   late TourSessionController _tourController;
   StreamSubscription<ServiceStatus>? _serviceStatusSub;
   StreamSubscription<void>? _tourUpdatesSub;
   late final OfflineMapRepository _offlineMapRepository;
 
-  AlignOnUpdate _alignPositionOnUpdate = AlignOnUpdate.always;
+  AlignOnUpdate _alignPositionOnUpdate = AlignOnUpdate.never;
   double _currentRotation = 0.0;
   bool _isMapLocked = false;
   bool _isMapMenuOpen = false;
@@ -138,7 +139,9 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   }
 
   Future<void> _initLocationLogic() async {
-    await _verifyLocationState(requestPerms: true);
+    final shouldRequestPermission = !_hasRequestedInitialLocationPermission;
+    _hasRequestedInitialLocationPermission = true;
+    await _verifyLocationState(requestPerms: shouldRequestPermission);
     if (kIsWeb) return;
     _serviceStatusSub = Geolocator.getServiceStatusStream().listen((status) {
       if (!mounted) return;
