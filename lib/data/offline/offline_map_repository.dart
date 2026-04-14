@@ -104,6 +104,12 @@ class OfflineMapRepository {
       );
 
       if (downloaded >= total) {
+        final isComplete = await _hasAllTiles(root, allTiles);
+        if (!isComplete) {
+          throw StateError(
+            'Cache offline incompleta: alcuni tile risultano mancanti.',
+          );
+        }
         await _persistReadyManifest(totalTiles: total);
         availability.value = true;
         yield OfflineMapProgress(
@@ -114,10 +120,12 @@ class OfflineMapRepository {
         return;
       }
 
-      final pendingTiles = allTiles.where((tile) {
-        final path = '${root.path}/${tile.z}/${tile.x}/${tile.y}.png';
-        return !File(path).existsSync();
-      }).toList(growable: false);
+      final pendingTiles = allTiles
+          .where((tile) {
+            final path = '${root.path}/${tile.z}/${tile.x}/${tile.y}.png';
+            return !File(path).existsSync();
+          })
+          .toList(growable: false);
 
       final progressController = StreamController<int>();
 
@@ -148,6 +156,13 @@ class OfflineMapRepository {
       }
 
       await workerFuture;
+
+      final isComplete = await _hasAllTiles(root, allTiles);
+      if (!isComplete) {
+        throw StateError(
+          'Download offline incompleto: non tutti i tile sono disponibili.',
+        );
+      }
 
       await _persistReadyManifest(totalTiles: total);
       availability.value = true;
@@ -240,6 +255,16 @@ class OfflineMapRepository {
     return existing;
   }
 
+  Future<bool> _hasAllTiles(Directory root, List<_TileCoords> tiles) async {
+    for (final tile in tiles) {
+      final file = File('${root.path}/${tile.z}/${tile.x}/${tile.y}.png');
+      if (!await file.exists()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   List<_TileCoords> _buildCesenaTiles() {
     final result = <_TileCoords>[];
     for (var z = _minZoom; z <= _maxZoom; z++) {
@@ -286,10 +311,7 @@ class OfflineMapRepository {
     for (var attempt = 0; attempt < 3; attempt++) {
       try {
         response = await _httpClient
-            .get(
-              uri,
-              headers: const {'User-Agent': 'CesenaRemembers/1.0'},
-            )
+            .get(uri, headers: const {'User-Agent': 'CesenaRemembers/1.0'})
             .timeout(const Duration(seconds: 12));
       } catch (_) {
         response = null;
