@@ -78,6 +78,10 @@ class OfflineMapsController extends ChangeNotifier {
         _activeCompleter = null;
         if (!completer.isCompleted) completer.complete(false);
       },
+      onDone: () {
+        _downloadSub?.cancel();
+        _downloadSub = null;
+      },
       cancelOnError: true,
     );
 

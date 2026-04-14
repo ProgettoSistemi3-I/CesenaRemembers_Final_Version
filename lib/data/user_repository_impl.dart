@@ -169,7 +169,8 @@ class UserRepositoryImpl implements IUserRepository {
   @override
   Future<List<UserProfile>> searchUsers(String query) async {
     final cleanQuery = query.trim().toLowerCase();
-    if (cleanQuery.isEmpty) return [];
+    // Evita letture Firestore inutili per query troppo corte o vuote.
+    if (cleanQuery.length < 2) return [];
 
     try {
       final snapshot = await _users
