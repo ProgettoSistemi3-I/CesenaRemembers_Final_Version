@@ -173,8 +173,8 @@ class UserRepositoryImpl implements IUserRepository {
 
     try {
       final snapshot = await _users
-          .where('username', isGreaterThanOrEqualTo: cleanQuery)
-          .where('username', isLessThanOrEqualTo: '$cleanQuery\uf8ff')
+          .where('usernameNormalized', isGreaterThanOrEqualTo: cleanQuery)
+          .where('usernameNormalized', isLessThanOrEqualTo: '$cleanQuery\uf8ff')
           .limit(10)
           .get();
 

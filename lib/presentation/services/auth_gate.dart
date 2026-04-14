@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../domain/entities/app_user.dart';
+import '../../domain/entities/userprofile.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/user_use_cases.dart';
 import '../../injection_container.dart';
@@ -84,30 +84,15 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
           );
         }
 
-        return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          stream: FirebaseFirestore.instance
-              .collection('users')
-              .doc(widget.appUser.id)
-              .snapshots(),
-          builder: (context, docSnapshot) {
-            if (!docSnapshot.hasData) {
+        return StreamBuilder<UserProfile?>(
+          stream: _userUseCases.getUserProfileStream(widget.appUser.id),
+          builder: (context, profileSnapshot) {
+            if (!profileSnapshot.hasData) {
               return const Scaffold(
                 body: Center(child: CircularProgressIndicator()),
               );
             }
-
-            final doc = docSnapshot.data!;
-            if (!doc.exists) {
-              // Il documento è stato eliminato (cancellazione account in corso).
-              // Mostriamo un indicatore di caricamento in attesa che anche
-              // l'utente auth venga rimosso e il flusso torni alla LoginPage.
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            }
-
-            final data = doc.data();
-            final profileCompleted = data?['profileCompleted'] == true;
+            final profileCompleted = profileSnapshot.data?.profileCompleted == true;
 
             if (!profileCompleted) {
               return ProfileSetupPage(

@@ -15,6 +15,6 @@ class ShellNavigationStore {
 
   static void openSettingsAndFocusGpsToggle() {
     focusGpsToggleInSettings.value = true;
-    goToTab(2);
+    goToTab(3);
   }
 }
