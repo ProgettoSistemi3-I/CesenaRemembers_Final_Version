@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../domain/entities/quiz_question.dart';
 import '../../../../domain/entities/tour_stop.dart';
 import '../../../controllers/poi_quiz_controller.dart';
 import '../../../theme/app_palette.dart';
@@ -12,6 +13,7 @@ class PoiBottomSheet extends StatefulWidget {
     required this.icon,
     required this.iconBackground,
     required this.elapsedSeconds,
+    required this.loadQuizQuestions,
     required this.onQuizCompleted,
     required this.onNextStop,
   });
@@ -20,6 +22,7 @@ class PoiBottomSheet extends StatefulWidget {
   final IconData icon;
   final Color iconBackground;
   final int elapsedSeconds;
+  final Future<List<QuizQuestion>> Function(TourStop stop) loadQuizQuestions;
   final ValueChanged<QuizCompletionData> onQuizCompleted;
   final VoidCallback onNextStop;
 
@@ -32,7 +35,9 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
   late TabController _tabController;
   PoiQuizController? _quizController;
   bool _quizInitialized = false;
+  bool _quizLoading = false;
   bool _quizCompletionSent = false;
+  List<QuizQuestion> _questions = const [];
 
   @override
   void initState() {
@@ -50,10 +55,37 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
 
   void _handleTabChange() {
     if (_quizInitialized || _tabController.index != 1) return;
+    _initializeQuiz();
+  }
+
+  Future<void> _initializeQuiz() async {
     setState(() {
-      _quizController = PoiQuizController(questions: widget.stop.questions);
-      _quizInitialized = true;
+      _quizLoading = true;
     });
+
+    try {
+      final loadedQuestions = await widget.loadQuizQuestions(widget.stop);
+      if (!mounted) return;
+
+      final questions = loadedQuestions.isEmpty
+          ? widget.stop.questions
+          : loadedQuestions;
+
+      setState(() {
+        _questions = List<QuizQuestion>.unmodifiable(questions);
+        _quizController = PoiQuizController(questions: _questions);
+        _quizInitialized = true;
+        _quizLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _questions = List<QuizQuestion>.unmodifiable(widget.stop.questions);
+        _quizController = PoiQuizController(questions: _questions);
+        _quizInitialized = true;
+        _quizLoading = false;
+      });
+    }
   }
 
   void _onAnswerTap(int index) {
@@ -79,7 +111,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         widget.onQuizCompleted(
           QuizCompletionData(
             score: quizController.score,
-            totalQuestions: widget.stop.questions.length,
+            totalQuestions: _questions.length,
           ),
         );
       }
@@ -340,7 +372,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
   }
 
   Widget _buildQuizContent(ThemeData theme) {
-    if (!_quizInitialized) {
+    if (!_quizInitialized || _quizLoading) {
       return const Center(
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 20),
@@ -352,7 +384,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
     final quizController = _quizController;
     if (quizController == null) return const SizedBox.shrink();
 
-    if (widget.stop.questions.isEmpty) {
+    if (_questions.isEmpty) {
       return Column(
         children: [
           Text(
@@ -373,7 +405,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         children: [
           QuizResultCard(
             score: quizController.score,
-            total: widget.stop.questions.length,
+            total: _questions.length,
             elapsed: widget.elapsedSeconds,
           ),
           const SizedBox(height: 20),
@@ -392,7 +424,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         Row(
           children: [
             Text(
-              'Domanda ${quizController.questionIndex + 1} di ${widget.stop.questions.length}',
+              'Domanda ${quizController.questionIndex + 1} di ${_questions.length}',
               style: TextStyle(
                 fontSize: 12,
                 color: theme.colorScheme.onSurfaceVariant,
@@ -416,7 +448,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
           child: LinearProgressIndicator(
             value:
                 (quizController.questionIndex + 1) /
-                widget.stop.questions.length,
+                _questions.length,
             backgroundColor:
                 theme.colorScheme.surfaceContainerHighest, // ADATTIVO
             valueColor: const AlwaysStoppedAnimation<Color>(AppPalette.olive),

@@ -16,8 +16,11 @@ import '../../../domain/usecases/poi_use_cases.dart';
 import '../../../domain/usecases/user_use_cases.dart';
 import '../../../injection_container.dart';
 import '../../../data/offline/offline_map_repository.dart';
+import '../../../data/repositories/quiz_history_repository.dart';
+import '../../../data/services/grok_quiz_service.dart';
 import '../../controllers/tour_session_controller.dart';
 import '../../services/poi_marker_factory.dart';
+import '../../services/dynamic_quiz_provider.dart';
 import '../../services/location_preference_store.dart';
 import '../../services/local_file_tile_provider.dart';
 import '../../services/shell_navigation_store.dart';
@@ -41,6 +44,10 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   final TourStopVisuals _tourStopVisuals = const TourStopVisuals();
   final TourScoringService _tourScoringService = const TourScoringService();
   final UserUseCases _userUseCases = sl<UserUseCases>();
+  final DynamicQuizProvider _dynamicQuizProvider = DynamicQuizProvider(
+    grokQuizService: sl<GrokQuizService>(),
+    quizHistoryRepository: sl<QuizHistoryRepository>(),
+  );
 
   static final LatLngBounds _cesenaBounds = LatLngBounds(
     const LatLng(44.1054, 12.2131), // SW
@@ -69,6 +76,8 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   bool _isCheckingLocation = true; // Scudo anti-sfarfallio del banner
   bool _isCenteringOnUser = false;
   bool _isSavingQuizResult = false;
+  int _userLevel = 1;
+  String? _prefetchedStopId;
 
   List<Poi> _pois = [];
   bool _isLoading = true;
@@ -97,6 +106,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     LocationPreferenceStore.gpsEnabled.addListener(_onGpsPreferenceChanged);
 
     _initLocationLogic();
+    _loadUserLevel();
     _loadPois();
     _loadOfflineAvailability(forceRefresh: true);
   }
@@ -248,6 +258,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
       _tourController.dispose();
       _tourController = TourSessionController(availableStops: _cachedStops!);
       _bindTourUpdates();
+      _prefetchCurrentStopQuizIfNeeded();
       setState(() {
         _pois = _cachedPois!;
         _isLoading = false;
@@ -267,6 +278,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
       _tourController.dispose();
       _tourController = TourSessionController(availableStops: stops);
       _bindTourUpdates();
+      _prefetchCurrentStopQuizIfNeeded();
 
       setState(() {
         _pois = pois;
@@ -321,6 +333,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   void _bindTourUpdates() {
     _tourUpdatesSub?.cancel();
     _tourUpdatesSub = _tourController.updates.listen((_) {
+      _prefetchCurrentStopQuizIfNeeded();
       if (mounted) setState(() {});
     });
   }
@@ -333,6 +346,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     if (!_tourController.hasStops) return;
     final hasStarted = await _tourController.startTour();
     if (hasStarted && mounted && _tourController.currentStop != null) {
+      _prefetchCurrentStopQuizIfNeeded();
       _centerOnStop(_tourController.currentStop!.position);
     }
   }
@@ -364,6 +378,12 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
         icon: visual.icon,
         iconBackground: visual.iconBackground,
         elapsedSeconds: _tourController.elapsedSeconds,
+        loadQuizQuestions: (stop) => _dynamicQuizProvider.getQuizForStop(
+          stop: stop,
+          userLevel: _userLevel,
+          uid: _userUseCases.getCurrentUserUid(),
+          questionCount: 3,
+        ),
         onNextStop: () {
           Navigator.pop(context);
           if (_tourController.advanceToNextStop()) {
@@ -388,6 +408,32 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
           _registerQuizCompletion(currentStop.id, result);
         },
       ),
+    );
+  }
+
+  Future<void> _loadUserLevel() async {
+    final uid = _userUseCases.getCurrentUserUid();
+    if (uid == null) return;
+    try {
+      final profile = await _userUseCases.getUserProfile(uid);
+      if (!mounted) return;
+      setState(() {
+        _userLevel = profile.level;
+      });
+    } catch (_) {
+      // fallback sul livello 1
+    }
+  }
+
+  void _prefetchCurrentStopQuizIfNeeded() {
+    final stop = _tourController.currentStop;
+    if (stop == null) return;
+    if (_prefetchedStopId == stop.id) return;
+    _prefetchedStopId = stop.id;
+    _dynamicQuizProvider.prefetchForStop(
+      stop: stop,
+      userLevel: _userLevel,
+      uid: _userUseCases.getCurrentUserUid(),
     );
   }
 

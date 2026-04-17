@@ -4,6 +4,8 @@ import 'package:get_it/get_it.dart';
 import 'data/offline/offline_map_repository.dart';
 import 'data/firebase_auth_repository.dart';
 import 'data/poi_repository_impl.dart';
+import 'data/repositories/quiz_history_repository.dart';
+import 'data/services/grok_quiz_service.dart';
 import 'data/user_repository_impl.dart';
 import 'domain/repositories/auth_repository.dart';
 import 'domain/repositories/i_poi_repository.dart';
@@ -27,6 +29,14 @@ Future<void> init() async {
     final repository = OfflineMapRepository();
     await repository.init();
     sl.registerLazySingleton<OfflineMapRepository>(() => repository);
+  }
+  if (!sl.isRegistered<GrokQuizService>()) {
+    sl.registerLazySingleton<GrokQuizService>(() => GrokQuizService());
+  }
+  if (!sl.isRegistered<QuizHistoryRepository>()) {
+    sl.registerLazySingleton<QuizHistoryRepository>(
+      () => QuizHistoryRepository(firestore: sl()),
+    );
   }
 
   // --- REPOSITORY ---
