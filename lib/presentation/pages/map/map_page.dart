@@ -337,6 +337,87 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> _confirmStopTour() async {
+    final shouldStop = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        final theme = Theme.of(dialogContext);
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          title: const Text('Interrompere il tour?'),
+          content: const Text(
+            'Il tour verrà terminato e perderai l’ordine attuale delle tappe.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(
+                'Annulla',
+                style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+              ),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: AppPalette.danger),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Interrompi'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldStop != true || !mounted) return;
+
+    _tourController.stopTour();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Tour interrotto.'),
+        backgroundColor: AppPalette.danger,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
+  void _openTourPlanSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final stops = _tourController.upcomingStops;
+            final distances = _tourController.upcomingStopsDistanceFromPrevious;
+            return SizedBox(
+              height: MediaQuery.of(context).size.height * 0.68,
+              child: TourPlanSheet(
+                upcomingStops: stops,
+                distanceFromPrevious: distances,
+                onReorder: (oldIndex, newIndex) {
+                  final normalizedNewIndex = oldIndex < newIndex
+                      ? newIndex - 1
+                      : newIndex;
+                  _tourController.reorderUpcomingStops(
+                    oldRelativeIndex: oldIndex,
+                    newRelativeIndex: normalizedNewIndex,
+                  );
+                  setModalState(() {});
+                },
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _centerOnStop(LatLng position) {
     Future.delayed(const Duration(milliseconds: 200), () {
       if (!mounted) return;
@@ -758,9 +839,36 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
                     _tourController.status == TourStatus.running)
                   Positioned(
                     right: 20,
-                    bottom: cardBottom + 132,
+                    bottom: cardBottom + 180,
                     child: ManualArrivalButton(
                       onTap: _tourController.markArrivedManually,
+                    ),
+                  ),
+                if (isTourActive)
+                  Positioned(
+                    left: 16,
+                    right: 16,
+                    bottom: cardBottom + 106,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TourQuickActionButton(
+                            label: 'Interrompi tour',
+                            icon: Icons.stop_circle_outlined,
+                            color: AppPalette.danger,
+                            onTap: _confirmStopTour,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: TourQuickActionButton(
+                            label: 'Ordina tappe',
+                            icon: Icons.format_list_bulleted_rounded,
+                            color: AppPalette.olive,
+                            onTap: _openTourPlanSheet,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 if (isTourActive && currentStop != null)

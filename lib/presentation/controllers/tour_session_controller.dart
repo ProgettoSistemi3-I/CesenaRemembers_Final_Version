@@ -48,6 +48,30 @@ class TourSessionController {
   TourStop? get currentStop =>
       _orderedStops.isEmpty ? null : _orderedStops[_currentStopIndex];
 
+  List<TourStop> get upcomingStops {
+    if (_orderedStops.isEmpty || _currentStopIndex >= _orderedStops.length) {
+      return const [];
+    }
+    return List.unmodifiable(_orderedStops.sublist(_currentStopIndex));
+  }
+
+  List<double?> get upcomingStopsDistanceFromPrevious {
+    if (_orderedStops.isEmpty || _currentStopIndex >= _orderedStops.length) {
+      return const [];
+    }
+
+    final distance = const Distance();
+    return List<double?>.generate(upcomingStops.length, (relativeIndex) {
+      final absoluteIndex = _currentStopIndex + relativeIndex;
+      if (absoluteIndex == 0) return null;
+      return distance.as(
+        LengthUnit.Meter,
+        _orderedStops[absoluteIndex - 1].position,
+        _orderedStops[absoluteIndex].position,
+      );
+    }, growable: false);
+  }
+
   double get distanceToCurrentStop {
     final stop = currentStop;
     if (stop == null || _userPosition == null) return -1;
@@ -99,10 +123,38 @@ class TourSessionController {
       return true;
     }
 
+    stopTour();
+    return false;
+  }
+
+  void stopTour() {
     _stopTracking();
     _status = TourStatus.idle;
+    _orderedStops = [];
+    _currentStopIndex = 0;
+    _elapsedSeconds = 0;
+    _totalElapsedSeconds = 0;
     _emit();
-    return false;
+  }
+
+  void reorderUpcomingStops({
+    required int oldRelativeIndex,
+    required int newRelativeIndex,
+  }) {
+    if (!isActive) return;
+
+    final upcomingLength = _orderedStops.length - _currentStopIndex;
+    if (upcomingLength < 2) return;
+    if (oldRelativeIndex < 0 || oldRelativeIndex >= upcomingLength) return;
+    if (newRelativeIndex < 0 || newRelativeIndex >= upcomingLength) return;
+
+    final absoluteOldIndex = _currentStopIndex + oldRelativeIndex;
+    final absoluteNewIndex = _currentStopIndex + newRelativeIndex;
+
+    final movedStop = _orderedStops.removeAt(absoluteOldIndex);
+    _orderedStops.insert(absoluteNewIndex, movedStop);
+
+    _emit();
   }
 
   Future<void> refreshPermissionsState() async {
