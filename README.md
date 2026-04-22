@@ -1,16 +1,20 @@
-# cesena_remembers
+# Cesena Remembers
 
-A new Flutter project.
+Applicazione Flutter per l'esplorazione storica con mappa, tour guidati, quiz e componenti social.
 
-## Getting Started
+## Avvio locale
 
-This project is a starting point for a Flutter application.
+Assicurati di configurare le chiavi tramite `--dart-define` (non sono più hardcoded nel codice):
 
-A few resources to get you started if this is your first Flutter project:
+```bash
+flutter run \
+  --dart-define=GOOGLE_WEB_CLIENT_ID=your_google_web_client_id \
+  --dart-define=MAPTILER_API_KEY=your_maptiler_key \
+  --dart-define=STADIA_MAPS_API_KEY=your_stadia_key
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Note architetturali
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Layer principali: `domain`, `data`, `presentation`.
+- La gestione mappe offline passa da `domain/repositories/offline_map_repository.dart` + `domain/usecases/offline_map_use_cases.dart`.
+- La logica utente è stata separata in data source verticali (`profile`, `progress`, `social`, `cleanup`) per ridurre responsabilità monolitiche.

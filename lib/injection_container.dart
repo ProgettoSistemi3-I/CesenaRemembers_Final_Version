@@ -1,35 +1,34 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
 
-import 'data/offline/offline_map_repository.dart';
 import 'data/firebase_auth_repository.dart';
+import 'data/offline/offline_map_repository.dart';
 import 'data/poi_repository_impl.dart';
 import 'data/user_repository_impl.dart';
 import 'domain/repositories/auth_repository.dart';
 import 'domain/repositories/i_poi_repository.dart';
+import 'domain/repositories/offline_map_repository.dart';
 import 'domain/repositories/user_repository.dart';
 import 'domain/usecases/auth_use_cases.dart';
+import 'domain/usecases/offline_map_use_cases.dart';
 import 'domain/usecases/poi_use_cases.dart';
 import 'domain/usecases/user_use_cases.dart';
+import 'presentation/controllers/social_controller.dart';
 import 'presentation/theme/theme_controller.dart';
-import 'presentation/controllers/social_controller.dart'; // Percorso corretto senza package:
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  // --- DIPENDENZE ESTERNE ---
   if (!sl.isRegistered<FirebaseFirestore>()) {
-    sl.registerLazySingleton<FirebaseFirestore>(
-      () => FirebaseFirestore.instance,
-    );
-  }
-  if (!sl.isRegistered<OfflineMapRepository>()) {
-    final repository = OfflineMapRepository();
-    await repository.init();
-    sl.registerLazySingleton<OfflineMapRepository>(() => repository);
+    sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
   }
 
-  // --- REPOSITORY ---
+  if (!sl.isRegistered<IOfflineMapRepository>()) {
+    final repository = OfflineMapRepository();
+    await repository.init();
+    sl.registerLazySingleton<IOfflineMapRepository>(() => repository);
+  }
+
   if (!sl.isRegistered<IPoiRepository>()) {
     sl.registerLazySingleton<IPoiRepository>(() => PoiRepositoryImpl());
   }
@@ -42,9 +41,11 @@ Future<void> init() async {
     );
   }
 
-  // --- USE CASES ---
   if (!sl.isRegistered<GetPoisUseCase>()) {
     sl.registerLazySingleton(() => GetPoisUseCase(sl()));
+  }
+  if (!sl.isRegistered<OfflineMapUseCases>()) {
+    sl.registerLazySingleton(() => OfflineMapUseCases(sl()));
   }
   if (!sl.isRegistered<SignInWithGoogleUseCase>()) {
     sl.registerLazySingleton(() => SignInWithGoogleUseCase(sl()));
@@ -59,7 +60,6 @@ Future<void> init() async {
     sl.registerLazySingleton(() => UserUseCases(sl()));
   }
 
-  // --- THEME CONTROLLER ---
   if (!sl.isRegistered<ThemeController>()) {
     sl.registerLazySingleton(() => ThemeController(userUseCases: sl()));
   }

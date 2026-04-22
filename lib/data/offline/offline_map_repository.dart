@@ -7,41 +7,28 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
-class OfflineMapProgress {
-  const OfflineMapProgress({
-    required this.downloaded,
-    required this.total,
-    required this.status,
-  });
+import '../../config/app_runtime_config.dart';
+import '../../domain/entities/offline_map.dart';
+import '../../domain/repositories/offline_map_repository.dart';
 
-  final int downloaded;
-  final int total;
-  final OfflineMapStatus status;
-
-  double get ratio => total == 0 ? 0 : downloaded / total;
-}
-
-enum OfflineMapStatus { idle, downloading, completed, failed }
-
-class OfflineMapRepository {
+class OfflineMapRepository implements IOfflineMapRepository {
   static const String _manifestFileName = 'manifest.json';
   static const String _cacheFolderName = 'offline_maps';
   static const String _mapStyle = 'basic-v2';
   static const String _mapTilerApiHost = 'https://api.maptiler.com/maps';
-  static const String _mapTilerApiKey = 'xPaUqCmkhgDz7eOdFSEY';
 
   static const int _minZoom = 12;
   static const int _maxZoom = 18;
   static const int _parallelism = 16;
 
-  // Bounds calibrati sui POI attuali con un margine uniforme, così il
-  // contenuto resta centrato e coerente con la mappa online.
   static const double _minLat = 44.1054;
   static const double _maxLat = 44.1714;
   static const double _minLon = 12.2131;
   static const double _maxLon = 12.2811;
 
   final http.Client _httpClient;
+
+  @override
   final ValueNotifier<bool> availability = ValueNotifier<bool>(false);
 
   Directory? _cacheRoot;
@@ -49,6 +36,7 @@ class OfflineMapRepository {
   OfflineMapRepository({http.Client? httpClient})
     : _httpClient = httpClient ?? http.Client();
 
+  @override
   Future<void> init() async {
     final appDir = await getApplicationDocumentsDirectory();
     _cacheRoot = Directory('${appDir.path}/$_cacheFolderName');
@@ -58,16 +46,20 @@ class OfflineMapRepository {
     availability.value = await hasOfflineMap();
   }
 
+  @override
   Future<bool> hasOfflineMap() async {
     final manifest = await _readManifest();
     return manifest['isReady'] == true;
   }
 
+  @override
   String get offlineMapTemplate =>
       'file://${_cacheRoot?.path ?? ''}/{z}/{x}/{y}.png';
 
+  @override
   String get localCachePath => _requireRoot().path;
 
+  @override
   Future<void> clearOfflineMap() async {
     final root = _requireRoot();
     if (await root.exists()) {
@@ -77,9 +69,11 @@ class OfflineMapRepository {
     availability.value = false;
   }
 
+  @override
   Stream<OfflineMapProgress> downloadOfflineMap() async* {
-    if (_mapTilerApiKey.trim().isEmpty) {
-      throw StateError('MapTiler API key non configurata.');
+    final mapTilerApiKey = AppRuntimeConfig.mapTilerApiKey;
+    if (mapTilerApiKey.trim().isEmpty) {
+      throw StateError('MapTiler API key non configurata (MAPTILER_API_KEY).');
     }
 
     final root = _requireRoot();
@@ -98,6 +92,7 @@ class OfflineMapRepository {
     final poolDone = _runWorkerPool(
       root: root,
       tiles: allTiles,
+      mapTilerApiKey: mapTilerApiKey,
       onTileComplete: () => progressController.add(++downloaded),
     );
 
@@ -132,6 +127,7 @@ class OfflineMapRepository {
   Future<void> _runWorkerPool({
     required Directory root,
     required List<_TileCoords> tiles,
+    required String mapTilerApiKey,
     required void Function() onTileComplete,
   }) async {
     var index = 0;
@@ -141,7 +137,7 @@ class OfflineMapRepository {
         if (index >= tiles.length) return;
         final tile = tiles[index++];
 
-        await _downloadTile(root, tile);
+        await _downloadTile(root, tile, mapTilerApiKey);
         onTileComplete();
       }
     }
@@ -205,7 +201,11 @@ class OfflineMapRepository {
     return (value * n).floor();
   }
 
-  Future<void> _downloadTile(Directory root, _TileCoords tile) async {
+  Future<void> _downloadTile(
+    Directory root,
+    _TileCoords tile,
+    String mapTilerApiKey,
+  ) async {
     final tileFile = File('${root.path}/${tile.z}/${tile.x}/${tile.y}.png');
     if (await tileFile.exists()) return;
 
@@ -213,7 +213,7 @@ class OfflineMapRepository {
 
     final uri = Uri.parse(
       '$_mapTilerApiHost/$_mapStyle/${tile.z}/${tile.x}/${tile.y}.png'
-      '?key=$_mapTilerApiKey',
+      '?key=$mapTilerApiKey',
     );
 
     Future<http.Response?> send() async {

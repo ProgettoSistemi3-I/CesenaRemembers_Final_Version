@@ -2,20 +2,20 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import '../../data/offline/offline_map_repository.dart';
+import '../../domain/entities/offline_map.dart';
+import '../../domain/usecases/offline_map_use_cases.dart';
 
 class OfflineMapsController extends ChangeNotifier {
-  OfflineMapsController({required OfflineMapRepository repository})
-    : _repository = repository;
+  OfflineMapsController({required OfflineMapUseCases useCases})
+    : _useCases = useCases;
 
-  final OfflineMapRepository _repository;
+  final OfflineMapUseCases _useCases;
 
   bool _enabled = false;
   bool _isBusy = false;
   double _progress = 0;
   String _statusMessage = 'Mappa offline non scaricata';
 
-  // Completer interno per tenere traccia di download in corso
   Completer<bool>? _activeCompleter;
   StreamSubscription<OfflineMapProgress>? _downloadSub;
 
@@ -25,9 +25,9 @@ class OfflineMapsController extends ChangeNotifier {
   String get statusMessage => _statusMessage;
 
   Future<void> init() async {
-    _enabled = await _repository.hasOfflineMap();
+    _enabled = await _useCases.hasOfflineMap();
     if (_enabled) {
-      _statusMessage = "Mappa offline disponibile nel menu mappe";
+      _statusMessage = 'Mappa offline disponibile nel menu mappe';
       _progress = 1;
     }
     notifyListeners();
@@ -41,14 +41,13 @@ class OfflineMapsController extends ChangeNotifier {
     _statusMessage = 'Download mappa in corso...';
     notifyListeners();
 
-    // Cancella eventuale subscription precedente
     await _downloadSub?.cancel();
     _downloadSub = null;
 
     final completer = Completer<bool>();
     _activeCompleter = completer;
 
-    _downloadSub = _repository.downloadOfflineMap().listen(
+    _downloadSub = _useCases.downloadOfflineMap().listen(
       (event) {
         _progress = event.ratio;
 
@@ -95,7 +94,7 @@ class OfflineMapsController extends ChangeNotifier {
     await _downloadSub?.cancel();
     _downloadSub = null;
 
-    await _repository.clearOfflineMap();
+    await _useCases.clearOfflineMap();
 
     _enabled = false;
     _isBusy = false;
@@ -107,7 +106,6 @@ class OfflineMapsController extends ChangeNotifier {
   @override
   void dispose() {
     _downloadSub?.cancel();
-    // Completa il future pendente in modo sicuro se il widget viene distrutto
     if (_activeCompleter != null && !_activeCompleter!.isCompleted) {
       _activeCompleter!.complete(false);
     }

@@ -3,7 +3,7 @@ part of 'map_page.dart';
 extension _MapPageView on _MapPageState {
   Widget _buildPage() {
     final data = _buildData;
-    final offlineTemplate = _offlineMapRepository.offlineMapTemplate;
+    final offlineTemplate = _offlineMapUseCases.offlineMapTemplate;
     final currentMapUrl = switch (_selectedMapStyle) {
       MapStyle.satellite => _MapPageState._urlSatellite,
       MapStyle.offline => offlineTemplate,

@@ -27,6 +27,7 @@ class PublicProfilePage extends StatefulWidget {
 class _PublicProfilePageState extends State<PublicProfilePage> {
   UserProfile? _targetProfile;
   bool _isLoading = true;
+  String? _loadError;
   late final SocialController _socialCtrl;
 
   @override
@@ -37,23 +38,34 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
   }
 
   Future<void> _loadProfile() async {
+    setState(() {
+      _isLoading = true;
+      _loadError = null;
+    });
+
     try {
       final profile = await sl<UserUseCases>().getUserProfile(widget.uid);
-      if (mounted) {
-        setState(() {
-          _targetProfile = profile;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Errore nel caricamento del profilo.')),
-        );
-      }
+      if (!mounted) return;
+      setState(() {
+        _targetProfile = profile;
+        _isLoading = false;
+        _loadError = null;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _loadError = 'Errore nel caricamento del profilo.';
+      });
     }
   }
 
+
+  @override
+  void dispose() {
+    _socialCtrl.dispose();
+    super.dispose();
+  }
   void _onFriendAction(String action) async {
     final myUid = _socialCtrl.currentUserId;
     if (_targetProfile == null) return;
@@ -196,6 +208,36 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
         appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
         body: const Center(
           child: CircularProgressIndicator(color: AppPalette.olive),
+        ),
+      );
+    }
+
+    if (_loadError != null) {
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _loadError!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: theme.colorScheme.onSurface),
+                ),
+                const SizedBox(height: 12),
+                FilledButton(
+                  onPressed: _loadProfile,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppPalette.olive,
+                  ),
+                  child: const Text('Riprova'),
+                ),
+              ],
+            ),
+          ),
         ),
       );
     }

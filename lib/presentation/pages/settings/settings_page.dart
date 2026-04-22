@@ -53,7 +53,7 @@ class _SettingsPageState extends State<SettingsPage>
 
     _controller.addListener(_onControllerError);
     _uiController = SettingsUiController();
-    _offlineMapsController = OfflineMapsController(repository: sl())
+    _offlineMapsController = OfflineMapsController(useCases: sl())
       ..addListener(_onOfflineDownloadFinished)
       ..init();
 
