@@ -49,6 +49,7 @@ class SocialController extends ChangeNotifier {
   bool isSearching = false;
   String? errorMessage;
   String _lastIssuedQuery = '';
+  int _searchSequence = 0;
 
   // Esponiamo l'ID corrente alla UI senza usare FirebaseAuth
   String get currentUserId => _userUseCases.getCurrentUserUid() ?? '';
@@ -118,11 +119,16 @@ class SocialController extends ChangeNotifier {
       errorMessage = null;
       _safeNotifyListeners();
 
+      final searchId = ++_searchSequence;
       try {
-        searchResults = await _userUseCases.searchUsers(normalizedQuery);
+        final results = await _userUseCases.searchUsers(normalizedQuery);
+        if (_isDisposed || searchId != _searchSequence) return;
+        searchResults = results;
       } catch (e) {
+        if (_isDisposed || searchId != _searchSequence) return;
         errorMessage = 'Errore durante la ricerca.';
       } finally {
+        if (_isDisposed || searchId != _searchSequence) return;
         isSearching = false;
         _safeNotifyListeners();
       }

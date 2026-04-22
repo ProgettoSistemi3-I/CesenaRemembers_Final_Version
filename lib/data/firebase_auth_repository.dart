@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../config/app_runtime_config.dart';
 import '../domain/entities/app_user.dart';
 import '../domain/repositories/auth_repository.dart';
 
@@ -15,8 +16,9 @@ class FirebaseAuthRepository implements AuthRepository {
        _googleSignIn =
            googleSignIn ??
            GoogleSignIn(
-             clientId:
-                 '966666011561-jg82mh4vbt29s6cggi0kij05d6h0coo4.apps.googleusercontent.com',
+             clientId: AppRuntimeConfig.googleWebClientId.trim().isEmpty
+                 ? null
+                 : AppRuntimeConfig.googleWebClientId,
            );
 
   @override

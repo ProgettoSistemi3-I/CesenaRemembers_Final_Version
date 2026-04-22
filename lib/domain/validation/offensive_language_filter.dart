@@ -106,8 +106,8 @@ class OffensiveLanguageFilter {
     'immigrati',
     'finocchio',
     'magrebino',
-    'magrebini'
-        'frocio',
+    'magrebini',
+    'frocio',
     'froc',
     'ricchione',
     'ricchion',
@@ -121,10 +121,12 @@ class OffensiveLanguageFilter {
   static bool containsOffensiveLanguage(String value) {
     if (value.trim().isEmpty) return false;
 
-    // Check esatto prima di normalizzare (per abbreviazioni)
     final words = value.toLowerCase().trim().split(RegExp(r'\s+'));
     for (final word in words) {
       final cleaned = word.replaceAll(RegExp(r'[^\w]'), '');
+      if (cleaned.isNotEmpty && _blockedTerms.contains(cleaned)) {
+        return true;
+      }
     }
 
     final normalized = _normalize(value);

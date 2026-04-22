@@ -8,10 +8,11 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../../data/offline/offline_map_repository.dart';
 import '../../../domain/entities/poi.dart';
+import '../../../config/app_runtime_config.dart';
 import '../../../domain/entities/tour_stop.dart';
 import '../../../domain/services/tour_scoring_service.dart';
+import '../../../domain/usecases/offline_map_use_cases.dart';
 import '../../../domain/usecases/poi_use_cases.dart';
 import '../../../domain/usecases/user_use_cases.dart';
 import '../../../injection_container.dart';
@@ -59,7 +60,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   late TourSessionController _tourController;
   StreamSubscription<ServiceStatus>? _serviceStatusSub;
   StreamSubscription<void>? _tourUpdatesSub;
-  late final OfflineMapRepository _offlineMapRepository;
+  late final OfflineMapUseCases _offlineMapUseCases;
 
   AlignOnUpdate _alignPositionOnUpdate = AlignOnUpdate.never;
   double _currentRotation = 0.0;
@@ -79,18 +80,21 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
 
   static const _urlStandard =
       'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png';
-  static const _urlStandardDark =
-      'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key=8331ce94-8651-4d9c-9534-b5891833b33e';
+  static final _urlStandardDark =
+      'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
+      '?api_key=${AppRuntimeConfig.stadiaMapsApiKey}';
   static const _urlSatellite =
       'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
 
   _MapBuildData get _buildData => _MapBuildData(
     theme: Theme.of(context),
-    standardMapUrl: Theme.of(context).brightness == Brightness.dark
+    standardMapUrl:
+        Theme.of(context).brightness == Brightness.dark &&
+            AppRuntimeConfig.stadiaMapsApiKey.trim().isNotEmpty
         ? _urlStandardDark
         : _urlStandard,
     localTileProvider: LocalFileTileProvider(
-      cacheRootPath: _offlineMapRepository.localCachePath,
+      cacheRootPath: _offlineMapUseCases.localCachePath,
     ),
     currentStop: _tourController.currentStop,
     isTourActive: _tourController.isActive,
@@ -109,8 +113,8 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _offlineMapRepository = sl<OfflineMapRepository>();
-    _offlineMapRepository.availability.addListener(_onOfflineAvailabilityChanged);
+    _offlineMapUseCases = sl<OfflineMapUseCases>();
+    _offlineMapUseCases.availability.addListener(_onOfflineAvailabilityChanged);
     _tourController = TourSessionController(availableStops: const []);
     _bindTourUpdates();
     LocationPreferenceStore.gpsEnabled.addListener(_onGpsPreferenceChanged);
@@ -127,7 +131,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     _tourUpdatesSub?.cancel();
     LocationPreferenceStore.gpsEnabled.removeListener(_onGpsPreferenceChanged);
     _tourController.dispose();
-    _offlineMapRepository.availability.removeListener(_onOfflineAvailabilityChanged);
+    _offlineMapUseCases.availability.removeListener(_onOfflineAvailabilityChanged);
     _mapController.dispose();
     super.dispose();
   }

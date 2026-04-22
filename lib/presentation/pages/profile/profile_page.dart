@@ -29,6 +29,7 @@ class _ProfilePageState extends State<ProfilePage>
   late Animation<double> _fadeAnim;
   late Animation<Offset> _slideAnim;
   late final ProfileController _profileController;
+  late final SocialController _socialController;
 
   @override
   void initState() {
@@ -47,12 +48,14 @@ class _ProfilePageState extends State<ProfilePage>
     ).drive(Tween(begin: const Offset(0, 0.06), end: Offset.zero));
     _animCtrl.forward();
     _profileController = ProfileController(userUseCases: sl());
+    _socialController = sl<SocialController>();
   }
 
   @override
   void dispose() {
     _animCtrl.dispose();
     _profileController.dispose();
+    _socialController.dispose();
     _nameController.dispose();
     super.dispose();
   }
@@ -120,7 +123,7 @@ class _ProfilePageState extends State<ProfilePage>
 
   // --- AMICIZIE E NOTIFICHE ---
   void _showFriendsList(UserProfile profile, ThemeData theme) async {
-    final users = await sl<SocialController>().loadUsersList(profile.friends);
+    final users = await _socialController.loadUsersList(profile.friends);
     if (!mounted) return;
     showModalBottomSheet(
       context: context,
@@ -133,7 +136,7 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   void _showRequestsList(UserProfile profile, ThemeData theme) async {
-    final users = await sl<SocialController>().loadUsersList(
+    final users = await _socialController.loadUsersList(
       profile.receivedFriendRequests,
     );
     if (!mounted) return;
