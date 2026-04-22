@@ -5,7 +5,7 @@ extension _MapPageTourActions on _MapPageState {
     if (!_tourController.hasStops) return;
     final hasStarted = await _tourController.startTour();
     if (hasStarted && mounted && _tourController.currentStop != null) {
-      _centerOnStop(_tourController.currentStop!.position);
+      _centerOnStop(_toLatLng(_tourController.currentStop!.position));
     }
   }
 
@@ -119,7 +119,7 @@ extension _MapPageTourActions on _MapPageState {
           Navigator.pop(context);
           if (_tourController.advanceToNextStop()) {
             if (_tourController.currentStop != null) {
-              _centerOnStop(_tourController.currentStop!.position);
+              _centerOnStop(_toLatLng(_tourController.currentStop!.position));
             }
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -148,7 +148,7 @@ extension _MapPageTourActions on _MapPageState {
   ) async {
     if (_isSavingQuizResult) return;
 
-    final uid = _userUseCases.getCurrentUserUid();
+    final uid = _profileUseCases.getCurrentUserUid();
     if (uid == null) return;
 
     _isSavingQuizResult = true;
@@ -159,7 +159,7 @@ extension _MapPageTourActions on _MapPageState {
     );
 
     try {
-      await _userUseCases.registerQuizCompletion(
+      await _progressUseCases.registerQuizCompletion(
         uid: uid,
         poiId: poiId,
         xpGained: score.totalXp,
@@ -196,4 +196,6 @@ extension _MapPageTourActions on _MapPageState {
       _isSavingQuizResult = false;
     }
   }
+
+  LatLng _toLatLng(GeoPoint point) => LatLng(point.latitude, point.longitude);
 }

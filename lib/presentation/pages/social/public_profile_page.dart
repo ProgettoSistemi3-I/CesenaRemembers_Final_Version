@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../../domain/entities/userprofile.dart';
-import '../../../domain/usecases/user_use_cases.dart';
+import '../../../domain/usecases/user_profile_use_cases.dart';
 import '../../../injection_container.dart';
 import '../../controllers/social_controller.dart';
-import '../../services/shell_navigation_store.dart'; // NUOVO IMPORT
+import '../../services/shell_navigation_store.dart';
 import '../../theme/app_palette.dart';
 import '../profile/avatar_catalog.dart';
 
@@ -44,7 +44,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
     });
 
     try {
-      final profile = await sl<UserUseCases>().getUserProfile(widget.uid);
+      final profile = await sl<UserProfileUseCases>().getUserProfile(widget.uid);
       if (!mounted) return;
       setState(() {
         _targetProfile = profile;
@@ -59,18 +59,16 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
       });
     }
   }
-
-
-  @override
-  void dispose() {
-    _socialCtrl.dispose();
-    super.dispose();
-  }
   void _onFriendAction(String action) async {
     final myUid = _socialCtrl.currentUserId;
     if (_targetProfile == null) return;
 
-    // Aggiornamento ottimistico della UI
+    final previousFriends = List<String>.from(_targetProfile!.friends);
+    final previousSent = List<String>.from(_targetProfile!.sentFriendRequests);
+    final previousReceived = List<String>.from(
+      _targetProfile!.receivedFriendRequests,
+    );
+
     setState(() {
       if (action == 'send') {
         _targetProfile!.receivedFriendRequests.add(myUid);
@@ -86,7 +84,26 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
       }
     });
 
-    await _socialCtrl.handleFriendAction(action, widget.uid);
+    final success = await _socialCtrl.handleFriendAction(action, widget.uid);
+    if (success || !mounted) return;
+
+    setState(() {
+      _targetProfile!.friends
+        ..clear()
+        ..addAll(previousFriends);
+      _targetProfile!.sentFriendRequests
+        ..clear()
+        ..addAll(previousSent);
+      _targetProfile!.receivedFriendRequests
+        ..clear()
+        ..addAll(previousReceived);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Operazione non riuscita. Stato ripristinato.'),
+        backgroundColor: AppPalette.danger,
+      ),
+    );
   }
 
   // Visualizza la lista amici dell'utente
@@ -166,18 +183,14 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                     onTap: () {
                       Navigator.pop(context); // Chiude la bottom sheet
 
-                      // --- LA TUA LOGICA CORRETTA ---
                       if (u.uid == _socialCtrl.currentUserId) {
-                        // Chiudiamo tutte le eventuali pagine pubbliche in sovraimpressione...
                         Navigator.of(
                           context,
                         ).popUntil((route) => route.isFirst);
-                        // ...e cambiamo la tab in basso per mostrare il tuo profilo personale (indice 2)
                         ShellNavigationStore.goToTab(2);
                         return;
                       }
 
-                      // Navigazione ricorsiva per gli ALTRI utenti
                       Navigator.push(
                         context,
                         MaterialPageRoute(

@@ -18,7 +18,7 @@ class _MainShellState extends State<MainShell> {
   // Le pagine vengono mantenute in vita (non ricostruite ad ogni switch)
   final List<Widget> _pages = const [
     MapPage(),
-    SocialPage(), // <--- NUOVA PAGINA QUI!
+    SocialPage(),
     ProfilePage(),
     SettingsPage(),
   ];
@@ -52,8 +52,7 @@ class _MainShellState extends State<MainShell> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: _onTapBottomBar,
-        type: BottomNavigationBarType
-            .fixed, // <--- Aggiungi questo per evitare che le icone spariscano se > 3
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.map_outlined),
@@ -61,7 +60,7 @@ class _MainShellState extends State<MainShell> {
             label: 'Mappa',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.people_outline), // Icona Social
+            icon: Icon(Icons.people_outline),
             activeIcon: Icon(Icons.people),
             label: 'Community',
           ),

@@ -12,7 +12,10 @@ import 'domain/repositories/user_repository.dart';
 import 'domain/usecases/auth_use_cases.dart';
 import 'domain/usecases/offline_map_use_cases.dart';
 import 'domain/usecases/poi_use_cases.dart';
-import 'domain/usecases/user_use_cases.dart';
+import 'domain/usecases/user_preferences_use_cases.dart';
+import 'domain/usecases/user_profile_use_cases.dart';
+import 'domain/usecases/user_progress_use_cases.dart';
+import 'domain/usecases/user_social_use_cases.dart';
 import 'presentation/controllers/social_controller.dart';
 import 'presentation/theme/theme_controller.dart';
 
@@ -56,13 +59,30 @@ Future<void> init() async {
   if (!sl.isRegistered<DeleteCurrentUserUseCase>()) {
     sl.registerLazySingleton(() => DeleteCurrentUserUseCase(sl()));
   }
-  if (!sl.isRegistered<UserUseCases>()) {
-    sl.registerLazySingleton(() => UserUseCases(sl()));
+  if (!sl.isRegistered<UserProfileUseCases>()) {
+    sl.registerLazySingleton(() => UserProfileUseCases(sl()));
+  }
+  if (!sl.isRegistered<UserPreferencesUseCases>()) {
+    sl.registerLazySingleton(() => UserPreferencesUseCases(sl()));
+  }
+  if (!sl.isRegistered<UserProgressUseCases>()) {
+    sl.registerLazySingleton(() => UserProgressUseCases(sl()));
+  }
+  if (!sl.isRegistered<UserSocialUseCases>()) {
+    sl.registerLazySingleton(() => UserSocialUseCases(sl()));
   }
 
   if (!sl.isRegistered<ThemeController>()) {
-    sl.registerLazySingleton(() => ThemeController(userUseCases: sl()));
+    sl.registerLazySingleton(() => ThemeController(profileUseCases: sl()));
   }
 
-  sl.registerFactory(() => SocialController(userUseCases: sl()));
+  if (!sl.isRegistered<SocialController>()) {
+    sl.registerLazySingleton(
+      () => SocialController(
+        profileUseCases: sl(),
+        progressUseCases: sl(),
+        socialUseCases: sl(),
+      ),
+    );
+  }
 }

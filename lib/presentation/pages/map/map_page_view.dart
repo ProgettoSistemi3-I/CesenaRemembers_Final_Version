@@ -190,7 +190,12 @@ extension _MapPageView on _MapPageState {
                 arrived: _tourController.isArrived,
                 onTap: _tourController.isArrived
                     ? _openPoiPopup
-                    : () => _centerOnStop(data.currentStop!.position),
+                    : () => _centerOnStop(
+                        LatLng(
+                          data.currentStop!.position.latitude,
+                          data.currentStop!.position.longitude,
+                        ),
+                      ),
               ),
             ),
         ],

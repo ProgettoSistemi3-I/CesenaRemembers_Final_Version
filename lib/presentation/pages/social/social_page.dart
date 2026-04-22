@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../injection_container.dart';
 import '../../controllers/social_controller.dart';
-import '../../services/shell_navigation_store.dart'; // NUOVO IMPORT
+import '../../services/shell_navigation_store.dart';
 import '../../theme/app_palette.dart';
 import '../profile/avatar_catalog.dart';
 import 'public_profile_page.dart';
@@ -25,15 +25,12 @@ class _SocialPageState extends State<SocialPage> {
 
   @override
   void dispose() {
-    _controller.dispose();
     _searchController.dispose();
     super.dispose();
   }
 
   void _openProfile(String uid, String name, String username) {
-    // --- LA TUA LOGICA CORRETTA APPLICATA ANCHE QUI ---
     if (uid == _controller.currentUserId) {
-      // Se clicchi te stesso (nella classifica o in ricerca), vai al tuo Profilo
       ShellNavigationStore.goToTab(2);
       return;
     }
@@ -329,6 +326,14 @@ class _SocialPageState extends State<SocialPage> {
     if (_controller.isSearching) {
       return const Center(
         child: CircularProgressIndicator(color: AppPalette.olive),
+      );
+    }
+    if (_controller.requiresMoreSearchChars) {
+      return Center(
+        child: Text(
+          'Digita almeno 2 caratteri per cercare.',
+          style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+        ),
       );
     }
     if (_controller.searchResults.isEmpty) {

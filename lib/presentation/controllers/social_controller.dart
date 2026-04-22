@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../../domain/entities/userprofile.dart';
-import '../../domain/usecases/user_use_cases.dart';
+import '../../domain/usecases/user_profile_use_cases.dart';
+import '../../domain/usecases/user_progress_use_cases.dart';
+import '../../domain/usecases/user_social_use_cases.dart';
 
 class LeaderboardEntry {
   final String uid;
@@ -37,7 +39,19 @@ class LeaderboardEntry {
 }
 
 class SocialController extends ChangeNotifier {
-  final UserUseCases _userUseCases;
+  SocialController({
+    required UserProfileUseCases profileUseCases,
+    required UserProgressUseCases progressUseCases,
+    required UserSocialUseCases socialUseCases,
+  }) : _profileUseCases = profileUseCases,
+       _progressUseCases = progressUseCases,
+       _socialUseCases = socialUseCases {
+    _startLeaderboardListener();
+  }
+
+  final UserProfileUseCases _profileUseCases;
+  final UserProgressUseCases _progressUseCases;
+  final UserSocialUseCases _socialUseCases;
   StreamSubscription<List<Map<String, dynamic>>>? _leaderboardSub;
   Timer? _searchDebounce;
   bool _isDisposed = false;
@@ -48,25 +62,21 @@ class SocialController extends ChangeNotifier {
   List<UserProfile> searchResults = [];
   bool isSearching = false;
   String? errorMessage;
+  bool requiresMoreSearchChars = false;
   String _lastIssuedQuery = '';
   int _searchSequence = 0;
 
   // Esponiamo l'ID corrente alla UI senza usare FirebaseAuth
-  String get currentUserId => _userUseCases.getCurrentUserUid() ?? '';
-
-  SocialController({required UserUseCases userUseCases})
-    : _userUseCases = userUseCases {
-    _startLeaderboardListener();
-  }
+  String get currentUserId => _profileUseCases.getCurrentUserUid() ?? '';
 
   void _safeNotifyListeners() {
     if (!_isDisposed) notifyListeners();
   }
 
   void _startLeaderboardListener() {
-    final myUid = _userUseCases.getCurrentUserUid();
+    final myUid = _profileUseCases.getCurrentUserUid();
 
-    _leaderboardSub = _userUseCases
+    _leaderboardSub = _progressUseCases
         .getLeaderboardStream(limit: 50)
         .listen(
           (docsData) {
@@ -106,9 +116,12 @@ class SocialController extends ChangeNotifier {
       searchResults = [];
       isSearching = false;
       errorMessage = null;
+      requiresMoreSearchChars =
+          normalizedQuery.isNotEmpty && normalizedQuery.length < 2;
       _safeNotifyListeners();
       return;
     }
+    requiresMoreSearchChars = false;
 
     _searchDebounce = Timer(const Duration(milliseconds: 350), () async {
       if (_isDisposed) return;
@@ -121,7 +134,7 @@ class SocialController extends ChangeNotifier {
 
       final searchId = ++_searchSequence;
       try {
-        final results = await _userUseCases.searchUsers(normalizedQuery);
+        final results = await _socialUseCases.searchUsers(normalizedQuery);
         if (_isDisposed || searchId != _searchSequence) return;
         searchResults = results;
       } catch (e) {
@@ -145,34 +158,36 @@ class SocialController extends ChangeNotifier {
 
   Future<List<UserProfile>> loadUsersList(List<String> uids) async {
     if (uids.isEmpty) return [];
-    return await _userUseCases.getUsersByIds(uids);
+    return await _socialUseCases.getUsersByIds(uids);
   }
 
-  Future<void> handleFriendAction(String action, String targetUid) async {
+  Future<bool> handleFriendAction(String action, String targetUid) async {
     final cUid = currentUserId;
-    if (cUid.isEmpty) return;
+    if (cUid.isEmpty) return false;
 
     try {
       switch (action) {
         case 'send':
-          await _userUseCases.sendFriendRequest(cUid, targetUid);
+          await _socialUseCases.sendFriendRequest(cUid, targetUid);
           break;
         case 'cancel':
-          await _userUseCases.cancelFriendRequest(cUid, targetUid);
+          await _socialUseCases.cancelFriendRequest(cUid, targetUid);
           break;
         case 'accept':
-          await _userUseCases.acceptFriendRequest(cUid, targetUid);
+          await _socialUseCases.acceptFriendRequest(cUid, targetUid);
           break;
         case 'reject':
-          await _userUseCases.rejectFriendRequest(cUid, targetUid);
+          await _socialUseCases.rejectFriendRequest(cUid, targetUid);
           break;
         case 'remove':
-          await _userUseCases.removeFriend(cUid, targetUid);
+          await _socialUseCases.removeFriend(cUid, targetUid);
           break;
       }
+      return true;
     } catch (e) {
       errorMessage = 'Errore durante l\'azione.';
       _safeNotifyListeners();
+      return false;
     }
   }
 }

@@ -47,7 +47,7 @@ class _ProfilePageState extends State<ProfilePage>
       curve: Curves.easeOutCubic,
     ).drive(Tween(begin: const Offset(0, 0.06), end: Offset.zero));
     _animCtrl.forward();
-    _profileController = ProfileController(userUseCases: sl());
+    _profileController = ProfileController(profileUseCases: sl());
     _socialController = sl<SocialController>();
   }
 
@@ -55,7 +55,6 @@ class _ProfilePageState extends State<ProfilePage>
   void dispose() {
     _animCtrl.dispose();
     _profileController.dispose();
-    _socialController.dispose();
     _nameController.dispose();
     super.dispose();
   }
