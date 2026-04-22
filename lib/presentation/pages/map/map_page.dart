@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math' as math;
-import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,23 +8,29 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../../data/offline/offline_map_repository.dart';
 import '../../../domain/entities/poi.dart';
 import '../../../domain/entities/tour_stop.dart';
 import '../../../domain/services/tour_scoring_service.dart';
 import '../../../domain/usecases/poi_use_cases.dart';
 import '../../../domain/usecases/user_use_cases.dart';
 import '../../../injection_container.dart';
-import '../../../data/offline/offline_map_repository.dart';
 import '../../controllers/tour_session_controller.dart';
-import '../../services/poi_marker_factory.dart';
-import '../../services/location_preference_store.dart';
 import '../../services/local_file_tile_provider.dart';
+import '../../services/location_preference_store.dart';
+import '../../services/poi_marker_factory.dart';
 import '../../services/shell_navigation_store.dart';
 import '../../services/tour_stop_mapper.dart';
 import '../../services/tour_stop_visuals.dart';
 import '../../theme/app_palette.dart';
+import 'widgets/location_issue_banner.dart';
 import 'widgets/map_controls.dart';
 import 'widgets/poi_bottom_sheet.dart';
+
+part 'map_page_data.dart';
+part 'map_page_location.dart';
+part 'map_page_tour.dart';
+part 'map_page_view.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -43,11 +48,10 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   final UserUseCases _userUseCases = sl<UserUseCases>();
 
   static final LatLngBounds _cesenaBounds = LatLngBounds(
-    const LatLng(44.1054, 12.2131), // SW
-    const LatLng(44.1714, 12.2811), // NE
+    const LatLng(44.1054, 12.2131),
+    const LatLng(44.1714, 12.2811),
   );
 
-  // Cache per non ricaricare tutto ogni volta che si cambia tab
   static List<Poi>? _cachedPois;
   static List<TourStop>? _cachedStops;
   static bool _hasRequestedInitialLocationPermission = false;
@@ -62,11 +66,10 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   bool _isMapLocked = false;
   bool _isMapMenuOpen = false;
 
-  // --- MOTORE GPS REATTIVO ---
   bool _isGpsEnabled = false;
   bool _hasPermissions = false;
   bool _isGpsPreferenceEnabled = LocationPreferenceStore.gpsEnabled.value;
-  bool _isCheckingLocation = true; // Scudo anti-sfarfallio del banner
+  bool _isCheckingLocation = true;
   bool _isCenteringOnUser = false;
   bool _isSavingQuizResult = false;
 
@@ -78,9 +81,27 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
       'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png';
   static const _urlStandardDark =
       'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key=8331ce94-8651-4d9c-9534-b5891833b33e';
-
   static const _urlSatellite =
       'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+
+  _MapBuildData get _buildData => _MapBuildData(
+    theme: Theme.of(context),
+    standardMapUrl: Theme.of(context).brightness == Brightness.dark
+        ? _urlStandardDark
+        : _urlStandard,
+    localTileProvider: LocalFileTileProvider(
+      cacheRootPath: _offlineMapRepository.localCachePath,
+    ),
+    currentStop: _tourController.currentStop,
+    isTourActive: _tourController.isActive,
+    canUseLocation: _isGpsEnabled && _hasPermissions && _isGpsPreferenceEnabled,
+    isLocationBannerVisible:
+        !_isCheckingLocation && !(_isGpsEnabled && _hasPermissions && _isGpsPreferenceEnabled),
+    currentStopVisual: _tourController.currentStop == null
+        ? null
+        : _tourStopVisuals.forStop(_tourController.currentStop!),
+  );
+
   MapStyle _selectedMapStyle = MapStyle.standard;
   bool _hasOfflineMaps = false;
 
@@ -89,9 +110,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _offlineMapRepository = sl<OfflineMapRepository>();
-    _offlineMapRepository.availability.addListener(
-      _onOfflineAvailabilityChanged,
-    );
+    _offlineMapRepository.availability.addListener(_onOfflineAvailabilityChanged);
     _tourController = TourSessionController(availableStops: const []);
     _bindTourUpdates();
     LocationPreferenceStore.gpsEnabled.addListener(_onGpsPreferenceChanged);
@@ -108,9 +127,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     _tourUpdatesSub?.cancel();
     LocationPreferenceStore.gpsEnabled.removeListener(_onGpsPreferenceChanged);
     _tourController.dispose();
-    _offlineMapRepository.availability.removeListener(
-      _onOfflineAvailabilityChanged,
-    );
+    _offlineMapRepository.availability.removeListener(_onOfflineAvailabilityChanged);
     _mapController.dispose();
     super.dispose();
   }
@@ -123,809 +140,28 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     }
   }
 
-  // ──────────────────────────────────────────────────────────────────────────
-  //  LOGICA POSIZIONE E GPS
-  // ──────────────────────────────────────────────────────────────────────────
-
-  void _onGpsPreferenceChanged() {
-    if (!mounted) return;
-    final enabled = LocationPreferenceStore.gpsEnabled.value;
-    setState(() {
-      _isGpsPreferenceEnabled = enabled;
-      if (!enabled) {
-        _alignPositionOnUpdate = AlignOnUpdate.never;
-      }
-    });
-  }
-
-  Future<void> _initLocationLogic() async {
-    final shouldRequestPermission = !_hasRequestedInitialLocationPermission;
-    _hasRequestedInitialLocationPermission = true;
-    await _verifyLocationState(requestPerms: shouldRequestPermission);
-    if (kIsWeb) return;
-    _serviceStatusSub = Geolocator.getServiceStatusStream().listen((status) {
-      if (!mounted) return;
-      setState(() {
-        _isGpsEnabled = (status == ServiceStatus.enabled);
-      });
-      _verifyLocationState(requestPerms: false);
-    });
-  }
-
-  Future<void> _verifyLocationState({required bool requestPerms}) async {
-    if (kIsWeb) {
-      var perm = await Geolocator.checkPermission();
-      if (perm == LocationPermission.denied && requestPerms) {
-        perm = await Geolocator.requestPermission();
-      }
-      final hasPerm =
-          perm == LocationPermission.whileInUse ||
-          perm == LocationPermission.always;
-      if (mounted) {
-        setState(() {
-          _isGpsEnabled = true;
-          _hasPermissions = hasPerm;
-          _isCheckingLocation = false;
-        });
-      }
-      return;
-    }
-
-    setState(() => _isCheckingLocation = true);
-
-    bool gps = await Geolocator.isLocationServiceEnabled();
-    LocationPermission perm = await Geolocator.checkPermission();
-
-    if (perm == LocationPermission.denied && requestPerms) {
-      perm = await Geolocator.requestPermission();
-    }
-
-    bool hasPerm =
-        (perm == LocationPermission.whileInUse ||
-        perm == LocationPermission.always);
-
-    if (mounted) {
-      setState(() {
-        _isGpsEnabled = gps;
-        _hasPermissions = hasPerm;
-        _isCheckingLocation = false;
-      });
-    }
-  }
-
-  Future<void> _resolveLocationIssues() async {
-    ShellNavigationStore.openSettingsAndFocusGpsToggle();
-  }
-
-  Future<void> _centerOnUserLocation() async {
-    if (_isCenteringOnUser) return;
-
-    if (!_isGpsPreferenceEnabled) {
-      _resolveLocationIssues();
-      return;
-    }
-
-    setState(() {
-      _isCenteringOnUser = true;
-      _alignPositionOnUpdate = AlignOnUpdate.always;
-    });
-
-    try {
-      await _verifyLocationState(requestPerms: true);
-      final canUseLocation =
-          _isGpsEnabled && _hasPermissions && _isGpsPreferenceEnabled;
-      if (!canUseLocation) return;
-
-      Position? position;
-      try {
-        position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.bestForNavigation,
-          timeLimit: const Duration(seconds: 6),
-        );
-      } catch (_) {
-        position = await Geolocator.getLastKnownPosition();
-      }
-
-      if (position != null && mounted) {
-        _mapController.move(
-          LatLng(position.latitude, position.longitude),
-          math.max(_mapController.camera.zoom, 16.5),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isCenteringOnUser = false);
-      }
-    }
-  }
-
-  // ──────────────────────────────────────────────────────────────────────────
-  //  CARICAMENTO DATI POI
-  // ──────────────────────────────────────────────────────────────────────────
-
-  Future<void> _loadPois() async {
-    if (_cachedPois != null && _cachedStops != null) {
-      _tourController.dispose();
-      _tourController = TourSessionController(availableStops: _cachedStops!);
-      _bindTourUpdates();
-      setState(() {
-        _pois = _cachedPois!;
-        _isLoading = false;
-      });
-      return;
-    }
-
-    try {
-      final getPois = sl<GetPoisUseCase>();
-      final pois = await getPois();
-      if (!mounted) return;
-
-      final stops = _tourStopMapper.fromPois(pois);
-      _cachedStops = stops;
-      _cachedPois = pois;
-
-      _tourController.dispose();
-      _tourController = TourSessionController(availableStops: stops);
-      _bindTourUpdates();
-
-      setState(() {
-        _pois = pois;
-        _loadError = null;
-        _isLoading = false;
-      });
-    } catch (error) {
-      if (!mounted) return;
-      setState(() {
-        _pois = [];
-        _loadError = 'Errore nel caricamento dei punti di interesse.';
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _loadOfflineAvailability({bool forceRefresh = false}) async {
-    final hasOffline = forceRefresh
-        ? await _offlineMapRepository.hasOfflineMap()
-        : _offlineMapRepository.availability.value;
-    if (!mounted) return;
-    setState(() {
-      _hasOfflineMaps = hasOffline;
-      if (!hasOffline && _selectedMapStyle == MapStyle.offline) {
-        _selectedMapStyle = MapStyle.standard;
-      }
-    });
-  }
-
-  void _onOfflineAvailabilityChanged() {
-    if (!mounted) return;
-    final hasOffline = _offlineMapRepository.availability.value;
-    setState(() {
-      _hasOfflineMaps = hasOffline;
-      if (!hasOffline && _selectedMapStyle == MapStyle.offline) {
-        _selectedMapStyle = MapStyle.standard;
-      }
-    });
-  }
-
-  List<Marker> _buildMarkers() {
-    return _pois
-        .map(
-          (poi) => _poiMarkerFactory.fromPoi(
-            poi,
-            counterRotationDegrees: _currentRotation,
-          ),
-        )
-        .toList(growable: false);
-  }
-
-  void _bindTourUpdates() {
-    _tourUpdatesSub?.cancel();
-    _tourUpdatesSub = _tourController.updates.listen((_) {
-      if (mounted) setState(() {});
-    });
-  }
-
-  // ──────────────────────────────────────────────────────────────────────────
-  //  AZIONI TOUR E MAPPA
-  // ──────────────────────────────────────────────────────────────────────────
-
-  Future<void> _startTour() async {
-    if (!_tourController.hasStops) return;
-    final hasStarted = await _tourController.startTour();
-    if (hasStarted && mounted && _tourController.currentStop != null) {
-      _centerOnStop(_tourController.currentStop!.position);
-    }
-  }
-
-  Future<void> _confirmStopTour() async {
-    final shouldStop = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) {
-        final theme = Theme.of(dialogContext);
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          title: const Text('Interrompere il tour?'),
-          content: const Text(
-            'Il tour verrà terminato e perderai l’ordine attuale delle tappe.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(
-                'Annulla',
-                style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
-              ),
-            ),
-            FilledButton(
-              style: FilledButton.styleFrom(backgroundColor: AppPalette.danger),
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('Interrompi'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (shouldStop != true || !mounted) return;
-
-    _tourController.stopTour();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Tour interrotto.'),
-        backgroundColor: AppPalette.danger,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
-  }
-
-  void _openTourPlanSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (sheetContext) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            final stops = _tourController.upcomingStops;
-            final distances = _tourController.upcomingStopsDistanceFromPrevious;
-            return SizedBox(
-              height: MediaQuery.of(context).size.height * 0.68,
-              child: TourPlanSheet(
-                upcomingStops: stops,
-                distanceFromPrevious: distances,
-                onReorder: (oldIndex, newIndex) {
-                  final normalizedNewIndex = oldIndex < newIndex
-                      ? newIndex - 1
-                      : newIndex;
-                  _tourController.reorderUpcomingStops(
-                    oldRelativeIndex: oldIndex,
-                    newRelativeIndex: normalizedNewIndex,
-                  );
-                  setModalState(() {});
-                },
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _centerOnStop(LatLng position) {
-    Future.delayed(const Duration(milliseconds: 200), () {
-      if (!mounted) return;
-      _mapController.move(position, 17.0);
-      setState(() => _alignPositionOnUpdate = AlignOnUpdate.never);
-    });
-  }
-
-  void _openPoiPopup() {
-    final currentStop = _tourController.currentStop;
-    if (currentStop == null) return;
-    final visual = _tourStopVisuals.forStop(currentStop);
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      isDismissible: false,
-      enableDrag: false,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) => PoiBottomSheet(
-        stop: currentStop,
-        icon: visual.icon,
-        iconBackground: visual.iconBackground,
-        elapsedSeconds: _tourController.elapsedSeconds,
-        onNextStop: () {
-          Navigator.pop(context);
-          if (_tourController.advanceToNextStop()) {
-            if (_tourController.currentStop != null) {
-              _centerOnStop(_tourController.currentStop!.position);
-            }
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('🎉 Tour completato! Ottimo lavoro.'),
-                backgroundColor: AppPalette.olive,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
-              ),
-            );
-          }
-        },
-        onQuizCompleted: (result) {
-          _registerQuizCompletion(currentStop.id, result);
-        },
-      ),
-    );
-  }
-
-  Future<void> _registerQuizCompletion(
-    String poiId,
-    QuizCompletionData result,
-  ) async {
-    if (_isSavingQuizResult) return;
-
-    final uid = _userUseCases.getCurrentUserUid();
-    if (uid == null) return;
-
-    _isSavingQuizResult = true;
-
-    final score = _tourScoringService.calculate(
-      correctAnswers: result.score,
-      totalElapsedSeconds: _tourController.totalElapsedSeconds,
-    );
-
-    try {
-      await _userUseCases.registerQuizCompletion(
-        uid: uid,
-        poiId: poiId,
-        xpGained: score.totalXp,
-        correctAnswers: result.score,
-        totalQuestions: result.totalQuestions,
-        tourElapsedSeconds: _tourController.totalElapsedSeconds,
-      );
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            '+${score.totalXp} XP (${score.baseXp} × ${score.timeMultiplier.toStringAsFixed(2)})',
-          ),
-          backgroundColor: AppPalette.olive,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
-        ),
-      );
-    } catch (_) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text(
-            'Errore nel salvataggio del punteggio. Riprova tra poco.',
-          ),
-          backgroundColor: AppPalette.danger,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
-        ),
-      );
-    } finally {
-      _isSavingQuizResult = false;
-    }
-  }
-
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final standardMapUrl = theme.brightness == Brightness.dark
-        ? _urlStandardDark
-        : _urlStandard;
-    final offlineTemplate = _offlineMapRepository.offlineMapTemplate;
-    final localTileProvider = LocalFileTileProvider(
-      cacheRootPath: _offlineMapRepository.localCachePath,
-    );
-    final currentMapUrl = switch (_selectedMapStyle) {
-      MapStyle.satellite => _urlSatellite,
-      MapStyle.offline => offlineTemplate,
-      MapStyle.standard => standardMapUrl,
-    };
-    const LatLng defaultCesenaCenter = LatLng(44.1384, 12.2471);
+  Widget build(BuildContext context) => _buildPage();
+}
 
-    const locationSettings = LocationSettings(
-      accuracy: LocationAccuracy.bestForNavigation,
-      distanceFilter: 0,
-    );
+class _MapBuildData {
+  const _MapBuildData({
+    required this.theme,
+    required this.standardMapUrl,
+    required this.localTileProvider,
+    required this.currentStop,
+    required this.isTourActive,
+    required this.canUseLocation,
+    required this.isLocationBannerVisible,
+    required this.currentStopVisual,
+  });
 
-    const cardHeight = 82.0;
-    const cardPadding = 12.0;
-    const cardBottom = cardHeight + cardPadding * 2;
-
-    if (_isLoading) {
-      return Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        body: const Center(
-          child: CircularProgressIndicator(color: AppPalette.olive),
-        ),
-      );
-    }
-
-    if (_loadError != null) {
-      return Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        body: _buildErrorState(theme),
-      );
-    }
-
-    final currentStop = _tourController.currentStop;
-    final isTourActive = _tourController.isActive;
-    final currentStopVisual = currentStop == null
-        ? null
-        : _tourStopVisuals.forStop(currentStop);
-    final bool canUseLocation =
-        _isGpsEnabled && _hasPermissions && _isGpsPreferenceEnabled;
-    final bool isLocationBannerVisible =
-        !_isCheckingLocation && !canUseLocation;
-
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: Stack(
-        children: [
-          FlutterMap(
-            mapController: _mapController,
-            options: MapOptions(
-              initialCenter: defaultCesenaCenter,
-              initialZoom: 14.0,
-              minZoom: 10.0,
-              maxZoom: 18.5,
-              cameraConstraint: CameraConstraint.contain(bounds: _cesenaBounds),
-              backgroundColor: theme.scaffoldBackgroundColor,
-              interactionOptions: InteractionOptions(
-                flags: _isMapLocked
-                    ? InteractiveFlag.none
-                    : InteractiveFlag.all,
-              ),
-              onMapEvent: (event) {
-                if (event is MapEventMove || event is MapEventRotate) {
-                  final rotation = _mapController.camera.rotation;
-                  if ((rotation - _currentRotation).abs() > 0.1) {
-                    setState(() => _currentRotation = rotation);
-                  }
-                }
-                if (event is MapEventMoveStart && _isMapMenuOpen) {
-                  setState(() => _isMapMenuOpen = false);
-                }
-              },
-              onPositionChanged: (camera, hasGesture) {
-                if (hasGesture &&
-                    _alignPositionOnUpdate != AlignOnUpdate.never) {
-                  setState(() => _alignPositionOnUpdate = AlignOnUpdate.never);
-                }
-              },
-            ),
-            children: [
-              TileLayer(
-                urlTemplate: currentMapUrl,
-                subdomains: _selectedMapStyle == MapStyle.offline
-                    ? const []
-                    : const ['a', 'b', 'c', 'd'],
-                userAgentPackageName: 'com.geoapp.prototype',
-                maxZoom: 19,
-                tileBounds: _cesenaBounds,
-                tileProvider: _selectedMapStyle == MapStyle.offline
-                    ? localTileProvider
-                    : null,
-              ),
-              // PALLINO POSIZIONE
-              if (canUseLocation)
-                CurrentLocationLayer(
-                  alignPositionOnUpdate: _alignPositionOnUpdate,
-                  style: LocationMarkerStyle(
-                    marker: const DefaultLocationMarker(
-                      color: Colors.blue,
-                      child: Icon(
-                        Icons.navigation,
-                        color: Colors.white,
-                        size: 14,
-                      ),
-                    ),
-                    accuracyCircleColor: Colors.blue.withOpacity(0.1),
-                    headingSectorColor: Colors.blue.withOpacity(0.2),
-                  ),
-                  positionStream: const LocationMarkerDataStreamFactory()
-                      .fromGeolocatorPositionStream(
-                        stream: Geolocator.getPositionStream(
-                          locationSettings: locationSettings,
-                        ),
-                      ),
-                ),
-              // MARKERS POI (RUOTATI)
-              MarkerLayer(markers: _buildMarkers()),
-            ],
-          ),
-
-          SafeArea(
-            child: Stack(
-              children: [
-                // ── BANNER GPS DISATTIVATO ──
-                if (isLocationBannerVisible)
-                  Positioned(
-                    top: 16,
-                    left: 16,
-                    right: 16,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surface.withOpacity(0.85),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: AppPalette.danger.withOpacity(0.3),
-                              width: 1.5,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 16,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: AppPalette.danger.withOpacity(0.12),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.location_off_rounded,
-                                  color: AppPalette.danger,
-                                  size: 24,
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      _isGpsEnabled
-                                          ? (_isGpsPreferenceEnabled
-                                                ? 'Permessi mancanti'
-                                                : 'Posizione disattivata')
-                                          : 'GPS Disattivato',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w800,
-                                        color: theme.colorScheme.onSurface,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      _isGpsPreferenceEnabled
-                                          ? 'Attiva la posizione per esplorare la mappa in tempo reale.'
-                                          : 'Riattiva la posizione nelle impostazioni per mostrare la tua posizione sulla mappa.',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        height: 1.3,
-                                        color:
-                                            theme.colorScheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              FilledButton(
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: AppPalette.danger,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                onPressed: _resolveLocationIssues,
-                                child: const Text(
-                                  'Risolvi',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                // ── CONTROLLI MAPPA ──
-                if (_currentRotation != 0 && !isLocationBannerVisible)
-                  Positioned(
-                    top: 16,
-                    right: 20,
-                    child: CircleFab(
-                      heroTag: 'rot',
-                      icon: Icons.navigation,
-                      iconColor: AppPalette.danger,
-                      onTap: () {
-                        _mapController.rotate(0);
-                        setState(() => _currentRotation = 0);
-                      },
-                    ),
-                  ),
-                Positioned(
-                  left: 20,
-                  bottom: isTourActive ? cardBottom : 20,
-                  child: MapTypeButton(
-                    isOpen: _isMapMenuOpen,
-                    selectedMapStyle: _selectedMapStyle,
-                    offlineEnabled: _hasOfflineMaps,
-                    onToggle: () =>
-                        setState(() => _isMapMenuOpen = !_isMapMenuOpen),
-                    onSelectStandard: () => setState(() {
-                      _selectedMapStyle = MapStyle.standard;
-                      _isMapMenuOpen = false;
-                    }),
-                    onSelectSatellite: () => setState(() {
-                      _selectedMapStyle = MapStyle.satellite;
-                      _isMapMenuOpen = false;
-                    }),
-                    onSelectOffline: () => setState(() {
-                      _selectedMapStyle = MapStyle.offline;
-                      _isMapMenuOpen = false;
-                    }),
-                  ),
-                ),
-                Positioned(
-                  right: 20,
-                  bottom: isTourActive ? cardBottom + 66 : 90,
-                  child: CircleFab(
-                    heroTag: 'lock',
-                    icon: _isMapLocked ? Icons.lock : Icons.lock_open,
-                    iconColor: _isMapLocked
-                        ? AppPalette.danger
-                        : theme.colorScheme.onSurfaceVariant,
-                    onTap: () => setState(() => _isMapLocked = !_isMapLocked),
-                  ),
-                ),
-                Positioned(
-                  right: 20,
-                  bottom: isTourActive ? cardBottom + 8 : 20,
-                  child: CircleFab(
-                    heroTag: 'loc',
-                    icon: Icons.my_location,
-                    iconColor: _isCenteringOnUser
-                        ? AppPalette.olive
-                        : _alignPositionOnUpdate == AlignOnUpdate.always
-                        ? AppPalette.olive
-                        : theme.colorScheme.onSurfaceVariant,
-                    onTap: _centerOnUserLocation,
-                  ),
-                ),
-
-                // ── INTERFACCIA TOUR ──
-                if (!isTourActive)
-                  Positioned(
-                    bottom: 28,
-                    left: 0,
-                    right: 0,
-                    child: Center(child: StartTourButton(onTap: _startTour)),
-                  ),
-                if (isTourActive &&
-                    _tourController.status == TourStatus.running)
-                  Positioned(
-                    right: 20,
-                    bottom: cardBottom + 180,
-                    child: ManualArrivalButton(
-                      onTap: _tourController.markArrivedManually,
-                    ),
-                  ),
-                if (isTourActive)
-                  Positioned(
-                    left: 16,
-                    top: isLocationBannerVisible ? 112 : 16,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TourQuickActionButton(
-                          label: 'Interrompi tour',
-                          icon: Icons.stop_circle_outlined,
-                          color: AppPalette.danger,
-                          onTap: _confirmStopTour,
-                        ),
-                        const SizedBox(height: 10),
-                        TourQuickActionButton(
-                          label: 'Ordina tappe',
-                          icon: Icons.format_list_bulleted_rounded,
-                          color: AppPalette.olive,
-                          onTap: _openTourPlanSheet,
-                        ),
-                      ],
-                    ),
-                  ),
-                if (isTourActive && currentStop != null)
-                  Positioned(
-                    bottom: cardPadding,
-                    left: 16,
-                    right: 16,
-                    child: NextStopCard(
-                      stop: currentStop,
-                      icon: currentStopVisual!.icon,
-                      iconBackground: currentStopVisual.iconBackground,
-                      stopIndex: _tourController.currentStopIndex,
-                      totalStops: _tourController.orderedStops.length,
-                      distanceMeters: _tourController.distanceToCurrentStop,
-                      elapsedSeconds: _tourController.elapsedSeconds,
-                      arrived: _tourController.isArrived,
-                      onTap: _tourController.isArrived
-                          ? _openPoiPopup
-                          : () => _centerOnStop(currentStop.position),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildErrorState(ThemeData theme) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, color: AppPalette.danger, size: 42),
-            const SizedBox(height: 12),
-            Text(
-              _loadError!,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: theme.colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () {
-                setState(() => _isLoading = true);
-                _loadPois();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppPalette.olive,
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Riprova'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  final ThemeData theme;
+  final String standardMapUrl;
+  final LocalFileTileProvider localTileProvider;
+  final TourStop? currentStop;
+  final bool isTourActive;
+  final bool canUseLocation;
+  final bool isLocationBannerVisible;
+  final TourStopVisual? currentStopVisual;
 }
