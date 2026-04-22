@@ -163,5 +163,5 @@ class _MapBuildData {
   final bool isTourActive;
   final bool canUseLocation;
   final bool isLocationBannerVisible;
-  final TourStopVisual? currentStopVisual;
+  final TourStopVisualData? currentStopVisual;
 }

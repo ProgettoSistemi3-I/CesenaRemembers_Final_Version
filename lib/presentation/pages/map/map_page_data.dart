@@ -2,12 +2,14 @@ part of 'map_page.dart';
 
 extension _MapPageDataLogic on _MapPageState {
   Future<void> _loadPois() async {
-    if (_cachedPois != null && _cachedStops != null) {
+    if (_MapPageState._cachedPois != null && _MapPageState._cachedStops != null) {
       _tourController.dispose();
-      _tourController = TourSessionController(availableStops: _cachedStops!);
+      _tourController = TourSessionController(
+        availableStops: _MapPageState._cachedStops!,
+      );
       _bindTourUpdates();
       setState(() {
-        _pois = _cachedPois!;
+        _pois = _MapPageState._cachedPois!;
         _isLoading = false;
       });
       return;
@@ -19,8 +21,8 @@ extension _MapPageDataLogic on _MapPageState {
       if (!mounted) return;
 
       final stops = _tourStopMapper.fromPois(pois);
-      _cachedStops = stops;
-      _cachedPois = pois;
+      _MapPageState._cachedStops = stops;
+      _MapPageState._cachedPois = pois;
 
       _tourController.dispose();
       _tourController = TourSessionController(availableStops: stops);

@@ -13,8 +13,9 @@ extension _MapPageLocationLogic on _MapPageState {
   }
 
   Future<void> _initLocationLogic() async {
-    final shouldRequestPermission = !_hasRequestedInitialLocationPermission;
-    _hasRequestedInitialLocationPermission = true;
+    final shouldRequestPermission =
+        !_MapPageState._hasRequestedInitialLocationPermission;
+    _MapPageState._hasRequestedInitialLocationPermission = true;
     await _verifyLocationState(requestPerms: shouldRequestPermission);
     if (kIsWeb) return;
     _serviceStatusSub = Geolocator.getServiceStatusStream().listen((status) {
