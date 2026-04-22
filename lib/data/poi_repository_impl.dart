@@ -12,6 +12,9 @@ class PoiRepositoryImpl implements IPoiRepository {
           latitude: item.latitude,
           longitude: item.longitude,
           type: item.type,
+          period: item.period,
+          description: item.description,
+          questions: item.questions,
         ),
       )
       .toList(growable: false);

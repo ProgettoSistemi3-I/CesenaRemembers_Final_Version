@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../../domain/validation/profile_validation.dart';
-import '../../../domain/usecases/user_use_cases.dart';
+import '../../../domain/usecases/user_profile_use_cases.dart';
 import '../../../injection_container.dart';
 import '../../theme/app_palette.dart';
 import 'avatar_catalog.dart';
@@ -24,7 +24,7 @@ class ProfileSetupPage extends StatefulWidget {
 }
 
 class _ProfileSetupPageState extends State<ProfileSetupPage> {
-  final UserUseCases _userUseCases = sl<UserUseCases>();
+  final UserProfileUseCases _profileUseCases = sl<UserProfileUseCases>();
 
   late final TextEditingController _nameController;
   final TextEditingController _usernameController = TextEditingController();
@@ -92,7 +92,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
       // Best-effort check: se le rules bloccano query globali non interrompiamo
       // il flusso, lasciando al salvataggio finale la validazione definitiva.
       try {
-        final available = await _userUseCases.isUsernameAvailable(
+        final available = await _profileUseCases.isUsernameAvailable(
           normalizedUsername,
         );
         if (!available) {
@@ -106,7 +106,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
         // Ignoriamo errori di availability check (es. permission-denied).
       }
 
-      await _userUseCases.completeInitialProfile(
+      await _profileUseCases.completeInitialProfile(
         uid: widget.uid,
         email: widget.email,
         username: normalizedUsername,

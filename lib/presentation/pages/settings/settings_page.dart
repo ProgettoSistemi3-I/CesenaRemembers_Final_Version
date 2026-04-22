@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../domain/usecases/auth_use_cases.dart';
-import '../../../domain/usecases/user_use_cases.dart';
+import '../../../domain/usecases/user_preferences_use_cases.dart';
+import '../../../domain/usecases/user_profile_use_cases.dart';
 import '../../../injection_container.dart';
 import '../../controllers/offline_maps_controller.dart';
 import '../../controllers/settings_controller.dart';
 import '../../controllers/settings_ui_controller.dart';
 import '../../services/shell_navigation_store.dart';
 import '../../theme/app_palette.dart';
-import '../../theme/theme_controller.dart'; // Import fondamentale per il tema dinamico
+import '../../theme/theme_controller.dart';
 
 // Dichiariamo che la parte visiva dei widget si trova in questo file separato
 part 'settings_page_sections.dart';
@@ -46,7 +47,8 @@ class _SettingsPageState extends State<SettingsPage>
     _controller = SettingsController(
       signOutUseCase: sl<SignOutUseCase>(),
       deleteCurrentUserUseCase: sl<DeleteCurrentUserUseCase>(),
-      userUseCases: sl<UserUseCases>(),
+      profileUseCases: sl<UserProfileUseCases>(),
+      preferencesUseCases: sl<UserPreferencesUseCases>(),
       themeController:
           sl<ThemeController>(), // Questo fa la magia in tempo reale
     );
@@ -209,7 +211,7 @@ class _SettingsPageState extends State<SettingsPage>
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 20),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurface.withOpacity(0.1),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -265,27 +267,6 @@ class _SettingsPageState extends State<SettingsPage>
         options: const ['Italiano', 'English'],
         selected: _uiController.selectedLanguage,
         onSelect: _uiController.setLanguage,
-      ),
-    );
-  }
-
-  void _showNotificationTypes() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (_) => _ChoiceSheet(
-        title: 'Tipi notifiche',
-        options: const [
-          'Tutte',
-          'Solo eventi importanti',
-          'Solo eventi e progressi',
-          'Nessuna promozione',
-        ],
-        selected: _uiController.notificationType,
-        onSelect: _uiController.setNotificationType,
       ),
     );
   }
@@ -372,7 +353,7 @@ class _SettingsPageState extends State<SettingsPage>
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 20),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurface.withOpacity(0.1),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),

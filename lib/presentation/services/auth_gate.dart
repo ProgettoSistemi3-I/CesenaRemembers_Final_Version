@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import '../../domain/entities/app_user.dart';
 import '../../domain/entities/userprofile.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../../domain/usecases/user_use_cases.dart';
+import '../../domain/usecases/user_profile_use_cases.dart';
 import '../../injection_container.dart';
 import '../pages/login_page.dart';
 import '../pages/profile/profile_setup_page.dart';
+import '../theme/theme_controller.dart';
 import 'main_shell.dart';
 
 class AuthGate extends StatelessWidget {
@@ -46,17 +47,19 @@ class _AuthenticatedGate extends StatefulWidget {
 }
 
 class _AuthenticatedGateState extends State<_AuthenticatedGate> {
-  late final UserUseCases _userUseCases;
+  late final UserProfileUseCases _profileUseCases;
   late final Future<void> _ensureFuture;
 
   @override
   void initState() {
     super.initState();
-    _userUseCases = sl<UserUseCases>();
-    _ensureFuture = _userUseCases.ensureUserDocument(
+    _profileUseCases = sl<UserProfileUseCases>();
+    _ensureFuture = _profileUseCases
+        .ensureUserDocument(
       uid: widget.appUser.id,
       email: widget.appUser.email,
-    );
+    )
+        .then((_) => sl<ThemeController>().refreshFromProfile());
   }
 
   @override
@@ -85,7 +88,7 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
         }
 
         return StreamBuilder<UserProfile?>(
-          stream: _userUseCases.getUserProfileStream(widget.appUser.id),
+          stream: _profileUseCases.getUserProfileStream(widget.appUser.id),
           builder: (context, profileSnapshot) {
             if (!profileSnapshot.hasData) {
               return const Scaffold(

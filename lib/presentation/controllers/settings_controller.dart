@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 
 import '../../domain/usecases/auth_use_cases.dart';
-import '../../domain/usecases/user_use_cases.dart';
+import '../../domain/usecases/user_preferences_use_cases.dart';
+import '../../domain/usecases/user_profile_use_cases.dart';
 import '../theme/theme_controller.dart';
 import '../services/location_permission_service.dart';
 import '../services/location_preference_store.dart';
@@ -10,7 +11,8 @@ class SettingsController extends ChangeNotifier {
   bool _isDisposed = false;
   final SignOutUseCase _signOutUseCase;
   final DeleteCurrentUserUseCase _deleteCurrentUserUseCase;
-  final UserUseCases _userUseCases;
+  final UserProfileUseCases _profileUseCases;
+  final UserPreferencesUseCases _preferencesUseCases;
   final ThemeController _themeController;
   final LocationPermissionService _locationService;
 
@@ -28,11 +30,13 @@ class SettingsController extends ChangeNotifier {
   SettingsController({
     required SignOutUseCase signOutUseCase,
     required DeleteCurrentUserUseCase deleteCurrentUserUseCase,
-    required UserUseCases userUseCases,
+    required UserProfileUseCases profileUseCases,
+    required UserPreferencesUseCases preferencesUseCases,
     required ThemeController themeController,
   }) : _signOutUseCase = signOutUseCase,
        _deleteCurrentUserUseCase = deleteCurrentUserUseCase,
-       _userUseCases = userUseCases,
+       _profileUseCases = profileUseCases,
+       _preferencesUseCases = preferencesUseCases,
        _themeController = themeController,
        _locationService = const LocationPermissionService() {
     loadUserPreferences();
@@ -52,14 +56,14 @@ class SettingsController extends ChangeNotifier {
   }
 
   String get _currentUid {
-    final uid = _userUseCases.getCurrentUserUid();
+    final uid = _profileUseCases.getCurrentUserUid();
     if (uid == null) throw Exception("Errore critico: utente non loggato.");
     return uid;
   }
 
   Future<void> loadUserPreferences() async {
     try {
-      final profile = await _userUseCases.getUserProfile(_currentUid);
+      final profile = await _profileUseCases.getUserProfile(_currentUid);
 
       notifiche = profile.notificheEnabled;
       modalitaNotte = profile.darkModeEnabled;
@@ -118,7 +122,7 @@ class SettingsController extends ChangeNotifier {
 
     try {
       // 2. Salvataggio su Firestore
-      await _userUseCases.updatePreferences(
+      await _preferencesUseCases.updatePreferences(
         uid: _currentUid,
         notifiche: newNotifiche,
         darkMode: newModalitaNotte,
@@ -158,7 +162,7 @@ class SettingsController extends ChangeNotifier {
 
     // ── Step 1: cancella i dati applicativi su Firestore ──
     try {
-      await _userUseCases.deleteUserData(uid: uid);
+      await _profileUseCases.deleteUserData(uid: uid);
     } catch (e) {
       // Firestore non ha eliminato nulla → lo stato è intatto, mostriamo errore.
       debugPrint('[DELETE‑ACCOUNT] Errore cancellazione Firestore: $e');

@@ -66,8 +66,8 @@ class TourSessionController {
       if (absoluteIndex == 0) return null;
       return distance.as(
         LengthUnit.Meter,
-        _orderedStops[absoluteIndex - 1].position,
-        _orderedStops[absoluteIndex].position,
+        _toLatLng(_orderedStops[absoluteIndex - 1].position),
+        _toLatLng(_orderedStops[absoluteIndex].position),
       );
     }, growable: false);
   }
@@ -75,7 +75,11 @@ class TourSessionController {
   double get distanceToCurrentStop {
     final stop = currentStop;
     if (stop == null || _userPosition == null) return -1;
-    return const Distance().as(LengthUnit.Meter, _userPosition!, stop.position);
+    return const Distance().as(
+      LengthUnit.Meter,
+      _userPosition!,
+      _toLatLng(stop.position),
+    );
   }
 
   bool get hasStops => _availableStops.isNotEmpty;
@@ -94,7 +98,7 @@ class TourSessionController {
     final origin = await _resolveOrigin();
 
     _orderedStops = _routePlanner.sortNearestNeighbor(
-      origin: origin,
+      origin: GeoPoint(latitude: origin.latitude, longitude: origin.longitude),
       stops: _availableStops,
     );
     _currentStopIndex = 0;
@@ -227,4 +231,6 @@ class TourSessionController {
       _updates.add(null);
     }
   }
+
+  LatLng _toLatLng(GeoPoint point) => LatLng(point.latitude, point.longitude);
 }

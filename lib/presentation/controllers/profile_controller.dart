@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../../domain/entities/userprofile.dart';
-import '../../domain/usecases/user_use_cases.dart';
+import '../../domain/usecases/user_profile_use_cases.dart';
 
 class ProfileController extends ChangeNotifier {
-  ProfileController({required UserUseCases userUseCases})
-    : _userUseCases = userUseCases {
+  ProfileController({required UserProfileUseCases profileUseCases})
+    : _profileUseCases = profileUseCases {
     _startProfileListener();
   }
 
-  final UserUseCases _userUseCases;
+  final UserProfileUseCases _profileUseCases;
   StreamSubscription<UserProfile?>? _profileSub;
   bool _isDisposed = false;
 
@@ -25,7 +25,7 @@ class ProfileController extends ChangeNotifier {
 
   void _startProfileListener() {
     // Otteniamo l'UID tramite lo Use Case
-    final uid = _userUseCases.getCurrentUserUid();
+    final uid = _profileUseCases.getCurrentUserUid();
 
     if (uid == null) {
       isLoading = false;
@@ -37,7 +37,7 @@ class ProfileController extends ChangeNotifier {
     _profileSub?.cancel();
 
     // Ascoltiamo lo stream dal Domain Layer
-    _profileSub = _userUseCases
+    _profileSub = _profileUseCases
         .getUserProfileStream(uid)
         .listen(
           (userProfile) async {
@@ -61,7 +61,7 @@ class ProfileController extends ChangeNotifier {
 
   Future<void> _loadProfileFromUseCase(String uid) async {
     try {
-      profile = await _userUseCases.getUserProfile(uid);
+      profile = await _profileUseCases.getUserProfile(uid);
       errorMessage = null;
     } catch (e) {
       errorMessage = 'Impossibile caricare il profilo.';
@@ -75,11 +75,11 @@ class ProfileController extends ChangeNotifier {
     String? displayName,
     String? avatarId,
   }) async {
-    final uid = _userUseCases.getCurrentUserUid();
+    final uid = _profileUseCases.getCurrentUserUid();
     if (uid == null) return;
 
     try {
-      await _userUseCases.updateProfileBasics(
+      await _profileUseCases.updateProfileBasics(
         uid: uid,
         displayName: displayName,
         avatarId: avatarId,

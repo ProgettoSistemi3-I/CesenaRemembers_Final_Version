@@ -6,7 +6,7 @@ class TourRoutePlanner {
   const TourRoutePlanner();
 
   List<TourStop> sortNearestNeighbor({
-    required LatLng origin,
+    required GeoPoint origin,
     required List<TourStop> stops,
   }) {
     final remaining = List<TourStop>.from(stops);
@@ -17,8 +17,10 @@ class TourRoutePlanner {
     while (remaining.isNotEmpty) {
       remaining.sort(
         (a, b) => distance
-            .as(LengthUnit.Meter, current, a.position)
-            .compareTo(distance.as(LengthUnit.Meter, current, b.position)),
+            .as(LengthUnit.Meter, _toLatLng(current), _toLatLng(a.position))
+            .compareTo(
+              distance.as(LengthUnit.Meter, _toLatLng(current), _toLatLng(b.position)),
+            ),
       );
       final next = remaining.removeAt(0);
       sorted.add(next);
@@ -27,4 +29,6 @@ class TourRoutePlanner {
 
     return sorted;
   }
+
+  LatLng _toLatLng(GeoPoint point) => LatLng(point.latitude, point.longitude);
 }

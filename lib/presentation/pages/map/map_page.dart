@@ -14,7 +14,8 @@ import '../../../domain/entities/tour_stop.dart';
 import '../../../domain/services/tour_scoring_service.dart';
 import '../../../domain/usecases/offline_map_use_cases.dart';
 import '../../../domain/usecases/poi_use_cases.dart';
-import '../../../domain/usecases/user_use_cases.dart';
+import '../../../domain/usecases/user_profile_use_cases.dart';
+import '../../../domain/usecases/user_progress_use_cases.dart';
 import '../../../injection_container.dart';
 import '../../controllers/tour_session_controller.dart';
 import '../../services/local_file_tile_provider.dart';
@@ -46,7 +47,8 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   final TourStopMapper _tourStopMapper = const TourStopMapper();
   final TourStopVisuals _tourStopVisuals = const TourStopVisuals();
   final TourScoringService _tourScoringService = const TourScoringService();
-  final UserUseCases _userUseCases = sl<UserUseCases>();
+  final UserProfileUseCases _profileUseCases = sl<UserProfileUseCases>();
+  final UserProgressUseCases _progressUseCases = sl<UserProgressUseCases>();
 
   static final LatLngBounds _cesenaBounds = LatLngBounds(
     const LatLng(44.1054, 12.2131),

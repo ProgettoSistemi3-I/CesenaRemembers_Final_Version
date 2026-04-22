@@ -118,7 +118,7 @@ class _LoginPageState extends State<LoginPage>
             'https://images.unsplash.com/photo-1524661135-423995f22d0b'
             '?q=80&w=1000&auto=format&fit=crop',
             fit: BoxFit.cover,
-            color: Colors.black.withOpacity(0.62),
+            color: Colors.black.withValues(alpha: 0.62),
             colorBlendMode: BlendMode.darken,
             errorBuilder: (_, _, _) => Container(
               decoration: const BoxDecoration(
@@ -135,7 +135,7 @@ class _LoginPageState extends State<LoginPage>
           Container(
             decoration: BoxDecoration(
               gradient: RadialGradient(
-                colors: [Colors.transparent, Colors.black.withOpacity(0.78)],
+                colors: [Colors.transparent, Colors.black.withValues(alpha: 0.78)],
                 radius: 1.0,
               ),
             ),
@@ -159,7 +159,7 @@ class _LoginPageState extends State<LoginPage>
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(color: _olive, width: 2),
-                          color: Colors.black.withOpacity(0.45),
+                          color: Colors.black.withValues(alpha: 0.45),
                         ),
                         child: Icon(
                           Icons.military_tech,
@@ -218,10 +218,10 @@ class _LoginPageState extends State<LoginPage>
                                 vertical: spacingSm * 0.75,
                               ),
                               decoration: BoxDecoration(
-                                color: _tan.withOpacity(0.16),
+                                color: _tan.withValues(alpha: 0.16),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: _tan.withOpacity(0.35),
+                                  color: _tan.withValues(alpha: 0.35),
                                 ),
                               ),
                               child: Text(
@@ -258,7 +258,7 @@ class _LoginPageState extends State<LoginPage>
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: _olive.withOpacity(0.22),
+            color: _olive.withValues(alpha: 0.22),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -271,7 +271,7 @@ class _LoginPageState extends State<LoginPage>
           padding: EdgeInsets.symmetric(vertical: btnVertPad),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
-            side: BorderSide(color: _olive.withOpacity(0.28), width: 1),
+            side: BorderSide(color: _olive.withValues(alpha: 0.28), width: 1),
           ),
           elevation: 0,
         ),
