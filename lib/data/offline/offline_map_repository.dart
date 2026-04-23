@@ -49,7 +49,13 @@ class OfflineMapRepository implements IOfflineMapRepository {
   @override
   Future<bool> hasOfflineMap() async {
     final manifest = await _readManifest();
-    return manifest['isReady'] == true;
+    final isReady = manifest['isReady'] == true;
+    final expectedTiles = manifest['expectedTiles'];
+    final downloadedTiles = manifest['downloadedTiles'];
+
+    if (!isReady) return false;
+    if (expectedTiles is! int || downloadedTiles is! int) return false;
+    return expectedTiles > 0 && downloadedTiles == expectedTiles;
   }
 
   @override
@@ -80,7 +86,8 @@ class OfflineMapRepository implements IOfflineMapRepository {
     final allTiles = _buildCesenaTiles();
     final total = allTiles.length;
 
-    var downloaded = 0;
+    var processed = 0;
+    var failed = 0;
     final progressController = StreamController<int>();
 
     yield OfflineMapProgress(
@@ -93,7 +100,11 @@ class OfflineMapRepository implements IOfflineMapRepository {
       root: root,
       tiles: allTiles,
       mapTilerApiKey: mapTilerApiKey,
-      onTileComplete: () => progressController.add(++downloaded),
+      onTileComplete: (didSucceed) {
+        processed++;
+        if (!didSucceed) failed++;
+        progressController.add(processed);
+      },
     );
 
     await for (final count in progressController.stream) {
@@ -108,14 +119,28 @@ class OfflineMapRepository implements IOfflineMapRepository {
     await poolDone;
     await progressController.close();
 
+    final downloadedTiles = total - failed;
+    final storedBytes = await _calculateStoredBytes(root);
+
     await _writeManifest(<String, dynamic>{
-      'isReady': true,
+      'isReady': failed == 0,
       'downloadedAt': DateTime.now().toIso8601String(),
       'minZoom': _minZoom,
       'maxZoom': _maxZoom,
       'source': 'maptiler:$_mapStyle',
+      'expectedTiles': total,
+      'downloadedTiles': downloadedTiles,
+      'failedTiles': failed,
+      'storedBytes': storedBytes,
     });
-    availability.value = true;
+    availability.value = failed == 0;
+
+    if (failed > 0) {
+      throw StateError(
+        'Download offline incompleto: $failed tile mancanti su $total. '
+        'Controlla connessione/restrizioni API e riprova.',
+      );
+    }
 
     yield OfflineMapProgress(
       downloaded: total,
@@ -128,7 +153,7 @@ class OfflineMapRepository implements IOfflineMapRepository {
     required Directory root,
     required List<_TileCoords> tiles,
     required String mapTilerApiKey,
-    required void Function() onTileComplete,
+    required void Function(bool didSucceed) onTileComplete,
   }) async {
     var index = 0;
 
@@ -137,8 +162,8 @@ class OfflineMapRepository implements IOfflineMapRepository {
         if (index >= tiles.length) return;
         final tile = tiles[index++];
 
-        await _downloadTile(root, tile, mapTilerApiKey);
-        onTileComplete();
+        final didSucceed = await _downloadTile(root, tile, mapTilerApiKey);
+        onTileComplete(didSucceed);
       }
     }
 
@@ -201,13 +226,13 @@ class OfflineMapRepository implements IOfflineMapRepository {
     return (value * n).floor();
   }
 
-  Future<void> _downloadTile(
+  Future<bool> _downloadTile(
     Directory root,
     _TileCoords tile,
     String mapTilerApiKey,
   ) async {
     final tileFile = File('${root.path}/${tile.z}/${tile.x}/${tile.y}.png');
-    if (await tileFile.exists()) return;
+    if (await tileFile.exists()) return true;
 
     await tileFile.parent.create(recursive: true);
 
@@ -242,7 +267,22 @@ class OfflineMapRepository implements IOfflineMapRepository {
         response.statusCode == 200 &&
         response.bodyBytes.isNotEmpty) {
       await tileFile.writeAsBytes(response.bodyBytes);
+      return true;
     }
+
+    return false;
+  }
+
+  Future<int> _calculateStoredBytes(Directory root) async {
+    var totalBytes = 0;
+
+    await for (final entity in root.list(recursive: true, followLinks: false)) {
+      if (entity is File && entity.path.endsWith('.png')) {
+        totalBytes += await entity.length();
+      }
+    }
+
+    return totalBytes;
   }
 }
 

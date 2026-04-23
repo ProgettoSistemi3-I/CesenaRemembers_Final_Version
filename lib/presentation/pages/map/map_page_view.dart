@@ -313,6 +313,7 @@ class _MapCanvas extends StatelessWidget {
       ),
       children: [
         TileLayer(
+          key: ValueKey<MapStyle>(selectedMapStyle),
           urlTemplate: currentMapUrl,
           subdomains: selectedMapStyle == MapStyle.offline
               ? const []
