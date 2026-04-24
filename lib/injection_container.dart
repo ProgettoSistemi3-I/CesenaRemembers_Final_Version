@@ -2,15 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
 
 import 'data/firebase_auth_repository.dart';
-import 'data/offline/offline_map_repository.dart';
 import 'data/poi_repository_impl.dart';
 import 'data/user_repository_impl.dart';
 import 'domain/repositories/auth_repository.dart';
 import 'domain/repositories/i_poi_repository.dart';
-import 'domain/repositories/offline_map_repository.dart';
 import 'domain/repositories/user_repository.dart';
 import 'domain/usecases/auth_use_cases.dart';
-import 'domain/usecases/offline_map_use_cases.dart';
 import 'domain/usecases/poi_use_cases.dart';
 import 'domain/usecases/user_preferences_use_cases.dart';
 import 'domain/usecases/user_profile_use_cases.dart';
@@ -26,11 +23,6 @@ Future<void> init() async {
     sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
   }
 
-  if (!sl.isRegistered<IOfflineMapRepository>()) {
-    final repository = OfflineMapRepository();
-    await repository.init();
-    sl.registerLazySingleton<IOfflineMapRepository>(() => repository);
-  }
 
   if (!sl.isRegistered<IPoiRepository>()) {
     sl.registerLazySingleton<IPoiRepository>(() => PoiRepositoryImpl());
@@ -46,9 +38,6 @@ Future<void> init() async {
 
   if (!sl.isRegistered<GetPoisUseCase>()) {
     sl.registerLazySingleton(() => GetPoisUseCase(sl()));
-  }
-  if (!sl.isRegistered<OfflineMapUseCases>()) {
-    sl.registerLazySingleton(() => OfflineMapUseCases(sl()));
   }
   if (!sl.isRegistered<SignInWithGoogleUseCase>()) {
     sl.registerLazySingleton(() => SignInWithGoogleUseCase(sl()));

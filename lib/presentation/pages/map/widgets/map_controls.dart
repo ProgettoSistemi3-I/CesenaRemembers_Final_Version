@@ -39,20 +39,16 @@ class MapTypeButton extends StatelessWidget {
     super.key,
     required this.isOpen,
     required this.selectedMapStyle,
-    required this.offlineEnabled,
     required this.onToggle,
     required this.onSelectStandard,
     required this.onSelectSatellite,
-    required this.onSelectOffline,
   });
 
   final bool isOpen;
   final MapStyle selectedMapStyle;
-  final bool offlineEnabled;
   final VoidCallback onToggle;
   final VoidCallback onSelectStandard;
   final VoidCallback onSelectSatellite;
-  final VoidCallback onSelectOffline;
 
   @override
   Widget build(BuildContext context) {
@@ -133,16 +129,6 @@ class MapTypeButton extends StatelessWidget {
                     : Colors.green.shade100, // ADATTIVO
                 onTap: onSelectSatellite,
               ),
-              if (offlineEnabled) ...[
-                const SizedBox(width: 12),
-                square(
-                  title: 'Offline',
-                  icon: Icons.offline_pin_outlined,
-                  isSelected: selectedMapStyle == MapStyle.offline,
-                  bgColor: Colors.orange.shade100,
-                  onTap: onSelectOffline,
-                ),
-              ],
             ],
           ),
           const SizedBox(height: 12),
@@ -162,7 +148,7 @@ class MapTypeButton extends StatelessWidget {
   }
 }
 
-enum MapStyle { standard, satellite, offline }
+enum MapStyle { standard, satellite }
 
 class StartTourButton extends StatelessWidget {
   const StartTourButton({super.key, required this.onTap});

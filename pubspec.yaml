@@ -44,6 +44,9 @@ dependencies:
   latlong2: ^0.9.1
   geolocator: ^14.0.2
   url_launcher: ^6.3.2
+  http_cache_file_store: ^2.0.1
+  flutter_map_cache: ^2.1.0
+  dio_cache_interceptor: ^4.0.6
 
 
 dev_dependencies:

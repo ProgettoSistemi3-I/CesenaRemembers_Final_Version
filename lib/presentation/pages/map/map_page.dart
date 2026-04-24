@@ -4,21 +4,23 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
+import 'package:flutter_map_cache/flutter_map_cache.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http_cache_file_store/http_cache_file_store.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../domain/entities/poi.dart';
 import '../../../config/app_runtime_config.dart';
 import '../../../domain/entities/tour_stop.dart';
 import '../../../domain/services/tour_scoring_service.dart';
-import '../../../domain/usecases/offline_map_use_cases.dart';
 import '../../../domain/usecases/poi_use_cases.dart';
 import '../../../domain/usecases/user_profile_use_cases.dart';
 import '../../../domain/usecases/user_progress_use_cases.dart';
 import '../../../injection_container.dart';
 import '../../controllers/tour_session_controller.dart';
-import '../../services/local_file_tile_provider.dart';
 import '../../services/location_preference_store.dart';
 import '../../services/poi_marker_factory.dart';
 import '../../services/shell_navigation_store.dart';
@@ -62,7 +64,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   late TourSessionController _tourController;
   StreamSubscription<ServiceStatus>? _serviceStatusSub;
   StreamSubscription<void>? _tourUpdatesSub;
-  late final OfflineMapUseCases _offlineMapUseCases;
+  CacheStore? _tileCacheStore;
 
   AlignOnUpdate _alignPositionOnUpdate = AlignOnUpdate.never;
   double _currentRotation = 0.0;
@@ -95,35 +97,30 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
             AppRuntimeConfig.stadiaMapsApiKey.trim().isNotEmpty
         ? _urlStandardDark
         : _urlStandard,
-    localTileProvider: LocalFileTileProvider(
-      cacheRootPath: _offlineMapUseCases.localCachePath,
-    ),
     currentStop: _tourController.currentStop,
     isTourActive: _tourController.isActive,
     canUseLocation: _isGpsEnabled && _hasPermissions && _isGpsPreferenceEnabled,
     isLocationBannerVisible:
-        !_isCheckingLocation && !(_isGpsEnabled && _hasPermissions && _isGpsPreferenceEnabled),
+        !_isCheckingLocation &&
+        !(_isGpsEnabled && _hasPermissions && _isGpsPreferenceEnabled),
     currentStopVisual: _tourController.currentStop == null
         ? null
         : _tourStopVisuals.forStop(_tourController.currentStop!),
   );
 
   MapStyle _selectedMapStyle = MapStyle.standard;
-  bool _hasOfflineMaps = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _offlineMapUseCases = sl<OfflineMapUseCases>();
-    _offlineMapUseCases.availability.addListener(_onOfflineAvailabilityChanged);
+    _initTileCaching();
     _tourController = TourSessionController(availableStops: const []);
     _bindTourUpdates();
     LocationPreferenceStore.gpsEnabled.addListener(_onGpsPreferenceChanged);
 
     _initLocationLogic();
     _loadPois();
-    _loadOfflineAvailability(forceRefresh: true);
   }
 
   @override
@@ -133,7 +130,6 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     _tourUpdatesSub?.cancel();
     LocationPreferenceStore.gpsEnabled.removeListener(_onGpsPreferenceChanged);
     _tourController.dispose();
-    _offlineMapUseCases.availability.removeListener(_onOfflineAvailabilityChanged);
     _mapController.dispose();
     super.dispose();
   }
@@ -142,8 +138,25 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _verifyLocationState(requestPerms: false);
-      _loadOfflineAvailability();
     }
+  }
+
+  Future<void> _initTileCaching() async {
+    final cacheDir = await getTemporaryDirectory();
+    final cachePath = '${cacheDir.path}/map_tiles_cache';
+    final cacheStore = FileCacheStore(cachePath);
+    if (!mounted) return;
+    setState(() => _tileCacheStore = cacheStore);
+  }
+
+  CachedTileProvider? get _cachedTileProvider {
+    final store = _tileCacheStore;
+    if (store == null) return null;
+    return CachedTileProvider(
+      store: store,
+      maxStale: const Duration(days: 120),
+      hitCacheOnNetworkFailure: true,
+    );
   }
 
   @override
@@ -154,7 +167,6 @@ class _MapBuildData {
   const _MapBuildData({
     required this.theme,
     required this.standardMapUrl,
-    required this.localTileProvider,
     required this.currentStop,
     required this.isTourActive,
     required this.canUseLocation,
@@ -164,7 +176,6 @@ class _MapBuildData {
 
   final ThemeData theme;
   final String standardMapUrl;
-  final LocalFileTileProvider localTileProvider;
   final TourStop? currentStop;
   final bool isTourActive;
   final bool canUseLocation;
