@@ -3,10 +3,8 @@ part of 'map_page.dart';
 extension _MapPageView on _MapPageState {
   Widget _buildPage() {
     final data = _buildData;
-    final offlineTemplate = _offlineMapUseCases.offlineMapTemplate;
     final currentMapUrl = switch (_selectedMapStyle) {
       MapStyle.satellite => _MapPageState._urlSatellite,
-      MapStyle.offline => offlineTemplate,
       MapStyle.standard => data.standardMapUrl,
     };
 
@@ -45,7 +43,7 @@ extension _MapPageView on _MapPageState {
             canUseLocation: data.canUseLocation,
             currentMapUrl: currentMapUrl,
             selectedMapStyle: _selectedMapStyle,
-            localTileProvider: data.localTileProvider,
+            cachedTileProvider: _cachedTileProvider,
             markers: _buildMarkers(),
             scaffoldBackgroundColor: data.theme.scaffoldBackgroundColor,
           ),
@@ -94,7 +92,6 @@ extension _MapPageView on _MapPageState {
             child: MapTypeButton(
               isOpen: _isMapMenuOpen,
               selectedMapStyle: _selectedMapStyle,
-              offlineEnabled: _hasOfflineMaps,
               onToggle: () => setState(() => _isMapMenuOpen = !_isMapMenuOpen),
               onSelectStandard: () => setState(() {
                 _selectedMapStyle = MapStyle.standard;
@@ -102,10 +99,6 @@ extension _MapPageView on _MapPageState {
               }),
               onSelectSatellite: () => setState(() {
                 _selectedMapStyle = MapStyle.satellite;
-                _isMapMenuOpen = false;
-              }),
-              onSelectOffline: () => setState(() {
-                _selectedMapStyle = MapStyle.offline;
                 _isMapMenuOpen = false;
               }),
             ),
@@ -253,7 +246,7 @@ class _MapCanvas extends StatelessWidget {
     required this.canUseLocation,
     required this.currentMapUrl,
     required this.selectedMapStyle,
-    required this.localTileProvider,
+    required this.cachedTileProvider,
     required this.markers,
     required this.scaffoldBackgroundColor,
   });
@@ -270,7 +263,7 @@ class _MapCanvas extends StatelessWidget {
   final bool canUseLocation;
   final String currentMapUrl;
   final MapStyle selectedMapStyle;
-  final LocalFileTileProvider localTileProvider;
+  final CachedTileProvider? cachedTileProvider;
   final List<Marker> markers;
   final Color scaffoldBackgroundColor;
 
@@ -315,15 +308,11 @@ class _MapCanvas extends StatelessWidget {
         TileLayer(
           key: ValueKey<MapStyle>(selectedMapStyle),
           urlTemplate: currentMapUrl,
-          subdomains: selectedMapStyle == MapStyle.offline
-              ? const []
-              : const ['a', 'b', 'c', 'd'],
+          subdomains: const ['a', 'b', 'c', 'd'],
           userAgentPackageName: 'com.geoapp.prototype',
           maxZoom: 19,
           tileBounds: cesenaBounds,
-          tileProvider: selectedMapStyle == MapStyle.offline
-              ? localTileProvider
-              : null,
+          tileProvider: cachedTileProvider,
         ),
         if (canUseLocation)
           CurrentLocationLayer(

@@ -43,30 +43,6 @@ extension _MapPageDataLogic on _MapPageState {
     }
   }
 
-  Future<void> _loadOfflineAvailability({bool forceRefresh = false}) async {
-    final hasOffline = forceRefresh
-        ? await _offlineMapUseCases.hasOfflineMap()
-        : _offlineMapUseCases.availability.value;
-    if (!mounted) return;
-    setState(() {
-      _hasOfflineMaps = hasOffline;
-      if (!hasOffline && _selectedMapStyle == MapStyle.offline) {
-        _selectedMapStyle = MapStyle.standard;
-      }
-    });
-  }
-
-  void _onOfflineAvailabilityChanged() {
-    if (!mounted) return;
-    final hasOffline = _offlineMapUseCases.availability.value;
-    setState(() {
-      _hasOfflineMaps = hasOffline;
-      if (!hasOffline && _selectedMapStyle == MapStyle.offline) {
-        _selectedMapStyle = MapStyle.standard;
-      }
-    });
-  }
-
   List<Marker> _buildMarkers() {
     return _pois
         .map(
