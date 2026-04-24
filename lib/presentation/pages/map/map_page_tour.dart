@@ -3,10 +3,13 @@ part of 'map_page.dart';
 extension _MapPageTourActions on _MapPageState {
   Future<void> _startTour() async {
     if (!_tourController.hasStops) return;
+    _quizOrchestrator.clearSessionCache();
     final hasStarted = await _tourController.startTour();
-    if (hasStarted && mounted && _tourController.currentStop != null) {
-      _centerOnStop(_toLatLng(_tourController.currentStop!.position));
-    }
+    if (!hasStarted || !mounted || _tourController.currentStop == null) return;
+
+    _centerOnStop(_toLatLng(_tourController.currentStop!.position));
+    await _prepareQuizForCurrentStop();
+    unawaited(_prefetchQuizForNextStop());
   }
 
   Future<void> _confirmStopTour() async {
@@ -120,6 +123,8 @@ extension _MapPageTourActions on _MapPageState {
           if (_tourController.advanceToNextStop()) {
             if (_tourController.currentStop != null) {
               _centerOnStop(_toLatLng(_tourController.currentStop!.position));
+              unawaited(_prepareQuizForCurrentStop());
+              unawaited(_prefetchQuizForNextStop());
             }
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -135,6 +140,7 @@ extension _MapPageTourActions on _MapPageState {
             );
           }
         },
+        quizQuestionsLoader: () => _loadQuizQuestions(currentStop),
         onQuizCompleted: (result) {
           _registerQuizCompletion(currentStop.id, result);
         },
@@ -195,6 +201,46 @@ extension _MapPageTourActions on _MapPageState {
     } finally {
       _isSavingQuizResult = false;
     }
+  }
+
+  Future<void> _prepareQuizForCurrentStop() async {
+    final stop = _tourController.currentStop;
+    final uid = _quizUserUid;
+    if (stop == null || uid == null) return;
+
+    try {
+      await _quizOrchestrator.prepareForStop(
+        stop: stop,
+        uid: uid,
+        profileLevel: _quizUserLevel,
+      );
+    } catch (_) {
+      // In test forziamo solo AI: gli errori saranno mostrati nella UI quiz.
+    }
+  }
+
+  Future<void> _prefetchQuizForNextStop() async {
+    final uid = _quizUserUid;
+    if (uid == null) return;
+
+    await _quizOrchestrator.prefetchNextStop(
+      stop: _nextStopForPrefetch,
+      uid: uid,
+      profileLevel: _quizUserLevel,
+    );
+  }
+
+  Future<List<QuizQuestion>> _loadQuizQuestions(TourStop stop) async {
+    final uid = _quizUserUid;
+    if (uid == null) {
+      throw const QuizGenerationException('Utente non autenticato.');
+    }
+
+    return _quizOrchestrator.getQuestionsForStop(
+      stop: stop,
+      uid: uid,
+      profileLevel: _quizUserLevel,
+    );
   }
 
   LatLng _toLatLng(GeoPoint point) => LatLng(point.latitude, point.longitude);

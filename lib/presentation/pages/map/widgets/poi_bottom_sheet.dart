@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../domain/entities/quiz_question.dart';
 import '../../../../domain/entities/tour_stop.dart';
 import '../../../controllers/poi_quiz_controller.dart';
 import '../../../theme/app_palette.dart';
@@ -12,6 +13,7 @@ class PoiBottomSheet extends StatefulWidget {
     required this.icon,
     required this.iconBackground,
     required this.elapsedSeconds,
+    required this.quizQuestionsLoader,
     required this.onQuizCompleted,
     required this.onNextStop,
   });
@@ -20,6 +22,7 @@ class PoiBottomSheet extends StatefulWidget {
   final IconData icon;
   final Color iconBackground;
   final int elapsedSeconds;
+  final Future<List<QuizQuestion>> Function() quizQuestionsLoader;
   final ValueChanged<QuizCompletionData> onQuizCompleted;
   final VoidCallback onNextStop;
 
@@ -33,6 +36,9 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
   PoiQuizController? _quizController;
   bool _quizInitialized = false;
   bool _quizCompletionSent = false;
+  bool _isLoadingQuiz = false;
+  String? _quizLoadError;
+  List<QuizQuestion> _generatedQuestions = const [];
 
   @override
   void initState() {
@@ -49,11 +55,35 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
   }
 
   void _handleTabChange() {
-    if (_quizInitialized || _tabController.index != 1) return;
+    if (_quizInitialized || _isLoadingQuiz || _tabController.index != 1) return;
+    _loadAiQuiz();
+  }
+
+  Future<void> _loadAiQuiz() async {
     setState(() {
-      _quizController = PoiQuizController(questions: widget.stop.questions);
-      _quizInitialized = true;
+      _isLoadingQuiz = true;
+      _quizLoadError = null;
     });
+
+    try {
+      final questions = await widget.quizQuestionsLoader();
+      if (!mounted) return;
+      setState(() {
+        _generatedQuestions = questions;
+        _quizController = PoiQuizController(questions: questions);
+        _quizInitialized = true;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _quizLoadError = error.toString();
+      });
+    } finally {
+      if (!mounted) return;
+      setState(() {
+        _isLoadingQuiz = false;
+      });
+    }
   }
 
   void _onAnswerTap(int index) {
@@ -79,7 +109,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         widget.onQuizCompleted(
           QuizCompletionData(
             score: quizController.score,
-            totalQuestions: widget.stop.questions.length,
+            totalQuestions: _generatedQuestions.length,
           ),
         );
       }
@@ -340,6 +370,43 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
   }
 
   Widget _buildQuizContent(ThemeData theme) {
+    if (_isLoadingQuiz) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          child: CircularProgressIndicator(color: AppPalette.olive),
+        ),
+      );
+    }
+
+    if (_quizLoadError != null) {
+      return Column(
+        children: [
+          Text(
+            'Generazione quiz non disponibile. Riprova.',
+            style: TextStyle(
+              fontSize: 14,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: _loadAiQuiz,
+              style: FilledButton.styleFrom(
+                backgroundColor: AppPalette.olive,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Riprova generazione AI'),
+            ),
+          ),
+          const SizedBox(height: 20),
+          NextStopActionButton(onTap: widget.onNextStop),
+        ],
+      );
+    }
+
     if (!_quizInitialized) {
       return const Center(
         child: Padding(
@@ -352,7 +419,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
     final quizController = _quizController;
     if (quizController == null) return const SizedBox.shrink();
 
-    if (widget.stop.questions.isEmpty) {
+    if (_generatedQuestions.isEmpty) {
       return Column(
         children: [
           Text(
@@ -373,7 +440,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         children: [
           QuizResultCard(
             score: quizController.score,
-            total: widget.stop.questions.length,
+            total: _generatedQuestions.length,
             elapsed: widget.elapsedSeconds,
           ),
           const SizedBox(height: 20),
@@ -392,7 +459,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         Row(
           children: [
             Text(
-              'Domanda ${quizController.questionIndex + 1} di ${widget.stop.questions.length}',
+              'Domanda ${quizController.questionIndex + 1} di ${_generatedQuestions.length}',
               style: TextStyle(
                 fontSize: 12,
                 color: theme.colorScheme.onSurfaceVariant,
@@ -416,7 +483,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
           child: LinearProgressIndicator(
             value:
                 (quizController.questionIndex + 1) /
-                widget.stop.questions.length,
+                _generatedQuestions.length,
             backgroundColor:
                 theme.colorScheme.surfaceContainerHighest, // ADATTIVO
             valueColor: const AlwaysStoppedAnimation<Color>(AppPalette.olive),

@@ -15,4 +15,14 @@ class AppRuntimeConfig {
     'STADIA_MAPS_API_KEY',
     defaultValue: '',
   );
+
+  static const String grokApiKey = String.fromEnvironment(
+    'GROK_API_KEY',
+    defaultValue: '',
+  );
+
+  static const String grokModel = String.fromEnvironment(
+    'GROK_MODEL',
+    defaultValue: 'grok-3-mini',
+  );
 }

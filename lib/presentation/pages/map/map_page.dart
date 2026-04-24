@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -13,6 +14,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../domain/entities/poi.dart';
+import '../../../domain/entities/quiz_question.dart';
 import '../../../config/app_runtime_config.dart';
 import '../../../domain/entities/tour_stop.dart';
 import '../../../domain/services/tour_scoring_service.dart';
@@ -26,6 +28,9 @@ import '../../services/poi_marker_factory.dart';
 import '../../services/shell_navigation_store.dart';
 import '../../services/tour_stop_mapper.dart';
 import '../../services/tour_stop_visuals.dart';
+import '../../services/grok_quiz_service.dart';
+import '../../services/quiz_generation_orchestrator.dart';
+import '../../services/quiz_history_service.dart';
 import '../../theme/app_palette.dart';
 import 'widgets/location_issue_banner.dart';
 import 'widgets/map_controls.dart';
@@ -51,6 +56,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   final TourScoringService _tourScoringService = const TourScoringService();
   final UserProfileUseCases _profileUseCases = sl<UserProfileUseCases>();
   final UserProgressUseCases _progressUseCases = sl<UserProgressUseCases>();
+  late final QuizGenerationOrchestrator _quizOrchestrator;
 
   static final LatLngBounds _cesenaBounds = LatLngBounds(
     const LatLng(44.1054, 12.2131),
@@ -64,6 +70,8 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   late TourSessionController _tourController;
   StreamSubscription<ServiceStatus>? _serviceStatusSub;
   StreamSubscription<void>? _tourUpdatesSub;
+  String? _quizUserUid;
+  int _quizUserLevel = 1;
   CacheStore? _tileCacheStore;
 
   AlignOnUpdate _alignPositionOnUpdate = AlignOnUpdate.never;
@@ -115,10 +123,15 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _initTileCaching();
+    _quizOrchestrator = QuizGenerationOrchestrator(
+      grokQuizService: GrokQuizService(),
+      historyService: QuizHistoryService(firestore: sl<FirebaseFirestore>()),
+    );
     _tourController = TourSessionController(availableStops: const []);
     _bindTourUpdates();
     LocationPreferenceStore.gpsEnabled.addListener(_onGpsPreferenceChanged);
 
+    _bootstrapQuizUserContext();
     _initLocationLogic();
     _loadPois();
   }
@@ -130,6 +143,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     _tourUpdatesSub?.cancel();
     LocationPreferenceStore.gpsEnabled.removeListener(_onGpsPreferenceChanged);
     _tourController.dispose();
+    _quizOrchestrator.clearSessionCache();
     _mapController.dispose();
     super.dispose();
   }
@@ -161,6 +175,29 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) => _buildPage();
+
+
+  Future<void> _bootstrapQuizUserContext() async {
+    final uid = _profileUseCases.getCurrentUserUid();
+    if (uid == null) return;
+
+    _quizUserUid = uid;
+    try {
+      final profile = await _profileUseCases.getUserProfile(uid);
+      _quizUserLevel = profile.level;
+    } catch (_) {
+      _quizUserLevel = 1;
+    }
+  }
+
+  TourStop? get _nextStopForPrefetch {
+    final index = _tourController.currentStopIndex + 1;
+    if (index < 0 || index >= _tourController.orderedStops.length) {
+      return null;
+    }
+    return _tourController.orderedStops[index];
+  }
+
 }
 
 class _MapBuildData {
