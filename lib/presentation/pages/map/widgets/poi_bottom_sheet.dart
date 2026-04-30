@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../../../domain/entities/tour_stop.dart';
+import '../../../../injection_container.dart';
 import '../../../controllers/poi_quiz_controller.dart';
 import '../../../theme/app_palette.dart';
 import '../../../services/tour_formatters.dart';
-import '../../../../injection_container.dart';
 
 class PoiBottomSheet extends StatefulWidget {
   const PoiBottomSheet({
@@ -46,6 +46,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
   void dispose() {
     _tabController.removeListener(_handleTabChange);
     _tabController.dispose();
+    _quizController?.dispose(); // Buona pratica pulire il controller
     super.dispose();
   }
 
@@ -53,53 +54,45 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
     if (_quizInitialized || _tabController.index != 1) return;
 
     setState(() {
-      // 1. Usiamo l'Injection Container per farci dare il Controller (che ha già lo UseCase iniettato)
       _quizController = sl<PoiQuizController>();
       _quizInitialized = true;
     });
 
-    // 2. Mettiamo la UI in ascolto dei cambiamenti del controller (che ora è un ChangeNotifier)
     _quizController!.addListener(() {
       if (mounted) setState(() {});
     });
 
-    // 3. Facciamo partire il caricamento vero e proprio dal server (passando ID e nome del POI)
     _quizController!.initQuiz(widget.stop.id, widget.stop.name);
   }
 
   void _onAnswerTap(int index) {
-    setState(() {
-      _quizController?.selectAnswer(index);
-    });
+    _quizController?.selectAnswer(index);
   }
 
   void _nextQuestion() {
-    setState(() {
-      _quizController?.nextQuestion();
-    });
+    _quizController?.nextQuestion();
   }
 
   void _completeQuiz() {
     final quizController = _quizController;
     if (quizController == null) return;
 
-    setState(() {
-      quizController.completeQuiz();
-      if (!_quizCompletionSent && quizController.quizDone) {
-        _quizCompletionSent = true;
-        widget.onQuizCompleted(
-          QuizCompletionData(
-            score: quizController.score,
-            totalQuestions: widget.stop.questions.length,
-          ),
-        );
-      }
-    });
+    quizController.completeQuiz();
+    if (!_quizCompletionSent && quizController.quizDone) {
+      _quizCompletionSent = true;
+      widget.onQuizCompleted(
+        QuizCompletionData(
+          score: quizController.score,
+          totalQuestions:
+              quizController.totalQuestions, // ORA USA IL CONTROLLER
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context); // TEMA ADATTIVO
+    final theme = Theme.of(context);
 
     return DraggableScrollableSheet(
       expand: false,
@@ -109,7 +102,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
       builder: (_, scrollController) {
         return Container(
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface, // ADATTIVO
+            color: theme.colorScheme.surface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -119,9 +112,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                 height: 4,
                 margin: const EdgeInsets.only(top: 12, bottom: 4),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurface.withValues(
-                    alpha: 0.1,
-                  ), // ADATTIVO
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -139,9 +130,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                       child: Icon(
                         widget.icon,
                         size: 24,
-                        color: Colors.black87.withValues(
-                          alpha: 0.55,
-                        ), // L'icona resta scura sul suo sfondo colorato
+                        color: Colors.black87.withValues(alpha: 0.55),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -154,16 +143,14 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w700,
-                              color: theme.colorScheme.onSurface, // ADATTIVO
+                              color: theme.colorScheme.onSurface,
                             ),
                           ),
                           Text(
                             widget.stop.period,
                             style: TextStyle(
                               fontSize: 12,
-                              color: theme
-                                  .colorScheme
-                                  .onSurfaceVariant, // ADATTIVO
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -206,14 +193,13 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                 height: .5,
                 color: theme.colorScheme.surfaceContainerHighest.withValues(
                   alpha: 0.5,
-                ), // ADATTIVO
+                ),
                 margin: const EdgeInsets.symmetric(horizontal: 20),
               ),
               TabBar(
                 controller: _tabController,
                 labelColor: AppPalette.olive,
-                unselectedLabelColor:
-                    theme.colorScheme.onSurfaceVariant, // ADATTIVO
+                unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
                 indicatorColor: AppPalette.olive,
                 indicatorWeight: 2,
                 labelStyle: const TextStyle(
@@ -271,8 +257,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
-                                  color:
-                                      theme.colorScheme.onSurface, // ADATTIVO
+                                  color: theme.colorScheme.onSurface,
                                 ),
                               ),
                             ],
@@ -283,9 +268,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                             style: TextStyle(
                               fontSize: 14,
                               height: 1.65,
-                              color: theme
-                                  .colorScheme
-                                  .onSurfaceVariant, // ADATTIVO
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(height: 24),
@@ -295,10 +278,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(vertical: 13),
                               decoration: BoxDecoration(
-                                color:
-                                    theme.brightness ==
-                                        Brightness
-                                            .dark // ADATTIVO
+                                color: theme.brightness == Brightness.dark
                                     ? AppPalette.tan.withValues(alpha: 0.15)
                                     : theme.colorScheme.surfaceContainerHighest
                                           .withValues(alpha: 0.5),
@@ -351,7 +331,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
   }
 
   Widget _buildQuizContent(ThemeData theme) {
-    if (!_quizInitialized) {
+    if (!_quizInitialized || _quizController == null) {
       return const Center(
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 20),
@@ -360,10 +340,31 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
       );
     }
 
-    final quizController = _quizController;
-    if (quizController == null) return const SizedBox.shrink();
+    final quizController = _quizController!;
 
-    if (widget.stop.questions.isEmpty) {
+    if (quizController.isLoading) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          child: CircularProgressIndicator(color: AppPalette.olive),
+        ),
+      );
+    }
+
+    if (quizController.error != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text(
+            quizController.error!,
+            style: const TextStyle(color: AppPalette.danger, fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
+    if (quizController.totalQuestions == 0) {
       return Column(
         children: [
           Text(
@@ -384,7 +385,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         children: [
           QuizResultCard(
             score: quizController.score,
-            total: widget.stop.questions.length,
+            total: quizController.totalQuestions, // ORA USA IL CONTROLLER
             elapsed: widget.elapsedSeconds,
           ),
           const SizedBox(height: 20),
@@ -403,7 +404,8 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         Row(
           children: [
             Text(
-              'Domanda ${quizController.questionIndex + 1} di ${widget.stop.questions.length}',
+              // ORA USA IL CONTROLLER PER IL NUMERO TOTALE
+              'Domanda ${quizController.questionIndex + 1} di ${quizController.totalQuestions}',
               style: TextStyle(
                 fontSize: 12,
                 color: theme.colorScheme.onSurfaceVariant,
@@ -425,11 +427,11 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
+            // ORA USA IL CONTROLLER PER LA BARRA DI PROGRESSO
             value:
                 (quizController.questionIndex + 1) /
-                widget.stop.questions.length,
-            backgroundColor:
-                theme.colorScheme.surfaceContainerHighest, // ADATTIVO
+                quizController.totalQuestions,
+            backgroundColor: theme.colorScheme.surfaceContainerHighest,
             valueColor: const AlwaysStoppedAnimation<Color>(AppPalette.olive),
             minHeight: 4,
           ),
@@ -441,7 +443,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
             fontSize: 15,
             fontWeight: FontWeight.w700,
             height: 1.4,
-            color: theme.colorScheme.onSurface, // ADATTIVO
+            color: theme.colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 16),
@@ -449,7 +451,6 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
           final isSelected = quizController.selectedAnswer == index;
           final isCorrect = index == question.correctIndex;
 
-          // COLORI DINAMICI DEL QUIZ
           var bgColor = theme.colorScheme.surface;
           var borderColor = theme.colorScheme.surfaceContainerHighest;
           var textColor = theme.colorScheme.onSurface;
@@ -499,11 +500,9 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                                       : theme
                                             .colorScheme
                                             .surfaceContainerHighest
-                                            .withValues(
-                                              alpha: 0.5,
-                                            ))) // ADATTIVO
+                                            .withValues(alpha: 0.5)))
                           : theme.colorScheme.surfaceContainerHighest
-                                .withValues(alpha: 0.5), // ADATTIVO
+                                .withValues(alpha: 0.5),
                       shape: BoxShape.circle,
                     ),
                     child: Center(
@@ -590,7 +589,6 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
 
 class QuizCompletionData {
   const QuizCompletionData({required this.score, required this.totalQuestions});
-
   final int score;
   final int totalQuestions;
 }
@@ -617,9 +615,7 @@ class QuizResultCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: perfect
             ? AppPalette.moss.withValues(alpha: 0.15)
-            : theme.colorScheme.surfaceContainerHighest.withValues(
-                alpha: 0.4,
-              ), // ADATTIVO
+            : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: perfect
