@@ -103,6 +103,8 @@ class _SettingsPageState extends State<SettingsPage>
         SnackBar(
           content: Text(_controller.errorMessage!),
           backgroundColor: AppPalette.danger,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       );
       _controller.clearError();
@@ -129,58 +131,60 @@ class _SettingsPageState extends State<SettingsPage>
     final theme = Theme.of(context);
     showModalBottomSheet(
       context: context,
-      backgroundColor: theme.colorScheme.surface, // ADATTIVO!
+      backgroundColor: theme.colorScheme.surface, 
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       builder: (_) => Padding(
-        padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+        padding: const EdgeInsets.fromLTRB(28, 16, 28, 36),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
               child: Container(
-                width: 36,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 20),
+                width: 40,
+                height: 5,
+                margin: const EdgeInsets.only(bottom: 24),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(2),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(4),
                 ),
               ),
             ),
             Text(
               title,
               style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
                 color: theme.colorScheme.onSurface,
+                letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Text(
               body,
               style: TextStyle(
-                fontSize: 14.5,
-                height: 1.45,
+                fontSize: 16,
+                height: 1.6,
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 28),
             SizedBox(
               width: double.infinity,
               child: FilledButton(
                 style: FilledButton.styleFrom(
                   backgroundColor: AppPalette.olive,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(20),
                   ),
+                  elevation: 0,
                 ),
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Chiudi'),
+                child: const Text('Chiudi', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ),
           ],
@@ -194,7 +198,7 @@ class _SettingsPageState extends State<SettingsPage>
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       builder: (_) => _ChoiceSheet(
         title: 'Lingua',
@@ -211,11 +215,16 @@ class _SettingsPageState extends State<SettingsPage>
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: theme.colorScheme.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28),
+          side: BorderSide(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3)),
+        ),
         title: Text(
           'Eliminare account?',
           style: TextStyle(
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w800,
+            fontSize: 20,
             color: theme.colorScheme.onSurface,
           ),
         ),
@@ -223,28 +232,33 @@ class _SettingsPageState extends State<SettingsPage>
           'Questa operazione rimuove account, progressi e dati associati in modo permanente.',
           style: TextStyle(
             color: theme.colorScheme.onSurfaceVariant,
-            height: 1.4,
+            height: 1.5,
+            fontSize: 15,
           ),
         ),
-        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+        actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Annulla'),
+            style: TextButton.styleFrom(
+              foregroundColor: theme.colorScheme.onSurfaceVariant,
+            ),
+            child: const Text('Annulla', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: AppPalette.danger,
               foregroundColor: Colors.white,
+              elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(16),
               ),
             ),
             onPressed: () {
               Navigator.pop(context);
               _deleteAccount();
             },
-            child: const Text('Elimina'),
+            child: const Text('Elimina', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -263,6 +277,8 @@ class _SettingsPageState extends State<SettingsPage>
               : 'Impossibile completare ora. Controlla il messaggio di errore.',
         ),
         backgroundColor: deleted ? AppPalette.olive : AppPalette.danger,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -273,56 +289,58 @@ class _SettingsPageState extends State<SettingsPage>
       context: context,
       backgroundColor: theme.colorScheme.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       builder: (_) => Padding(
-        padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+        padding: const EdgeInsets.fromLTRB(28, 16, 28, 36),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
               child: Container(
-                width: 36,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 20),
+                width: 40,
+                height: 5,
+                margin: const EdgeInsets.only(bottom: 24),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(2),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(4),
                 ),
               ),
             ),
             Text(
               title,
               style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
                 color: theme.colorScheme.onSurface,
+                letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Text(
               subtitle,
               style: TextStyle(
-                fontSize: 14.5,
+                fontSize: 16,
                 color: theme.colorScheme.onSurfaceVariant,
-                height: 1.45,
+                height: 1.6,
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 28),
             SizedBox(
               width: double.infinity,
               child: FilledButton(
                 style: FilledButton.styleFrom(
                   backgroundColor: AppPalette.olive,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(20),
                   ),
+                  elevation: 0,
                 ),
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Perfetto'),
+                child: const Text('Perfetto', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ),
           ],
@@ -333,10 +351,10 @@ class _SettingsPageState extends State<SettingsPage>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context); // Recuperiamo il tema attuale
+    final theme = Theme.of(context); 
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor, // ADATTIVO!
+      backgroundColor: theme.scaffoldBackgroundColor, 
       body: ListenableBuilder(
         listenable: Listenable.merge([
           _controller,
@@ -355,21 +373,24 @@ class _SettingsPageState extends State<SettingsPage>
               position: _slideAnim,
               child: CustomScrollView(
                 controller: _scrollController,
+                physics: const BouncingScrollPhysics(),
                 slivers: [
                   SliverAppBar(
-                    backgroundColor: theme.scaffoldBackgroundColor, // ADATTIVO
+                    backgroundColor: theme.scaffoldBackgroundColor,
                     elevation: 0,
-                    expandedHeight: 0,
-                    floating: true,
-                    snap: true,
-                    centerTitle: true,
-                    title: Text(
-                      'Impostazioni',
-                      style: TextStyle(
-                        color: theme.colorScheme.onSurface, // ADATTIVO
-                        fontWeight: FontWeight.w700,
-                        fontSize: 17,
-                        letterSpacing: 0.3,
+                    expandedHeight: 60,
+                    pinned: true,
+                    centerTitle: false,
+                    title: Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text(
+                        'Impostazioni',
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurface, 
+                          fontWeight: FontWeight.w800,
+                          fontSize: 28,
+                          letterSpacing: -0.5,
+                        ),
                       ),
                     ),
                   ),
@@ -377,19 +398,20 @@ class _SettingsPageState extends State<SettingsPage>
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 18),
+                          const SizedBox(height: 16),
                           const _HeaderCard(
                             title: 'Tour interattivo WWII',
                             subtitle:
                                 'Gestisci privacy, notifiche e lingua in un unico posto.',
                             icon: Icons.tour_outlined,
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 32),
 
                           // --- ACCOUNT ---
                           const _SectionLabel('Account'),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 16),
                           _SettingsCard(
                             children: [
                               _ActionRow(
@@ -422,11 +444,11 @@ class _SettingsPageState extends State<SettingsPage>
                               ),
                             ],
                           ),
-                          const SizedBox(height: 22),
+                          const SizedBox(height: 32),
 
                           // --- PREFERENZE APP ---
                           const _SectionLabel('Preferenze App'),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 16),
                           _SettingsCard(
                             children: [
                               _SwitchRow(
@@ -450,17 +472,15 @@ class _SettingsPageState extends State<SettingsPage>
                                   newModalitaNotte: v,
                                 ),
                               ),
-                              // Posizione GPS spostata da qui
                             ],
                           ),
-                          const SizedBox(height: 22),
+                          const SizedBox(height: 32),
 
                           // --- PRIVACY ---
                           const _SectionLabel('Privacy'),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 16),
                           _SettingsCard(
                             children: [
-                              // Posizione GPS inserita qui
                               Container(
                                 key: _gpsToggleKey,
                                 child: _SwitchRow(
@@ -485,14 +505,13 @@ class _SettingsPageState extends State<SettingsPage>
                                   ),
                                 ),
                               ),
-                              // Autorizzazioni rimossa!
                             ],
                           ),
-                          const SizedBox(height: 22),
+                          const SizedBox(height: 32),
 
                           // --- GENERALE ---
                           const _SectionLabel('Generale'),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 16),
                           _SettingsCard(
                             children: [
                               _ActionRow(
@@ -504,11 +523,11 @@ class _SettingsPageState extends State<SettingsPage>
                               ),
                             ],
                           ),
-                          const SizedBox(height: 22),
+                          const SizedBox(height: 32),
 
                           // --- INFO ---
                           const _SectionLabel('Info'),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 16),
                           _SettingsCard(
                             children: [
                               _ActionRow(
@@ -546,7 +565,7 @@ class _SettingsPageState extends State<SettingsPage>
                               ),
                             ],
                           ),
-                          const SizedBox(height: 36),
+                          const SizedBox(height: 48),
                         ],
                       ),
                     ),
