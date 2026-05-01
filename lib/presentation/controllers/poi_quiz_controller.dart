@@ -32,13 +32,13 @@ class PoiQuizController extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  Future<void> initQuiz(String poiId, String poiName) async {
+  Future<void> initQuiz(String poiId, String poiName, int userXp) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      _questions = await _getQuizUseCase(poiId, poiName);
+      _questions = await _getQuizUseCase(poiId, poiName, userXp);
       _questionIndex = 0;
       _score = 0;
       _selectedAnswer = null;

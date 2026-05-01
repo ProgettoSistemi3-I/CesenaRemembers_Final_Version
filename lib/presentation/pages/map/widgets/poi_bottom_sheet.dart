@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../domain/entities/tour_stop.dart';
 import '../../../../injection_container.dart';
 import '../../../controllers/poi_quiz_controller.dart';
+import '../../../../domain/usecases/user_profile_use_cases.dart';
 import '../../../theme/app_palette.dart';
 import '../../../services/tour_formatters.dart';
 
@@ -62,7 +63,24 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
       if (mounted) setState(() {});
     });
 
-    _quizController!.initQuiz(widget.stop.id, widget.stop.name);
+    // Recupera gli XP dell'utente (se disponibile) e inizializza il quiz
+    _initQuizWithUserXp();
+  }
+
+  Future<void> _initQuizWithUserXp() async {
+    int userXp = 0;
+    try {
+      final profileUseCases = sl<UserProfileUseCases>();
+      final uid = profileUseCases.getCurrentUserUid();
+      if (uid != null) {
+        final profile = await profileUseCases.getUserProfile(uid);
+        userXp = profile.xp;
+      }
+    } catch (_) {
+      userXp = 0;
+    }
+
+    _quizController!.initQuiz(widget.stop.id, widget.stop.name, userXp);
   }
 
   void _onAnswerTap(int index) {
