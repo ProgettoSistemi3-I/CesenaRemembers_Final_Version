@@ -104,7 +104,9 @@ class _SettingsPageState extends State<SettingsPage>
           content: Text(_controller.errorMessage!),
           backgroundColor: AppPalette.danger,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       );
       _controller.clearError();
@@ -131,7 +133,7 @@ class _SettingsPageState extends State<SettingsPage>
     final theme = Theme.of(context);
     showModalBottomSheet(
       context: context,
-      backgroundColor: theme.colorScheme.surface, 
+      backgroundColor: theme.colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
@@ -184,7 +186,10 @@ class _SettingsPageState extends State<SettingsPage>
                   elevation: 0,
                 ),
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Chiudi', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: const Text(
+                  'Chiudi',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ],
@@ -218,7 +223,9 @@ class _SettingsPageState extends State<SettingsPage>
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(28),
-          side: BorderSide(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3)),
+          side: BorderSide(
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+          ),
         ),
         title: Text(
           'Eliminare account?',
@@ -243,7 +250,10 @@ class _SettingsPageState extends State<SettingsPage>
             style: TextButton.styleFrom(
               foregroundColor: theme.colorScheme.onSurfaceVariant,
             ),
-            child: const Text('Annulla', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text(
+              'Annulla',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -258,7 +268,10 @@ class _SettingsPageState extends State<SettingsPage>
               Navigator.pop(context);
               _deleteAccount();
             },
-            child: const Text('Elimina', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text(
+              'Elimina',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -340,7 +353,10 @@ class _SettingsPageState extends State<SettingsPage>
                   elevation: 0,
                 ),
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Perfetto', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: const Text(
+                  'Perfetto',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ],
@@ -351,15 +367,12 @@ class _SettingsPageState extends State<SettingsPage>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context); 
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor, 
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: ListenableBuilder(
-        listenable: Listenable.merge([
-          _controller,
-          _uiController,
-        ]),
+        listenable: Listenable.merge([_controller, _uiController]),
         builder: (context, _) {
           if (_controller.isLoading) {
             return const Center(
@@ -386,7 +399,7 @@ class _SettingsPageState extends State<SettingsPage>
                       child: Text(
                         'Impostazioni',
                         style: TextStyle(
-                          color: theme.colorScheme.onSurface, 
+                          color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.w800,
                           fontSize: 28,
                           letterSpacing: -0.5,
@@ -406,6 +419,28 @@ class _SettingsPageState extends State<SettingsPage>
                             subtitle:
                                 'Gestisci privacy, notifiche e lingua in un unico posto.',
                             icon: Icons.tour_outlined,
+                          ),
+                          const SizedBox(height: 32),
+
+                          // --- CREDITI E RICONOSCIMENTI ---
+                          const _SectionLabel('Crediti'),
+                          const SizedBox(height: 16),
+                          _SettingsCard(
+                            children: [
+                              _ActionRow(
+                                icon: Icons.stars_rounded,
+                                title: 'Crediti e Riconoscimenti',
+                                subtitle:
+                                    'Scopri il team dietro Cesena Remembers',
+                                accent: AppPalette.olive,
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const CreditsPage(),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 32),
 
@@ -575,6 +610,207 @@ class _SettingsPageState extends State<SettingsPage>
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+//  NUOVA PAGINA DEDICATA AI CREDITI
+// ─────────────────────────────────────────────
+class CreditsPage extends StatelessWidget {
+  const CreditsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
+      appBar: AppBar(
+        backgroundColor: theme.colorScheme.surface,
+        elevation: 0,
+        centerTitle: false,
+        title: Text(
+          'Riconoscimenti',
+          style: TextStyle(
+            color: theme.colorScheme.onSurface,
+            fontWeight: FontWeight.w800,
+            fontSize: 24,
+            letterSpacing: -0.5,
+          ),
+        ),
+        iconTheme: IconThemeData(color: theme.colorScheme.onSurface),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(24),
+        children: [
+          // Header decorativo con l'icona della vostra app
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppPalette.olive.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: ClipOval(
+                child: Image.asset(
+                  'assets/icon/app_icon.png',
+                  width: 72,
+                  height: 72,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Cesena Remembers',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
+              color: theme.colorScheme.onSurface,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Realizzato con passione per preservare la memoria storica della nostra città.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 15,
+              height: 1.5,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 48),
+
+          // Sviluppatori con Link a GitHub
+          const _SectionLabel('Il Team'),
+          const SizedBox(height: 16),
+          _SettingsCard(
+            children: [
+              _ActionRow(
+                icon: Icons.code_rounded,
+                title: 'Lorenzo Ostolani',
+                subtitle: 'Sviluppo & Architettura',
+                accent: AppPalette.olive,
+                onTap: () => launchUrl(
+                  Uri.parse('https://github.com/lorenzoostolani'),
+                  mode: LaunchMode.externalApplication,
+                ),
+              ),
+              const _ThinDivider(),
+              _ActionRow(
+                icon: Icons.code_rounded,
+                title: 'Luca Bazzocchi',
+                subtitle: 'Sviluppo & Architettura',
+                accent: AppPalette.olive,
+                onTap: () => launchUrl(
+                  Uri.parse('https://github.com/ilMastroDeiBug'),
+                  mode: LaunchMode.externalApplication,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 32),
+
+          // Ringraziamenti statici (Senza freccine di navigazione)
+          const _SectionLabel('Ringraziamenti'),
+          const SizedBox(height: 16),
+          _SettingsCard(
+            children: [
+              const _StaticCreditRow(
+                icon: Icons.school_outlined,
+                title: 'Prof. David Veneti',
+                subtitle: 'Docente Referente',
+                accent: AppPalette.moss,
+              ),
+              const _ThinDivider(),
+              const _StaticCreditRow(
+                icon: Icons.groups_outlined,
+                title: 'Classe 3I',
+                subtitle: 'Supporto e Ideazione',
+                accent: AppPalette.tan,
+              ),
+              const _ThinDivider(),
+              _ActionRow(
+                icon: Icons.account_balance_outlined,
+                title: 'ITT Blaise Pascal',
+                subtitle: 'Visita il sito web dell\'istituto',
+                accent: AppPalette.olive,
+                onTap: () => launchUrl(
+                  Uri.parse('https://www.ispascalcomandini.it/'),
+                  mode: LaunchMode.externalApplication,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 40),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+//  WIDGET PRIVATO PER RIGHE STATICHE SENZA FRECCIA
+// ─────────────────────────────────────────────
+class _StaticCreditRow extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color accent;
+
+  const _StaticCreditRow({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.accent,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(icon, color: accent, size: 22),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
