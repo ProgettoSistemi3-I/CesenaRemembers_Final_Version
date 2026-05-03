@@ -113,10 +113,9 @@ class _LoginPageState extends State<LoginPage>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Sfondo mappa d'epoca
-          Image.network(
-            'https://images.unsplash.com/photo-1524661135-423995f22d0b'
-            '?q=80&w=1000&auto=format&fit=crop',
+          // Sfondo mappa locale
+          Image.asset(
+            'assets/loginView.png',
             fit: BoxFit.cover,
             color: Colors.black.withValues(alpha: 0.62),
             colorBlendMode: BlendMode.darken,
@@ -135,7 +134,10 @@ class _LoginPageState extends State<LoginPage>
           Container(
             decoration: BoxDecoration(
               gradient: RadialGradient(
-                colors: [Colors.transparent, Colors.black.withValues(alpha: 0.78)],
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withValues(alpha: 0.78),
+                ],
                 radius: 1.0,
               ),
             ),

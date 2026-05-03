@@ -45,4 +45,50 @@ class UserProfile {
   int get visitedCount => visitedPoiIds.length;
   int get achievementsCount => unlockedAchievements.length;
   int get level => (xp ~/ 250) + 1;
+
+  // METODO AGGIUNTO: Permette di clonare l'oggetto modificando solo i campi necessari
+  UserProfile copyWith({
+    String? uid,
+    String? email,
+    String? displayName,
+    String? username,
+    String? avatarId,
+    bool? profileCompleted,
+    int? xp,
+    List<String>? visitedPoiIds,
+    List<String>? unlockedAchievements,
+    bool? notificheEnabled,
+    bool? darkModeEnabled,
+    bool? gpsEnabled,
+    int? maxQuizScore,
+    int? totalQuizCompleted,
+    int? totalCorrectAnswers,
+    int? bestTourTimeSeconds,
+    List<String>? friends,
+    List<String>? sentFriendRequests,
+    List<String>? receivedFriendRequests,
+  }) {
+    return UserProfile(
+      uid: uid ?? this.uid,
+      email: email ?? this.email,
+      displayName: displayName ?? this.displayName,
+      username: username ?? this.username,
+      avatarId: avatarId ?? this.avatarId,
+      profileCompleted: profileCompleted ?? this.profileCompleted,
+      xp: xp ?? this.xp,
+      visitedPoiIds: visitedPoiIds ?? this.visitedPoiIds,
+      unlockedAchievements: unlockedAchievements ?? this.unlockedAchievements,
+      notificheEnabled: notificheEnabled ?? this.notificheEnabled,
+      darkModeEnabled: darkModeEnabled ?? this.darkModeEnabled,
+      gpsEnabled: gpsEnabled ?? this.gpsEnabled,
+      maxQuizScore: maxQuizScore ?? this.maxQuizScore,
+      totalQuizCompleted: totalQuizCompleted ?? this.totalQuizCompleted,
+      totalCorrectAnswers: totalCorrectAnswers ?? this.totalCorrectAnswers,
+      bestTourTimeSeconds: bestTourTimeSeconds ?? this.bestTourTimeSeconds,
+      friends: friends ?? this.friends,
+      sentFriendRequests: sentFriendRequests ?? this.sentFriendRequests,
+      receivedFriendRequests:
+          receivedFriendRequests ?? this.receivedFriendRequests,
+    );
+  }
 }
