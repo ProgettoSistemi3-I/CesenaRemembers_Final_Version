@@ -139,11 +139,22 @@ class _SocialPageState extends State<SocialPage> {
   }
 
   Widget _buildLeaderboard(ThemeData theme) {
-    if (_controller.leaderboard.isEmpty) {
+    if (_controller.isLeaderboardLoading) {
       return const Center(
         child: CircularProgressIndicator(
           color: AppPalette.olive,
           strokeWidth: 3,
+        ),
+      );
+    }
+    if (_controller.leaderboard.isEmpty) {
+      return Center(
+        child: Text(
+          'Nessun utente in classifica al momento.',
+          style: TextStyle(
+            color: theme.colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       );
     }

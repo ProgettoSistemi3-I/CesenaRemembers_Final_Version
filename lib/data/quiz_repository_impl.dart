@@ -69,6 +69,11 @@ class QuizRepositoryImpl implements IQuizRepository {
         return place.questions;
       }
     }
-    return const [];
+
+    // Ultimo fallback di sicurezza: restituiamo sempre un set locale valido.
+    if (HistoricPlacesSeed.items.isNotEmpty) {
+      return HistoricPlacesSeed.items.first.questions;
+    }
+    return const <QuizQuestion>[];
   }
 }

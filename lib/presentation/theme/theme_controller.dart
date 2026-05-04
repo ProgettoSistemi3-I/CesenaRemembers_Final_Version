@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../domain/usecases/user_profile_use_cases.dart';
+import '../../core/logging/app_logger.dart';
 
 class ThemeController extends ChangeNotifier {
   final UserProfileUseCases _profileUseCases;
@@ -27,8 +28,13 @@ class ThemeController extends ChangeNotifier {
     try {
       final profile = await _profileUseCases.getUserProfile(uid);
       _themeMode = profile.darkModeEnabled ? ThemeMode.dark : ThemeMode.light;
-    } catch (e) {
-      debugPrint("Errore caricamento tema: $e");
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        'Errore caricamento tema da profilo',
+        error: e,
+        stackTrace: stackTrace,
+        name: 'ThemeController',
+      );
       _themeMode = ThemeMode.light;
     }
   }
