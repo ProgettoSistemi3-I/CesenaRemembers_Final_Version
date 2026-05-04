@@ -21,6 +21,20 @@ class LocationPermissionService {
     }
   }
 
+  /// Controlla solo se il permesso è stato concesso dall'utente,
+  /// indipendentemente dallo stato del servizio GPS hardware.
+  /// Usato per il toggle nelle impostazioni: se l'utente ha autorizzato
+  /// l'app, il toggle deve risultare attivo anche se il GPS è spento.
+  Future<bool> hasPermissionGranted() async {
+    try {
+      final permission = await Geolocator.checkPermission();
+      return permission == LocationPermission.always ||
+          permission == LocationPermission.whileInUse;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<LocationAccessStatus> ensureLocationAccess() async {
     try {
       if (kIsWeb) {

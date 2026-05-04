@@ -69,11 +69,14 @@ class SettingsController extends ChangeNotifier {
       notifiche = profile.notificheEnabled;
       modalitaNotte = profile.darkModeEnabled;
 
-      final hasRealPermission = await _locationService.hasActivePermission();
-      posizione = hasRealPermission;
+      // Usa hasPermissionGranted() per il toggle: se l'utente ha concesso
+      // il permesso all'app, il toggle risulta attivo anche quando il
+      // servizio GPS hardware è temporaneamente spento.
+      final hasPermission = await _locationService.hasPermissionGranted();
+      posizione = hasPermission;
       LocationPreferenceStore.setGpsEnabled(posizione);
 
-      if (hasRealPermission && !profile.gpsEnabled) {
+      if (hasPermission && !profile.gpsEnabled) {
         await _preferencesUseCases.updatePreferences(uid: _currentUid, gps: true);
       }
 
