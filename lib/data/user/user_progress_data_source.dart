@@ -38,9 +38,7 @@ class UserProgressDataSource {
         data['visitedPoiIds'] ?? const [],
       );
 
-      if (visitedPoiIds.contains(poiId)) {
-        return;
-      }
+      final isFirstVisit = !visitedPoiIds.contains(poiId);
 
       final currentXp = (data['xp'] as num?)?.toInt() ?? 0;
       final nextXp = currentXp + xpGained;
@@ -56,15 +54,15 @@ class UserProgressDataSource {
       final quizScorePercent = totalQuestions <= 0
           ? 0
           : ((correctAnswers / totalQuestions) * 100).round();
-      visitedPoiIds.add(poiId);
+      if (isFirstVisit) visitedPoiIds.add(poiId);
 
       transaction.set(userRef, {
         'visitedPoiIds': visitedPoiIds,
         'xp': nextXp,
-        'leaderboardScore':
-            nextXp > currentLeaderboard ? nextXp : currentLeaderboard,
-        'maxQuizScore':
-            quizScorePercent > currentMaxQuizScore
+        'leaderboardScore': nextXp > currentLeaderboard
+            ? nextXp
+            : currentLeaderboard,
+        'maxQuizScore': quizScorePercent > currentMaxQuizScore
             ? quizScorePercent
             : currentMaxQuizScore,
         'totalQuizCompleted': currentQuizCompleted + 1,

@@ -37,7 +37,10 @@ class UserModel extends UserProfile {
         json['unlockedAchievements'] ?? [],
       ),
       notificheEnabled: json['preferences']?['notifiche'] ?? true,
-      darkModeEnabled: json['preferences']?['modalitaNotte'] ?? false,
+      darkModeEnabled:
+          json['preferences']?['modalitaNotte'] ??
+          json['preferences']?['modalità notte'] ??
+          false,
       gpsEnabled: json['preferences']?['posizioneGps'] ?? true,
       maxQuizScore: json['maxQuizScore'] ?? 0,
       totalQuizCompleted: json['totalQuizCompleted'] ?? 0,

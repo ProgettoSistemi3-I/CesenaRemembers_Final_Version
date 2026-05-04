@@ -57,7 +57,8 @@ class SocialController extends ChangeNotifier {
   bool _isDisposed = false;
 
   List<LeaderboardEntry> leaderboard = [];
-  LeaderboardEntry? currentUserEntry;
+
+  // RIMOSSA LA VARIABILE FISSA LeaderboardEntry? currentUserEntry;
 
   List<UserProfile> searchResults = [];
   bool isSearching = false;
@@ -69,13 +70,22 @@ class SocialController extends ChangeNotifier {
   // Esponiamo l'ID corrente alla UI senza usare FirebaseAuth
   String get currentUserId => _profileUseCases.getCurrentUserUid() ?? '';
 
+  // 🔴 FIX: Getter Dinamico! Calcola il tuo utente "al volo" basandosi sempre sull'UID aggiornato
+  LeaderboardEntry? get currentUserEntry {
+    final myUid = currentUserId;
+    if (myUid.isEmpty || leaderboard.isEmpty) return null;
+    try {
+      return leaderboard.firstWhere((e) => e.uid == myUid);
+    } catch (_) {
+      return null;
+    }
+  }
+
   void _safeNotifyListeners() {
     if (!_isDisposed) notifyListeners();
   }
 
   void _startLeaderboardListener() {
-    final myUid = _profileUseCases.getCurrentUserUid();
-
     _leaderboardSub = _progressUseCases
         .getLeaderboardStream(limit: 50)
         .listen(
@@ -88,15 +98,8 @@ class SocialController extends ChangeNotifier {
                 })
                 .toList(growable: false);
 
-            if (myUid != null) {
-              try {
-                currentUserEntry = leaderboard.firstWhere(
-                  (e) => e.uid == myUid,
-                );
-              } catch (_) {
-                currentUserEntry = null;
-              }
-            }
+            // 🔴 FIX: Rimosso il calcolo statico dell'utente qui dentro!
+            // Ora ci pensa il getter dinamico `currentUserEntry` in alto.
 
             _safeNotifyListeners();
           },

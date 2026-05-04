@@ -1,12 +1,15 @@
 import 'package:flutter/foundation.dart';
 import '../../domain/entities/quiz_question.dart';
+// IMPORTANTE: Assicurati che questo percorso sia corretto.
+// Se il tuo file si chiama get_poi_quiz_usecases.dart usa quello,
+// se si chiama get_poi_quiz_use_case.dart (senza la 's' finale) correggi l'import
 import '../../domain/usecases/get_poi_quiz_usecases.dart';
 
 class PoiQuizController extends ChangeNotifier {
   final GetPoiQuizUseCase _getQuizUseCase;
 
   PoiQuizController({required GetPoiQuizUseCase getQuizUseCase})
-      : _getQuizUseCase = getQuizUseCase;
+    : _getQuizUseCase = getQuizUseCase;
 
   List<QuizQuestion> _questions = [];
   int? _selectedAnswer;
@@ -23,18 +26,19 @@ class PoiQuizController extends ChangeNotifier {
   bool get quizDone => _quizDone;
   bool get isLastQuestionAnswered => _lastQuestionAnswered;
   bool get hasMoreQuestions => _questionIndex < _questions.length - 1;
-  QuizQuestion? get currentQuestion => _questions.isEmpty ? null : _questions[_questionIndex];
+  QuizQuestion? get currentQuestion =>
+      _questions.isEmpty ? null : _questions[_questionIndex];
   int get totalQuestions => _questions.length;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  Future<void> initQuiz(String poiId, String poiName) async {
+  Future<void> initQuiz(String poiId, String poiName, int userXp) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      _questions = await _getQuizUseCase(poiId, poiName);
+      _questions = await _getQuizUseCase(poiId, poiName, userXp);
       _questionIndex = 0;
       _score = 0;
       _selectedAnswer = null;

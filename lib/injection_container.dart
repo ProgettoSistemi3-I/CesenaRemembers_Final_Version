@@ -4,26 +4,32 @@ import 'package:get_it/get_it.dart';
 import 'data/firebase_auth_repository.dart';
 import 'data/poi_repository_impl.dart';
 import 'data/user_repository_impl.dart';
+import 'data/quiz_repository_impl.dart'; // <-- AGGIUNTO
 import 'domain/repositories/auth_repository.dart';
 import 'domain/repositories/i_poi_repository.dart';
 import 'domain/repositories/user_repository.dart';
+import 'domain/repositories/i_quiz_repository.dart'; // <-- AGGIUNTO
 import 'domain/usecases/auth_use_cases.dart';
 import 'domain/usecases/poi_use_cases.dart';
 import 'domain/usecases/user_preferences_use_cases.dart';
 import 'domain/usecases/user_profile_use_cases.dart';
 import 'domain/usecases/user_progress_use_cases.dart';
 import 'domain/usecases/user_social_use_cases.dart';
+import 'domain/usecases/get_poi_quiz_usecases.dart'; // <-- AGGIUNTO
 import 'presentation/controllers/social_controller.dart';
 import 'presentation/theme/theme_controller.dart';
+import 'presentation/controllers/poi_quiz_controller.dart'; // <-- AGGIUNTO
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
   if (!sl.isRegistered<FirebaseFirestore>()) {
-    sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
+    sl.registerLazySingleton<FirebaseFirestore>(
+      () => FirebaseFirestore.instance,
+    );
   }
 
-
+  // --- REPOSITORIES ---
   if (!sl.isRegistered<IPoiRepository>()) {
     sl.registerLazySingleton<IPoiRepository>(() => PoiRepositoryImpl());
   }
@@ -35,9 +41,18 @@ Future<void> init() async {
       () => UserRepositoryImpl(firestore: sl()),
     );
   }
+  if (!sl.isRegistered<IQuizRepository>()) {
+    // <-- AGGIUNTO
+    sl.registerLazySingleton<IQuizRepository>(() => QuizRepositoryImpl());
+  }
 
+  // --- USE CASES ---
   if (!sl.isRegistered<GetPoisUseCase>()) {
     sl.registerLazySingleton(() => GetPoisUseCase(sl()));
+  }
+  if (!sl.isRegistered<GetPoiQuizUseCase>()) {
+    // <-- AGGIUNTO
+    sl.registerLazySingleton(() => GetPoiQuizUseCase(sl()));
   }
   if (!sl.isRegistered<SignInWithGoogleUseCase>()) {
     sl.registerLazySingleton(() => SignInWithGoogleUseCase(sl()));
@@ -61,6 +76,7 @@ Future<void> init() async {
     sl.registerLazySingleton(() => UserSocialUseCases(sl()));
   }
 
+  // --- CONTROLLERS ---
   if (!sl.isRegistered<ThemeController>()) {
     sl.registerLazySingleton(() => ThemeController(profileUseCases: sl()));
   }
@@ -73,5 +89,10 @@ Future<void> init() async {
         socialUseCases: sl(),
       ),
     );
+  }
+
+  if (!sl.isRegistered<PoiQuizController>()) {
+    // <-- AGGIUNTO
+    sl.registerFactory(() => PoiQuizController(getQuizUseCase: sl()));
   }
 }
