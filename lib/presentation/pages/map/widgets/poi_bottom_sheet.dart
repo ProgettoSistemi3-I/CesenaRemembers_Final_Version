@@ -102,7 +102,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         QuizCompletionData(
           score: quizController.score,
           totalQuestions:
-              quizController.totalQuestions, // ORA USA IL CONTROLLER
+              quizController.totalQuestions,
         ),
       );
     }
@@ -403,7 +403,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         children: [
           QuizResultCard(
             score: quizController.score,
-            total: quizController.totalQuestions, // ORA USA IL CONTROLLER
+            total: quizController.totalQuestions,
             elapsed: widget.elapsedSeconds,
           ),
           const SizedBox(height: 20),
@@ -422,7 +422,6 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         Row(
           children: [
             Text(
-              // ORA USA IL CONTROLLER PER IL NUMERO TOTALE
               'Domanda ${quizController.questionIndex + 1} di ${quizController.totalQuestions}',
               style: TextStyle(
                 fontSize: 12,
@@ -445,7 +444,6 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
-            // ORA USA IL CONTROLLER PER LA BARRA DI PROGRESSO
             value:
                 (quizController.questionIndex + 1) /
                 quizController.totalQuestions,
@@ -455,6 +453,14 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
           ),
         ),
         const SizedBox(height: 18),
+        if (!quizController.usesPersonalizedQuestions &&
+            quizController.fallbackNotice != null) ...[
+          _QuizFallbackBanner(
+            notice: quizController.fallbackNotice!,
+            difficultyLabel: quizController.fallbackDifficultyLabel,
+          ),
+          const SizedBox(height: 14),
+        ],
         Text(
           question.question,
           style: TextStyle(
@@ -601,6 +607,48 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
           ),
         ],
       ],
+    );
+  }
+}
+
+class _QuizFallbackBanner extends StatelessWidget {
+  const _QuizFallbackBanner({required this.notice, this.difficultyLabel});
+
+  final String notice;
+  final String? difficultyLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppPalette.tan.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppPalette.tan.withValues(alpha: 0.35)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Avviso quiz',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: AppPalette.tan,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(notice, style: const TextStyle(fontSize: 12.5)),
+          if (difficultyLabel != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              difficultyLabel!,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

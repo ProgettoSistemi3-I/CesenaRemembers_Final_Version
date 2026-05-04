@@ -9,7 +9,6 @@ class QuizQuestion {
     required this.correctIndex,
   });
 
-  // NUOVO: Questo costruttore "fabbrica" un oggetto partendo dal JSON del server
   factory QuizQuestion.fromJson(Map<String, dynamic> json) {
     return QuizQuestion(
       question: json['question'] ?? '',

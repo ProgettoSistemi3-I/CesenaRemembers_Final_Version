@@ -4,21 +4,21 @@ import 'package:get_it/get_it.dart';
 import 'data/firebase_auth_repository.dart';
 import 'data/poi_repository_impl.dart';
 import 'data/user_repository_impl.dart';
-import 'data/quiz_repository_impl.dart'; // <-- AGGIUNTO
+import 'data/quiz_repository_impl.dart';
 import 'domain/repositories/auth_repository.dart';
 import 'domain/repositories/i_poi_repository.dart';
 import 'domain/repositories/user_repository.dart';
-import 'domain/repositories/i_quiz_repository.dart'; // <-- AGGIUNTO
+import 'domain/repositories/i_quiz_repository.dart';
 import 'domain/usecases/auth_use_cases.dart';
 import 'domain/usecases/poi_use_cases.dart';
 import 'domain/usecases/user_preferences_use_cases.dart';
 import 'domain/usecases/user_profile_use_cases.dart';
 import 'domain/usecases/user_progress_use_cases.dart';
 import 'domain/usecases/user_social_use_cases.dart';
-import 'domain/usecases/get_poi_quiz_usecases.dart'; // <-- AGGIUNTO
+import 'domain/usecases/get_poi_quiz_usecases.dart';
 import 'presentation/controllers/social_controller.dart';
 import 'presentation/theme/theme_controller.dart';
-import 'presentation/controllers/poi_quiz_controller.dart'; // <-- AGGIUNTO
+import 'presentation/controllers/poi_quiz_controller.dart';
 
 final sl = GetIt.instance;
 
@@ -42,7 +42,6 @@ Future<void> init() async {
     );
   }
   if (!sl.isRegistered<IQuizRepository>()) {
-    // <-- AGGIUNTO
     sl.registerLazySingleton<IQuizRepository>(() => QuizRepositoryImpl());
   }
 
@@ -51,7 +50,6 @@ Future<void> init() async {
     sl.registerLazySingleton(() => GetPoisUseCase(sl()));
   }
   if (!sl.isRegistered<GetPoiQuizUseCase>()) {
-    // <-- AGGIUNTO
     sl.registerLazySingleton(() => GetPoiQuizUseCase(sl()));
   }
   if (!sl.isRegistered<SignInWithGoogleUseCase>()) {
@@ -92,7 +90,6 @@ Future<void> init() async {
   }
 
   if (!sl.isRegistered<PoiQuizController>()) {
-    // <-- AGGIUNTO
     sl.registerFactory(() => PoiQuizController(getQuizUseCase: sl()));
   }
 }

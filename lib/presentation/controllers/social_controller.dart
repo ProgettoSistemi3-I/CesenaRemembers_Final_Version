@@ -70,7 +70,6 @@ class SocialController extends ChangeNotifier {
   // Esponiamo l'ID corrente alla UI senza usare FirebaseAuth
   String get currentUserId => _profileUseCases.getCurrentUserUid() ?? '';
 
-  // 🔴 FIX: Getter Dinamico! Calcola il tuo utente "al volo" basandosi sempre sull'UID aggiornato
   LeaderboardEntry? get currentUserEntry {
     final myUid = currentUserId;
     if (myUid.isEmpty || leaderboard.isEmpty) return null;
@@ -98,7 +97,6 @@ class SocialController extends ChangeNotifier {
                 })
                 .toList(growable: false);
 
-            // 🔴 FIX: Rimosso il calcolo statico dell'utente qui dentro!
             // Ora ci pensa il getter dinamico `currentUserEntry` in alto.
 
             _safeNotifyListeners();
