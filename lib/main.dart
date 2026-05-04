@@ -4,10 +4,9 @@ import 'package:flutter/services.dart';
 
 import 'firebase_options.dart';
 import 'injection_container.dart' as di;
-// Togli l'import diretto di AuthGate da qui, non serve più!
 import 'presentation/theme/app_palette.dart';
 import 'presentation/theme/theme_controller.dart';
-import 'presentation/pages/splash_screen.dart'; // 🔴 1. IMPORTA LO SPLASH SCREEN
+import 'presentation/pages/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,7 +41,7 @@ class CesenaRemembersApp extends StatelessWidget {
           themeMode: themeCtrl.themeMode,
           theme: AppPalette.lightTheme,
           darkTheme: AppPalette.darkTheme,
-          home: const SplashScreen(), // 🔴 2. FAI PARTIRE L'APP DA QUI
+          home: const SplashScreen(),
         );
       },
     );

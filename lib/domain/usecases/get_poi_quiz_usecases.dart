@@ -1,4 +1,4 @@
-import '../entities/quiz_question.dart';
+import '../entities/quiz_load_result.dart';
 import '../repositories/i_quiz_repository.dart';
 
 class GetPoiQuizUseCase {
@@ -6,11 +6,7 @@ class GetPoiQuizUseCase {
 
   const GetPoiQuizUseCase(this.repository);
 
-  Future<List<QuizQuestion>> call(
-    String poiId,
-    String poiName,
-    int userXp,
-  ) async {
-    return await repository.getQuizForPoi(poiId, poiName, userXp);
+  Future<QuizLoadResult> call(String poiId, String poiName, int userXp) {
+    return repository.getQuizForPoi(poiId, poiName, userXp);
   }
 }

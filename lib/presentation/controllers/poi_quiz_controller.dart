@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
+
 import '../../domain/entities/quiz_question.dart';
-// IMPORTANTE: Assicurati che questo percorso sia corretto.
-// Se il tuo file si chiama get_poi_quiz_usecases.dart usa quello,
-// se si chiama get_poi_quiz_use_case.dart (senza la 's' finale) correggi l'import
 import '../../domain/usecases/get_poi_quiz_usecases.dart';
 
 class PoiQuizController extends ChangeNotifier {
@@ -19,6 +17,9 @@ class PoiQuizController extends ChangeNotifier {
   bool _lastQuestionAnswered = false;
   bool _isLoading = false;
   String? _error;
+  bool _usesPersonalizedQuestions = true;
+  String? _fallbackNotice;
+  String? _fallbackDifficultyLabel;
 
   int? get selectedAnswer => _selectedAnswer;
   int get questionIndex => _questionIndex;
@@ -31,21 +32,30 @@ class PoiQuizController extends ChangeNotifier {
   int get totalQuestions => _questions.length;
   bool get isLoading => _isLoading;
   String? get error => _error;
+  bool get usesPersonalizedQuestions => _usesPersonalizedQuestions;
+  String? get fallbackNotice => _fallbackNotice;
+  String? get fallbackDifficultyLabel => _fallbackDifficultyLabel;
 
   Future<void> initQuiz(String poiId, String poiName, int userXp) async {
     _isLoading = true;
     _error = null;
+    _fallbackNotice = null;
+    _fallbackDifficultyLabel = null;
     notifyListeners();
 
     try {
-      _questions = await _getQuizUseCase(poiId, poiName, userXp);
+      final result = await _getQuizUseCase(poiId, poiName, userXp);
+      _questions = result.questions;
+      _usesPersonalizedQuestions = result.usesPersonalizedQuestions;
+      _fallbackNotice = result.fallbackNotice;
+      _fallbackDifficultyLabel = result.fallbackDifficultyLabel;
       _questionIndex = 0;
       _score = 0;
       _selectedAnswer = null;
       _quizDone = _questions.isEmpty;
       _lastQuestionAnswered = false;
-    } catch (e) {
-      _error = "Errore durante la comunicazione con il server.";
+    } catch (_) {
+      _error = 'Errore durante la comunicazione con il server.';
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -54,9 +64,12 @@ class PoiQuizController extends ChangeNotifier {
 
   void selectAnswer(int index) {
     final question = currentQuestion;
-    if (question == null) return;
-    if (_selectedAnswer != null) return;
-    if (index < 0 || index >= question.options.length) return;
+    if (question == null || _selectedAnswer != null) {
+      return;
+    }
+    if (index < 0 || index >= question.options.length) {
+      return;
+    }
 
     final isCorrect = index == question.correctIndex;
     _selectedAnswer = index;
@@ -68,8 +81,9 @@ class PoiQuizController extends ChangeNotifier {
   }
 
   void nextQuestion() {
-    if (_quizDone) return;
-    if (!hasMoreQuestions) return;
+    if (_quizDone || !hasMoreQuestions) {
+      return;
+    }
     _questionIndex++;
     _selectedAnswer = null;
     _lastQuestionAnswered = false;
@@ -83,8 +97,9 @@ class PoiQuizController extends ChangeNotifier {
       notifyListeners();
       return;
     }
-    if (_selectedAnswer == null) return;
-    if (!_lastQuestionAnswered) return;
+    if (_selectedAnswer == null || !_lastQuestionAnswered) {
+      return;
+    }
     _quizDone = true;
     notifyListeners();
   }

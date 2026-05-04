@@ -6,6 +6,11 @@ class AppRuntimeConfig {
     defaultValue: '',
   );
 
+  static const String mapTilerApiKey = String.fromEnvironment(
+    'MAPTILER_API_KEY',
+    defaultValue: '',
+  );
+
   static const String stadiaMapsApiKey = String.fromEnvironment(
     'STADIA_MAPS_API_KEY',
     defaultValue: '',

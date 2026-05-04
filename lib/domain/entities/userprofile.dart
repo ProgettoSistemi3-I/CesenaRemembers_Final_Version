@@ -46,7 +46,6 @@ class UserProfile {
   int get achievementsCount => unlockedAchievements.length;
   int get level => (xp ~/ 250) + 1;
 
-  // METODO AGGIUNTO: Permette di clonare l'oggetto modificando solo i campi necessari
   UserProfile copyWith({
     String? uid,
     String? email,

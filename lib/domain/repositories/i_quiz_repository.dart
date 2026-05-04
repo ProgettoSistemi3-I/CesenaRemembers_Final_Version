@@ -1,9 +1,5 @@
-import '../entities/quiz_question.dart';
+import '../entities/quiz_load_result.dart';
 
 abstract class IQuizRepository {
-  Future<List<QuizQuestion>> getQuizForPoi(
-    String poiId,
-    String poiName,
-    int userXP,
-  );
+  Future<QuizLoadResult> getQuizForPoi(String poiId, String poiName, int userXP);
 }

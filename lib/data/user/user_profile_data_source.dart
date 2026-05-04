@@ -157,7 +157,6 @@ class UserProfileDataSource {
           (existingData['leaderboardScore'] as num?)?.toInt() ?? 0,
       'preferences': {
         'notifiche': existingPrefs['notifiche'] ?? true,
-        // 🔴 FIX: Ora leggiamo solo la chiave pulita
         'modalitaNotte': existingPrefs['modalitaNotte'] ?? false,
         'posizioneGps': existingPrefs['posizioneGps'] ?? true,
       },
