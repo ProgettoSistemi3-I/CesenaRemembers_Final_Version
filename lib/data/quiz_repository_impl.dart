@@ -11,12 +11,42 @@ import 'seeds/historic_places_seed.dart';
 class QuizRepositoryImpl implements IQuizRepository {
   static const String _baseUrl = 'https://sharika-matripotestal-ina.ngrok-free.dev';
   static const _fallbackDifficultyLabel = 'Difficoltà standard (seed locale)';
+  static const Duration _cacheTtl = Duration(minutes: 10);
+
+  static final Map<String, _CachedQuizResult> _quizCache = {};
+  static final Map<String, Future<QuizLoadResult>> _inFlightRequests = {};
 
   @override
   Future<QuizLoadResult> getQuizForPoi(
     String poiId,
     String poiName,
     int userXp,
+  ) async {
+    final cacheKey = '$poiId|$userXp';
+    final cached = _quizCache[cacheKey];
+    if (cached != null && DateTime.now().difference(cached.timestamp) < _cacheTtl) {
+      return cached.result;
+    }
+
+    final inFlight = _inFlightRequests[cacheKey];
+    if (inFlight != null) {
+      return inFlight;
+    }
+
+    final request = _fetchQuiz(poiId, poiName, userXp, cacheKey);
+    _inFlightRequests[cacheKey] = request;
+    try {
+      return await request;
+    } finally {
+      _inFlightRequests.remove(cacheKey);
+    }
+  }
+
+  Future<QuizLoadResult> _fetchQuiz(
+    String poiId,
+    String poiName,
+    int userXp,
+    String cacheKey,
   ) async {
     try {
       final response = await http
@@ -41,10 +71,12 @@ class QuizRepositoryImpl implements IQuizRepository {
       final List<dynamic> questionsJson = data['questions'] ?? [];
       final questions = questionsJson.map((q) => QuizQuestion.fromJson(q)).toList();
 
-      return QuizLoadResult(
+      final result = QuizLoadResult(
         questions: questions,
         usesPersonalizedQuestions: true,
       );
+      _quizCache[cacheKey] = _CachedQuizResult(result, DateTime.now());
+      return result;
     } catch (error, stackTrace) {
       AppLogger.error(
         'Quiz API unavailable. Using fallback quiz seed for poi=$poiId',
@@ -53,13 +85,15 @@ class QuizRepositoryImpl implements IQuizRepository {
         name: 'QuizRepository',
       );
 
-      return QuizLoadResult(
+      final result = QuizLoadResult(
         questions: _fallbackQuestions(poiId),
         usesPersonalizedQuestions: false,
         fallbackNotice:
             'Per un errore del server le domande non sono personalizzate e usano una difficoltà locale specifica.',
         fallbackDifficultyLabel: _fallbackDifficultyLabel,
       );
+      _quizCache[cacheKey] = _CachedQuizResult(result, DateTime.now());
+      return result;
     }
   }
 
@@ -76,4 +110,11 @@ class QuizRepositoryImpl implements IQuizRepository {
     }
     return const <QuizQuestion>[];
   }
+}
+
+class _CachedQuizResult {
+  const _CachedQuizResult(this.result, this.timestamp);
+
+  final QuizLoadResult result;
+  final DateTime timestamp;
 }

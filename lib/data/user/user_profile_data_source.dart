@@ -208,17 +208,17 @@ class UserProfileDataSource {
     if (darkMode != null) prefsUpdate['modalitaNotte'] = darkMode;
     if (gps != null) prefsUpdate['posizioneGps'] = gps;
 
+    if (prefsUpdate.isEmpty) {
+      return;
+    }
+
     // 2. Creiamo l'aggiornamento principale
     final Map<String, dynamic> updates = {
       'updatedAt': FieldValue.serverTimestamp(),
+      'preferences': prefsUpdate,
     };
 
-    // 3. Inseriamo la mappa interna dentro l'aggiornamento principale (se c'è qualcosa da aggiornare)
-    if (prefsUpdate.isNotEmpty) {
-      updates['preferences'] = prefsUpdate;
-    }
-
-    // 4. Ora il merge: true capirà che deve unire i dati DENTRO la mappa 'preferences'
+    // 3. Ora il merge: true capirà che deve unire i dati DENTRO la mappa 'preferences'
     await _users.doc(uid).set(updates, SetOptions(merge: true));
   }
 

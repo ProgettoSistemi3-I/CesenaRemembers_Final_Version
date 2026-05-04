@@ -10,6 +10,8 @@ extension _MapPageDataLogic on _MapPageState {
       _bindTourUpdates();
       setState(() {
         _pois = _MapPageState._cachedPois!;
+        _cachedMarkers = const [];
+        _lastMarkerRotation = null;
         _isLoading = false;
       });
       return;
@@ -30,6 +32,8 @@ extension _MapPageDataLogic on _MapPageState {
 
       setState(() {
         _pois = pois;
+        _cachedMarkers = const [];
+        _lastMarkerRotation = null;
         _loadError = null;
         _isLoading = false;
       });
@@ -44,7 +48,12 @@ extension _MapPageDataLogic on _MapPageState {
   }
 
   List<Marker> _buildMarkers() {
-    return _pois
+    if (_cachedMarkers.isNotEmpty && _lastMarkerRotation == _currentRotation) {
+      return _cachedMarkers;
+    }
+
+    _lastMarkerRotation = _currentRotation;
+    _cachedMarkers = _pois
         .map(
           (poi) => _poiMarkerFactory.fromPoi(
             poi,
@@ -52,6 +61,8 @@ extension _MapPageDataLogic on _MapPageState {
           ),
         )
         .toList(growable: false);
+
+    return _cachedMarkers;
   }
 
   void _bindTourUpdates() {
