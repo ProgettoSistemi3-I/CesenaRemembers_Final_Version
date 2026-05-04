@@ -3,6 +3,26 @@ part of 'map_page.dart';
 extension _MapPageTourActions on _MapPageState {
   Future<void> _startTour() async {
     if (!_tourController.hasStops) return;
+    await _verifyLocationState(requestPerms: true);
+    final canStartTour =
+        _isGpsPreferenceEnabled && _isGpsEnabled && _hasPermissions;
+    if (!canStartTour) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            'Per iniziare il tour attiva GPS, permessi posizione e opzione nell’app.',
+          ),
+          backgroundColor: AppPalette.danger,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
+        ),
+      );
+      _resolveLocationIssues();
+      return;
+    }
+
     final hasStarted = await _tourController.startTour();
     if (hasStarted && mounted && _tourController.currentStop != null) {
       _centerOnStop(_toLatLng(_tourController.currentStop!.position));
