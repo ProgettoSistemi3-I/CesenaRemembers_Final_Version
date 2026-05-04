@@ -70,8 +70,12 @@ class SettingsController extends ChangeNotifier {
       modalitaNotte = profile.darkModeEnabled;
 
       final hasRealPermission = await _locationService.hasActivePermission();
-      posizione = profile.gpsEnabled && hasRealPermission;
+      posizione = hasRealPermission;
       LocationPreferenceStore.setGpsEnabled(posizione);
+
+      if (hasRealPermission && !profile.gpsEnabled) {
+        await _preferencesUseCases.updatePreferences(uid: _currentUid, gps: true);
+      }
 
       errorMessage = null;
 
@@ -89,17 +93,15 @@ class SettingsController extends ChangeNotifier {
     bool? newModalitaNotte,
     bool? newPosizione,
   }) async {
-    if (newPosizione != null) {
-      if (newPosizione == true) {
-        final status = await _locationService.ensureLocationAccess();
-        if (status != LocationAccessStatus.granted) {
-          errorMessage =
-              'Permesso negato o GPS disattivato. Controlla le impostazioni del telefono.';
-          posizione = false;
-          LocationPreferenceStore.setGpsEnabled(false);
-          _safeNotifyListeners();
-          return;
-        }        
+    if (newPosizione == true) {
+      final status = await _locationService.ensureLocationAccess();
+      if (status != LocationAccessStatus.granted) {
+        errorMessage =
+            'Permesso negato o GPS disattivato. Controlla le impostazioni del telefono.';
+        posizione = false;
+        LocationPreferenceStore.setGpsEnabled(false);
+        _safeNotifyListeners();
+        return;
       }
     }
 

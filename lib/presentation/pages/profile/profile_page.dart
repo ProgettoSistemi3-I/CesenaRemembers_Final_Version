@@ -263,34 +263,34 @@ class _ProfilePageState extends State<ProfilePage>
 
           if (users.isEmpty)
             Padding(
-              padding: const EdgeInsets.all(40),
-
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-
-                children: [
-                  Icon(
-                    Icons.people_outline_rounded,
-
-                    size: 64,
-
-                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  Text(
-                    'Nessun utente trovato.',
-
-                    style: TextStyle(
-                      color: theme.colorScheme.onSurfaceVariant,
-
-                      fontSize: 16,
-
-                      fontWeight: FontWeight.w500,
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.35),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.people_outline_rounded,
+                      size: 24,
+                      color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Nessuna richiesta al momento.',
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             )
           else

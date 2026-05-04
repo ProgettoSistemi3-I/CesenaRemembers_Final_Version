@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../domain/usecases/auth_use_cases.dart';
 import '../../injection_container.dart';
@@ -80,11 +81,26 @@ class _LoginPageState extends State<LoginPage>
     });
     try {
       await _signInWithGoogle();
-    } catch (e) {
+    } on FirebaseAuthException catch (e) {
       if (!mounted) return;
-      setState(() => _error = 'Errore durante il login: $e');
+      setState(() => _error = _mapAuthErrorMessage(e));
+    } catch (_) {
+      if (!mounted) return;
+      setState(
+        () => _error =
+            'Accesso non riuscito. Controlla la connessione e riprova.',
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  String _mapAuthErrorMessage(FirebaseAuthException exception) {
+    switch (exception.code) {
+      case 'network-request-failed':
+        return 'Sei offline. Controlla la connessione Internet e riprova.';
+      default:
+        return 'Accesso non riuscito. Riprova tra qualche secondo.';
     }
   }
 
