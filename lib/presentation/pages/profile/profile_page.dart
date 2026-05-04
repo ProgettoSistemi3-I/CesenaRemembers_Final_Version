@@ -581,7 +581,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                             isEditingName: _isEditingName,
 
-                            username: '@${profile.username}',
+                            username: profile.username,
 
                             points: profile.xp.toString(),
 
