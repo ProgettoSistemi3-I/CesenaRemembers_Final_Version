@@ -2,7 +2,8 @@ part of 'map_page.dart';
 
 extension _MapPageDataLogic on _MapPageState {
   Future<void> _loadPois() async {
-    if (_MapPageState._cachedPois != null && _MapPageState._cachedStops != null) {
+    if (_MapPageState._cachedPois != null &&
+        _MapPageState._cachedStops != null) {
       _tourController.dispose();
       _tourController = TourSessionController(
         availableStops: _MapPageState._cachedStops!,
@@ -11,6 +12,7 @@ extension _MapPageDataLogic on _MapPageState {
       setState(() {
         _pois = _MapPageState._cachedPois!;
         _isLoading = false;
+        _loadError = null;
         _markers = _buildMarkers(_pois);
       });
       return;
@@ -61,6 +63,8 @@ extension _MapPageDataLogic on _MapPageState {
   }
 
   void _onRotationChanged(double rotation) {
+    if ((_currentRotation - rotation).abs() < 0.5)
+      return; // Soglia per evitare ricalcoli eccessivi
     setState(() {
       _currentRotation = rotation;
       // Ricalcola i marker solo quando la rotazione cambia
