@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../../domain/usecases/auth_use_cases.dart';
 import '../../domain/usecases/user_preferences_use_cases.dart';
 import '../../domain/usecases/user_profile_use_cases.dart';
+import '../../core/logging/app_logger.dart';
 import '../theme/theme_controller.dart';
 import '../services/location_permission_service.dart';
 import '../services/location_preference_store.dart';
@@ -16,12 +17,12 @@ class SettingsController extends ChangeNotifier {
   final ThemeController _themeController;
   final LocationPermissionService _locationService;
 
-  // --- STATO DELLE PREFERENZE (Salvate su Firebase e Locali) ---
+  // Stato preferenze (persistite su Firebase + cache locale)
   bool notifiche = true;
   bool modalitaNotte = false;
   bool posizione = true;
 
-  // --- STATO DELLA UI ---
+  // Stato UI
   bool isLoading = true;
   bool isLoggingOut = false;
   bool isDeletingAccount = false;
@@ -88,27 +89,21 @@ class SettingsController extends ChangeNotifier {
     bool? newModalitaNotte,
     bool? newPosizione,
   }) async {
-    // --- GESTIONE SPECIALE PER IL GPS ---
     if (newPosizione != null) {
       if (newPosizione == true) {
-        // Se l'utente vuole ATTIVARE il GPS, chiediamo il permesso al sistema
         final status = await _locationService.ensureLocationAccess();
         if (status != LocationAccessStatus.granted) {
-          // Se rifiuta, blocchiamo lo switch su FALSE
           errorMessage =
               'Permesso negato o GPS disattivato. Controlla le impostazioni del telefono.';
           posizione = false;
           LocationPreferenceStore.setGpsEnabled(false);
           _safeNotifyListeners();
-          return; // Interrompiamo qui, non salviamo su DB
-        }
-      } else {
-        // Se l'utente SPEGNE il GPS dall'app, non possiamo spegnerlo dal telefono (è vietato da Android/iOS),
-        // ma possiamo smettere di usarlo nell'app e salvarlo su DB.
+          return;
+        }        
       }
     }
 
-    // 1. Aggiornamento Immediato
+    // 1) Aggiornamento ottimistico
     if (newNotifiche != null) notifiche = newNotifiche;
     if (newModalitaNotte != null) {
       modalitaNotte = newModalitaNotte;
@@ -121,15 +116,15 @@ class SettingsController extends ChangeNotifier {
     _safeNotifyListeners();
 
     try {
-      // 2. Salvataggio su Firestore
+      // 2) Persistenza remota
       await _preferencesUseCases.updatePreferences(
         uid: _currentUid,
         notifiche: newNotifiche,
         darkMode: newModalitaNotte,
-        gps: newPosizione, // Verrà salvato solo se il permesso è stato concesso
+        gps: newPosizione,
       );
     } catch (e) {
-      // 3. Rollback
+      // 3) Rollback
       errorMessage = 'Errore di connessione. Modifica annullata.';
       await loadUserPreferences();
       _themeController.toggleTheme(modalitaNotte);
@@ -160,27 +155,31 @@ class SettingsController extends ChangeNotifier {
 
     final uid = _currentUid;
 
-    // ── Step 1: cancella i dati applicativi su Firestore ──
     try {
       await _profileUseCases.deleteUserData(uid: uid);
     } catch (e) {
-      // Firestore non ha eliminato nulla → lo stato è intatto, mostriamo errore.
-      debugPrint('[DELETE‑ACCOUNT] Errore cancellazione Firestore: $e');
+      AppLogger.error(
+        'Delete account failed at Firestore cleanup',
+        error: e,
+        name: 'SettingsController',
+      );
       errorMessage = 'Impossibile eliminare i dati: $e';
       isDeletingAccount = false;
       _safeNotifyListeners();
       return false;
     }
 
-    // ── Step 2: elimina l'utente Firebase Auth ──
     try {
       await _deleteCurrentUserUseCase();
-      // Successo: authStateChanges emetterà null → LoginPage
       return true;
     } catch (e) {
-      // Auth non eliminato ma i dati Firestore sono già stati rimossi.
-      // Forziamo il logout per evitare stati inconsistenti.
-      debugPrint('[DELETE‑ACCOUNT] Errore cancellazione auth: $e');
+      AppLogger.error(
+        'Delete account failed at Auth deletion after Firestore cleanup',
+        error: e,
+        name: 'SettingsController',
+      );
+      errorMessage =
+          'Account non eliminato completamente. I dati app sono stati rimossi, ma la cancellazione auth è fallita. Verrai disconnesso per sicurezza.';
       try {
         await _signOutUseCase();
       } catch (_) {}

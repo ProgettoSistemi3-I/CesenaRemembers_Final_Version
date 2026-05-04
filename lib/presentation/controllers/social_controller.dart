@@ -57,6 +57,7 @@ class SocialController extends ChangeNotifier {
   bool _isDisposed = false;
 
   List<LeaderboardEntry> leaderboard = [];
+  bool isLeaderboardLoading = true;
 
   // RIMOSSA LA VARIABILE FISSA LeaderboardEntry? currentUserEntry;
 
@@ -96,12 +97,14 @@ class SocialController extends ChangeNotifier {
                   return LeaderboardEntry.fromMap(entry.value, entry.key + 1);
                 })
                 .toList(growable: false);
+            isLeaderboardLoading = false;
 
             // Ora ci pensa il getter dinamico `currentUserEntry` in alto.
 
             _safeNotifyListeners();
           },
           onError: (error) {
+            isLeaderboardLoading = false;
             errorMessage = 'Impossibile caricare la classifica.';
             _safeNotifyListeners();
           },
