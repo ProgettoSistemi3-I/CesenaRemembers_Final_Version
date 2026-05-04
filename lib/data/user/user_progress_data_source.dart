@@ -42,8 +42,6 @@ class UserProgressDataSource {
 
       final currentXp = (data['xp'] as num?)?.toInt() ?? 0;
       final nextXp = currentXp + xpGained;
-      final currentLeaderboard =
-          (data['leaderboardScore'] as num?)?.toInt() ?? 0;
       final currentMaxQuizScore = (data['maxQuizScore'] as num?)?.toInt() ?? 0;
       final currentQuizCompleted =
           (data['totalQuizCompleted'] as num?)?.toInt() ?? 0;
@@ -59,9 +57,7 @@ class UserProgressDataSource {
       transaction.set(userRef, {
         'visitedPoiIds': visitedPoiIds,
         'xp': nextXp,
-        'leaderboardScore': nextXp > currentLeaderboard
-            ? nextXp
-            : currentLeaderboard,
+        'leaderboardScore': nextXp, // mirrors xp, kept for Firestore query ordering
         'maxQuizScore': quizScorePercent > currentMaxQuizScore
             ? quizScorePercent
             : currentMaxQuizScore,

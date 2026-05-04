@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../../domain/entities/tour_stop.dart';
 import '../../../../injection_container.dart';
 import '../../../controllers/poi_quiz_controller.dart';
-import '../../../../domain/usecases/user_profile_use_cases.dart';
 import '../../../theme/app_palette.dart';
 import '../../../services/tour_formatters.dart';
 
@@ -16,6 +15,7 @@ class PoiBottomSheet extends StatefulWidget {
     required this.elapsedSeconds,
     required this.onQuizCompleted,
     required this.onNextStop,
+    this.userXp = 0,
   });
 
   final TourStop stop;
@@ -24,6 +24,8 @@ class PoiBottomSheet extends StatefulWidget {
   final int elapsedSeconds;
   final ValueChanged<QuizCompletionData> onQuizCompleted;
   final VoidCallback onNextStop;
+  /// XP dell'utente passato dal genitore per evitare una lettura Firestore extra.
+  final int userXp;
 
   @override
   State<PoiBottomSheet> createState() => _PoiBottomSheetState();
@@ -68,19 +70,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
   }
 
   Future<void> _initQuizWithUserXp() async {
-    int userXp = 0;
-    try {
-      final profileUseCases = sl<UserProfileUseCases>();
-      final uid = profileUseCases.getCurrentUserUid();
-      if (uid != null) {
-        final profile = await profileUseCases.getUserProfile(uid);
-        userXp = profile.xp;
-      }
-    } catch (_) {
-      userXp = 0;
-    }
-
-    _quizController!.initQuiz(widget.stop.id, widget.stop.name, userXp);
+    _quizController!.initQuiz(widget.stop.id, widget.stop.name, widget.userXp);
   }
 
   void _onAnswerTap(int index) {

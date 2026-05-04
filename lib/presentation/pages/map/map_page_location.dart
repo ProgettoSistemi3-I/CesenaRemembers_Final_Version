@@ -45,7 +45,7 @@ extension _MapPageLocationLogic on _MapPageState {
       return;
     }
 
-    setState(() => _isCheckingLocation = true);
+    if (mounted) setState(() => _isCheckingLocation = true);
 
     final gps = await Geolocator.isLocationServiceEnabled();
     var perm = await Geolocator.checkPermission();

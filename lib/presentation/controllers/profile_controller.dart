@@ -71,11 +71,17 @@ class ProfileController extends ChangeNotifier {
     }
   }
 
+  /// Imposta un messaggio di errore e notifica i listener.
+  /// Evita l'accesso diretto a [errorMessage] e [notifyListeners] dall'esterno.
+  void setError(String message) {
+    errorMessage = message;
+    _safeNotifyListeners();
+  }
+
   Future<void> updateProfileBasics({
     String? displayName,
     String? avatarId,
-  }) async {
-    final uid = _profileUseCases.getCurrentUserUid();
+  }) async {    final uid = _profileUseCases.getCurrentUserUid();
     if (uid == null) return;
 
     try {

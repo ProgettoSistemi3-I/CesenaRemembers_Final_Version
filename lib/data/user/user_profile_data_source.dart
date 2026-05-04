@@ -202,24 +202,16 @@ class UserProfileDataSource {
     bool? darkMode,
     bool? gps,
   }) async {
-    // 1. Creiamo la mappa interna per le preferenze
-    final Map<String, dynamic> prefsUpdate = {};
-    if (notifiche != null) prefsUpdate['notifiche'] = notifiche;
-    if (darkMode != null) prefsUpdate['modalitaNotte'] = darkMode;
-    if (gps != null) prefsUpdate['posizioneGps'] = gps;
-
-    // 2. Creiamo l'aggiornamento principale
+    // Usiamo la dot-notation per aggiornare SOLO i sotto-campi richiesti
+    // senza sovrascrivere gli altri valori dentro "preferences".
     final Map<String, dynamic> updates = {
       'updatedAt': FieldValue.serverTimestamp(),
     };
+    if (notifiche != null) updates['preferences.notifiche'] = notifiche;
+    if (darkMode != null) updates['preferences.modalitaNotte'] = darkMode;
+    if (gps != null) updates['preferences.posizioneGps'] = gps;
 
-    // 3. Inseriamo la mappa interna dentro l'aggiornamento principale (se c'è qualcosa da aggiornare)
-    if (prefsUpdate.isNotEmpty) {
-      updates['preferences'] = prefsUpdate;
-    }
-
-    // 4. Ora il merge: true capirà che deve unire i dati DENTRO la mappa 'preferences'
-    await _users.doc(uid).set(updates, SetOptions(merge: true));
+    await _users.doc(uid).update(updates);
   }
 
   Future<List<UserProfile>> searchUsers(String query) async {

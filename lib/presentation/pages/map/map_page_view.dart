@@ -33,8 +33,7 @@ extension _MapPageView on _MapPageState {
             cesenaBounds: _MapPageState._cesenaBounds,
             isMapLocked: _isMapLocked,
             currentRotation: _currentRotation,
-            onRotationChanged: (rotation) =>
-                setState(() => _currentRotation = rotation),
+            onRotationChanged: _onRotationChanged,
             isMapMenuOpen: _isMapMenuOpen,
             onCloseMapMenu: () => setState(() => _isMapMenuOpen = false),
             alignPositionOnUpdate: _alignPositionOnUpdate,
@@ -44,7 +43,7 @@ extension _MapPageView on _MapPageState {
             currentMapUrl: currentMapUrl,
             selectedMapStyle: _selectedMapStyle,
             cachedTileProvider: _cachedTileProvider,
-            markers: _buildMarkers(),
+            markers: _markers,
             scaffoldBackgroundColor: data.theme.scaffoldBackgroundColor,
           ),
           _buildOverlay(data),
@@ -232,7 +231,7 @@ extension _MapPageView on _MapPageState {
   }
 }
 
-class _MapCanvas extends StatelessWidget {
+class _MapCanvas extends StatefulWidget {
   const _MapCanvas({
     required this.mapController,
     required this.cesenaBounds,
@@ -268,55 +267,69 @@ class _MapCanvas extends StatelessWidget {
   final Color scaffoldBackgroundColor;
 
   @override
-  Widget build(BuildContext context) {
-    const defaultCesenaCenter = LatLng(44.1384, 12.2471);
-    const locationSettings = LocationSettings(
-      accuracy: LocationAccuracy.bestForNavigation,
-      distanceFilter: 0,
-    );
+  State<_MapCanvas> createState() => _MapCanvasState();
+}
 
+class _MapCanvasState extends State<_MapCanvas> {
+  // Il position stream viene creato UNA SOLA VOLTA e riutilizzato ad ogni rebuild.
+  // Se fosse dentro build(), verrebbe ricreato ad ogni setState() del genitore
+  // (es. ogni secondo durante il tour), causando N subscription aperte.
+  static const _locationSettings = LocationSettings(
+    accuracy: LocationAccuracy.bestForNavigation,
+    distanceFilter: 5, // aggiorna solo ogni 5 metri, non ad ogni tick GPS
+  );
+
+  late final Stream<LocationMarkerPosition?> _positionStream =
+      const LocationMarkerDataStreamFactory().fromGeolocatorPositionStream(
+        stream: Geolocator.getPositionStream(locationSettings: _locationSettings),
+      );
+
+  static const _defaultCesenaCenter = LatLng(44.1384, 12.2471);
+
+  @override
+  Widget build(BuildContext context) {
     return FlutterMap(
-      mapController: mapController,
+      mapController: widget.mapController,
       options: MapOptions(
-        initialCenter: defaultCesenaCenter,
+        initialCenter: _defaultCesenaCenter,
         initialZoom: 14.0,
         minZoom: 10.0,
         maxZoom: 18.5,
-        cameraConstraint: CameraConstraint.contain(bounds: cesenaBounds),
-        backgroundColor: scaffoldBackgroundColor,
+        cameraConstraint: CameraConstraint.contain(bounds: widget.cesenaBounds),
+        backgroundColor: widget.scaffoldBackgroundColor,
         interactionOptions: InteractionOptions(
-          flags: isMapLocked ? InteractiveFlag.none : InteractiveFlag.all,
+          flags: widget.isMapLocked ? InteractiveFlag.none : InteractiveFlag.all,
         ),
         onMapEvent: (event) {
           if (event is MapEventMove || event is MapEventRotate) {
-            final rotation = mapController.camera.rotation;
-            if ((rotation - currentRotation).abs() > 0.1) {
-              onRotationChanged(rotation);
+            final rotation = widget.mapController.camera.rotation;
+            if ((rotation - widget.currentRotation).abs() > 0.1) {
+              widget.onRotationChanged(rotation);
             }
           }
-          if (event is MapEventMoveStart && isMapMenuOpen) {
-            onCloseMapMenu();
+          if (event is MapEventMoveStart && widget.isMapMenuOpen) {
+            widget.onCloseMapMenu();
           }
         },
         onPositionChanged: (_, hasGesture) {
-          if (hasGesture && alignPositionOnUpdate != AlignOnUpdate.never) {
-            onDisableFollowUser();
+          if (hasGesture && widget.alignPositionOnUpdate != AlignOnUpdate.never) {
+            widget.onDisableFollowUser();
           }
         },
       ),
       children: [
         TileLayer(
-          key: ValueKey<MapStyle>(selectedMapStyle),
-          urlTemplate: currentMapUrl,
+          key: ValueKey<MapStyle>(widget.selectedMapStyle),
+          urlTemplate: widget.currentMapUrl,
           subdomains: const ['a', 'b', 'c', 'd'],
           userAgentPackageName: 'com.geoapp.prototype',
           maxZoom: 19,
-          tileBounds: cesenaBounds,
-          tileProvider: cachedTileProvider,
+          tileBounds: widget.cesenaBounds,
+          tileProvider: widget.cachedTileProvider,
         ),
-        if (canUseLocation)
+        if (widget.canUseLocation)
           CurrentLocationLayer(
-            alignPositionOnUpdate: alignPositionOnUpdate,
+            alignPositionOnUpdate: widget.alignPositionOnUpdate,
             style: LocationMarkerStyle(
               marker: const DefaultLocationMarker(
                 color: Colors.blue,
@@ -325,14 +338,9 @@ class _MapCanvas extends StatelessWidget {
               accuracyCircleColor: Colors.blue.withValues(alpha: 0.1),
               headingSectorColor: Colors.blue.withValues(alpha: 0.2),
             ),
-            positionStream: const LocationMarkerDataStreamFactory()
-                .fromGeolocatorPositionStream(
-                  stream: Geolocator.getPositionStream(
-                    locationSettings: locationSettings,
-                  ),
-                ),
+            positionStream: _positionStream,
           ),
-        MarkerLayer(markers: markers),
+        MarkerLayer(markers: widget.markers),
       ],
     );
   }

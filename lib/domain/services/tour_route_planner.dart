@@ -5,6 +5,10 @@ import '../entities/tour_stop.dart';
 class TourRoutePlanner {
   const TourRoutePlanner();
 
+  /// Ordina le tappe con l'algoritmo nearest-neighbor (greedy).
+  /// Complessità: O(n²) — sufficiente per il numero di POI dell'app.
+  /// Rispetto alla versione precedente, si evita il sort O(n log n) ad ogni
+  /// iterazione: si cerca semplicemente il minimo in un singolo passaggio lineare.
   List<TourStop> sortNearestNeighbor({
     required GeoPoint origin,
     required List<TourStop> stops,
@@ -15,14 +19,20 @@ class TourRoutePlanner {
     const distance = Distance();
 
     while (remaining.isNotEmpty) {
-      remaining.sort(
-        (a, b) => distance
-            .as(LengthUnit.Meter, _toLatLng(current), _toLatLng(a.position))
-            .compareTo(
-              distance.as(LengthUnit.Meter, _toLatLng(current), _toLatLng(b.position)),
-            ),
-      );
-      final next = remaining.removeAt(0);
+      var minDist = double.infinity;
+      var minIdx = 0;
+      for (var i = 0; i < remaining.length; i++) {
+        final d = distance.as(
+          LengthUnit.Meter,
+          _toLatLng(current),
+          _toLatLng(remaining[i].position),
+        );
+        if (d < minDist) {
+          minDist = d;
+          minIdx = i;
+        }
+      }
+      final next = remaining.removeAt(minIdx);
       sorted.add(next);
       current = next.position;
     }

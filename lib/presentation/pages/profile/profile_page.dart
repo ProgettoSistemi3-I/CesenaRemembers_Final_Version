@@ -123,10 +123,9 @@ class _ProfilePageState extends State<ProfilePage>
     }
 
     if (!ProfileValidation.isValidDisplayName(updatedName)) {
-      _profileController.errorMessage =
-          'Il nome deve avere ${ProfileValidation.minDisplayNameLength}-${ProfileValidation.maxDisplayNameLength} caratteri.';
-
-      _profileController.notifyListeners();
+      _profileController.setError(
+        'Il nome deve avere ${ProfileValidation.minDisplayNameLength}-${ProfileValidation.maxDisplayNameLength} caratteri.',
+      );
 
       setState(() => _nameController.text = profile.displayName);
 
@@ -134,10 +133,9 @@ class _ProfilePageState extends State<ProfilePage>
     }
 
     if (ProfileValidation.hasOffensiveDisplayName(updatedName)) {
-      _profileController.errorMessage =
-          'Il nome contiene termini non consentiti.\nInseriscine uno diverso.';
-
-      _profileController.notifyListeners();
+      _profileController.setError(
+        'Il nome contiene termini non consentiti.\nInseriscine uno diverso.',
+      );
 
       setState(() => _nameController.text = profile.displayName);
 
@@ -237,7 +235,7 @@ class _ProfilePageState extends State<ProfilePage>
             height: 5,
 
             decoration: BoxDecoration(
-              color: theme.colorScheme.onSurfaceVariant.withOpacity(0.3),
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
 
               borderRadius: BorderRadius.circular(10),
             ),
@@ -271,8 +269,8 @@ class _ProfilePageState extends State<ProfilePage>
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(
-                    0.35,
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(
+                    alpha: 0.35,
                   ),
                   borderRadius: BorderRadius.circular(18),
                 ),
@@ -281,8 +279,8 @@ class _ProfilePageState extends State<ProfilePage>
                     Icon(
                       Icons.people_outline_rounded,
                       size: 24,
-                      color: theme.colorScheme.onSurfaceVariant.withOpacity(
-                        0.7,
+                      color: theme.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.7,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -318,12 +316,12 @@ class _ProfilePageState extends State<ProfilePage>
 
                   return Container(
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                      color: theme.colorScheme.surfaceVariant.withValues(alpha: 0.3),
 
                       borderRadius: BorderRadius.circular(20),
 
                       border: Border.all(
-                        color: theme.colorScheme.outline.withOpacity(0.1),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.1),
                       ),
                     ),
 
@@ -340,7 +338,7 @@ class _ProfilePageState extends State<ProfilePage>
                           shape: BoxShape.circle,
 
                           border: Border.all(
-                            color: theme.colorScheme.primary.withOpacity(0.2),
+                            color: theme.colorScheme.primary.withValues(alpha: 0.2),
 
                             width: 2,
                           ),
@@ -510,7 +508,7 @@ class _ProfilePageState extends State<ProfilePage>
                             Container(
                               decoration: BoxDecoration(
                                 color: theme.colorScheme.surfaceVariant
-                                    .withOpacity(0.4),
+                                    .withValues(alpha: 0.4),
 
                                 shape: BoxShape.circle,
                               ),

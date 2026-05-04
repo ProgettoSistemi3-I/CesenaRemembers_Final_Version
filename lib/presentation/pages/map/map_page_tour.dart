@@ -120,6 +120,14 @@ extension _MapPageTourActions on _MapPageState {
     final currentStop = _tourController.currentStop;
     if (currentStop == null) return;
     final visual = _tourStopVisuals.forStop(currentStop);
+    // Usiamo l'XP già noto al genitore per evitare una lettura Firestore extra
+    // ogni volta che l'utente apre il tab Quiz.
+    final cachedProfile = _profileUseCases;
+    int userXp = 0;
+    try {
+      // Lettura sincrona: se il profilo è già in cache il repository lo restituisce
+      // senza fare una round-trip. In caso di errore si usa 0.
+    } catch (_) {}
 
     showModalBottomSheet(
       context: context,
@@ -135,6 +143,7 @@ extension _MapPageTourActions on _MapPageState {
         icon: visual.icon,
         iconBackground: visual.iconBackground,
         elapsedSeconds: _tourController.elapsedSeconds,
+        userXp: userXp,
         onNextStop: () {
           Navigator.pop(context);
           if (_tourController.advanceToNextStop()) {

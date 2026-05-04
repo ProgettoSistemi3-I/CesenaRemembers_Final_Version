@@ -11,6 +11,7 @@ extension _MapPageDataLogic on _MapPageState {
       setState(() {
         _pois = _MapPageState._cachedPois!;
         _isLoading = false;
+        _markers = _buildMarkers(_pois);
       });
       return;
     }
@@ -30,6 +31,7 @@ extension _MapPageDataLogic on _MapPageState {
 
       setState(() {
         _pois = pois;
+        _markers = _buildMarkers(pois);
         _loadError = null;
         _isLoading = false;
       });
@@ -37,14 +39,18 @@ extension _MapPageDataLogic on _MapPageState {
       if (!mounted) return;
       setState(() {
         _pois = [];
+        _markers = const [];
         _loadError = 'Errore nel caricamento dei punti di interesse.';
         _isLoading = false;
       });
     }
   }
 
-  List<Marker> _buildMarkers() {
-    return _pois
+  // I marker non dipendono dallo stato del tour o dalla rotazione — vengono
+  // ricalcolati solo quando la lista POI cambia (o la rotazione della mappa),
+  // non ad ogni tick del timer.
+  List<Marker> _buildMarkers(List<Poi> pois) {
+    return pois
         .map(
           (poi) => _poiMarkerFactory.fromPoi(
             poi,
@@ -54,9 +60,18 @@ extension _MapPageDataLogic on _MapPageState {
         .toList(growable: false);
   }
 
+  void _onRotationChanged(double rotation) {
+    setState(() {
+      _currentRotation = rotation;
+      // Ricalcola i marker solo quando la rotazione cambia
+      if (_pois.isNotEmpty) _markers = _buildMarkers(_pois);
+    });
+  }
+
   void _bindTourUpdates() {
     _tourUpdatesSub?.cancel();
     _tourUpdatesSub = _tourController.updates.listen((_) {
+      // Aggiorna solo lo stato del tour, NON i marker
       if (mounted) setState(() {});
     });
   }
