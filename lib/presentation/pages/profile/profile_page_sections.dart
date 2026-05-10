@@ -13,7 +13,7 @@ class _HeroCard extends StatelessWidget {
 
   final String friendsCount;
 
-  final String level;
+  final String toursCount;
 
   final VoidCallback onAvatarTap;
 
@@ -34,7 +34,7 @@ class _HeroCard extends StatelessWidget {
 
     required this.friendsCount,
 
-    required this.level,
+    required this.toursCount,
 
     required this.onAvatarTap,
 
@@ -308,9 +308,9 @@ class _HeroCard extends StatelessWidget {
                 const _VerticalDivider(),
 
                 _MiniStat(
-                  label: 'Livello',
+                  label: 'Tour',
 
-                  value: level,
+                  value: toursCount,
 
                   highlightColor: AppPalette.moss,
                 ),
@@ -511,126 +511,128 @@ class _StatCard extends StatelessWidget {
   }
 }
 
-class _BadgesRow extends StatelessWidget {
+class _AchievementsGrid extends StatelessWidget {
+  final List<String> unlockedIds;
+
+  const _AchievementsGrid({required this.unlockedIds});
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final achievements = AchievementService.all;
 
-      children: [
-        const Expanded(
-          child: _BadgeTile(
-            icon: Icons.military_tech_rounded,
-
-            label: 'Pioniere',
-
-            color: AppPalette.olive,
-          ),
-        ),
-
-        const Expanded(
-          child: _BadgeTile(
-            icon: Icons.explore_rounded,
-
-            label: 'Esploratore',
-
-            color: AppPalette.tan,
-          ),
-        ),
-
-        const Expanded(
-          child: _BadgeTile(
-            icon: Icons.history_edu_rounded,
-
-            label: 'Storico',
-
-            color: AppPalette.moss,
-          ),
-        ),
-
-        Expanded(
-          child: _BadgeTile(
-            icon: Icons.lock_outline_rounded,
-
-            label: 'Segreto',
-
-            color: Colors.grey.withValues(alpha: 0.5),
-
-            isLocked: true,
-          ),
-        ),
-      ],
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 16,
+        childAspectRatio: 0.75,
+      ),
+      itemCount: achievements.length,
+      itemBuilder: (context, i) {
+        final achievement = achievements[i];
+        final isUnlocked = unlockedIds.contains(achievement.id);
+        return _AchievementTile(
+          achievement: achievement,
+          isUnlocked: isUnlocked,
+        );
+      },
     );
   }
 }
 
-class _BadgeTile extends StatelessWidget {
-  final IconData icon;
+class _AchievementTile extends StatelessWidget {
+  final AchievementDefinition achievement;
+  final bool isUnlocked;
 
-  final String label;
-
-  final Color color;
-
-  final bool isLocked;
-
-  const _BadgeTile({
-    required this.icon,
-
-    required this.label,
-
-    required this.color,
-
-    this.isLocked = false,
+  const _AchievementTile({
+    required this.achievement,
+    required this.isUnlocked,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Column(
-      children: [
-        Container(
-          width: 64,
-
-          height: 64,
-
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-
-            color: isLocked
-                ? theme.colorScheme.onSurface.withValues(alpha: 0.05)
-                : color.withValues(alpha: 0.12),
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+            title: Row(
+              children: [
+                Icon(
+                  achievement.icon,
+                  color: isUnlocked ? AppPalette.olive : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    achievement.title,
+                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
+                  ),
+                ),
+              ],
+            ),
+            content: Text(
+              isUnlocked
+                  ? achievement.description
+                  : '🔒  ${achievement.description}',
+              style: TextStyle(
+                color: isUnlocked
+                    ? theme.colorScheme.onSurface
+                    : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
           ),
-
-          child: Icon(
-            icon,
-
-            color: isLocked
-                ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)
-                : color,
-
-            size: 30,
+        );
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isUnlocked
+                  ? AppPalette.olive.withValues(alpha: 0.12)
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+            ),
+            child: Icon(
+              isUnlocked ? achievement.icon : Icons.lock_outline_rounded,
+              color: isUnlocked
+                  ? AppPalette.olive
+                  : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+              size: 22,
+            ),
           ),
-        ),
-
-        const SizedBox(height: 10),
-
-        Text(
-          label,
-
-          style: TextStyle(
-            fontSize: 12,
-
-            fontWeight: isLocked ? FontWeight.w500 : FontWeight.w700,
-
-            color: isLocked
-                ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6)
-                : theme.colorScheme.onSurface,
+          const SizedBox(height: 6),
+          Text(
+            isUnlocked ? achievement.title : '???',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: isUnlocked ? FontWeight.w700 : FontWeight.w500,
+              color: isUnlocked
+                  ? theme.colorScheme.onSurface
+                  : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+            ),
           ),
-
-          textAlign: TextAlign.center,
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

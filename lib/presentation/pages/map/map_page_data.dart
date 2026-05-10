@@ -63,8 +63,9 @@ extension _MapPageDataLogic on _MapPageState {
   }
 
   void _onRotationChanged(double rotation) {
-    if ((_currentRotation - rotation).abs() < 0.5)
+    if ((_currentRotation - rotation).abs() < 0.5) {
       return; // Soglia per evitare ricalcoli eccessivi
+    }
     setState(() {
       _currentRotation = rotation;
       // Ricalcola i marker solo quando la rotazione cambia

@@ -13,8 +13,10 @@ class UserProfile {
   final bool gpsEnabled;
   final int maxQuizScore;
   final int totalQuizCompleted;
+  final int totalToursCompleted;
   final int totalCorrectAnswers;
   final int bestTourTimeSeconds;
+  final int maxSingleTourXp;
   final List<String> friends;
   final List<String> sentFriendRequests;
   final List<String> receivedFriendRequests;
@@ -34,8 +36,10 @@ class UserProfile {
     this.gpsEnabled = true,
     this.maxQuizScore = 0,
     this.totalQuizCompleted = 0,
+    this.totalToursCompleted = 0,
     this.totalCorrectAnswers = 0,
     this.bestTourTimeSeconds = 0,
+    this.maxSingleTourXp = 0,
     this.friends = const [],
     this.sentFriendRequests = const [],
     this.receivedFriendRequests = const [],
@@ -61,8 +65,10 @@ class UserProfile {
     bool? gpsEnabled,
     int? maxQuizScore,
     int? totalQuizCompleted,
+    int? totalToursCompleted,
     int? totalCorrectAnswers,
     int? bestTourTimeSeconds,
+    int? maxSingleTourXp,
     List<String>? friends,
     List<String>? sentFriendRequests,
     List<String>? receivedFriendRequests,
@@ -82,8 +88,10 @@ class UserProfile {
       gpsEnabled: gpsEnabled ?? this.gpsEnabled,
       maxQuizScore: maxQuizScore ?? this.maxQuizScore,
       totalQuizCompleted: totalQuizCompleted ?? this.totalQuizCompleted,
+      totalToursCompleted: totalToursCompleted ?? this.totalToursCompleted,
       totalCorrectAnswers: totalCorrectAnswers ?? this.totalCorrectAnswers,
       bestTourTimeSeconds: bestTourTimeSeconds ?? this.bestTourTimeSeconds,
+      maxSingleTourXp: maxSingleTourXp ?? this.maxSingleTourXp,
       friends: friends ?? this.friends,
       sentFriendRequests: sentFriendRequests ?? this.sentFriendRequests,
       receivedFriendRequests:

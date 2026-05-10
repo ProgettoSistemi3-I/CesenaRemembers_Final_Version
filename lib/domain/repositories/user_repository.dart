@@ -48,6 +48,7 @@ abstract class IUserRepository {
     required int correctAnswers,
     required int totalQuestions,
     required int tourElapsedSeconds,
+    bool isTourComplete = false,
   });
 
   // Elimina tutti i dati utente persistiti (profilo e indice username).

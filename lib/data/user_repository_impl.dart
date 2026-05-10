@@ -85,6 +85,7 @@ class UserRepositoryImpl implements IUserRepository {
     required int correctAnswers,
     required int totalQuestions,
     required int tourElapsedSeconds,
+    bool isTourComplete = false,
   }) => _progress.registerQuizCompletion(
     uid: uid,
     poiId: poiId,
@@ -92,6 +93,7 @@ class UserRepositoryImpl implements IUserRepository {
     correctAnswers: correctAnswers,
     totalQuestions: totalQuestions,
     tourElapsedSeconds: tourElapsedSeconds,
+    isTourComplete: isTourComplete,
   );
 
   @override

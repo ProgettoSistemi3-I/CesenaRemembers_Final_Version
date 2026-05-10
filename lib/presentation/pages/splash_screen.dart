@@ -43,8 +43,8 @@ class _SplashScreenState extends State<SplashScreen>
         // pushReplacement "distrugge" lo splash screen, così l'utente non può tornarci premendo "Indietro"
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const AuthGate(),
-            transitionsBuilder: (_, animation, __, child) {
+            pageBuilder: (_, _, _) => const AuthGate(),
+            transitionsBuilder: (_, animation, _, child) {
               return FadeTransition(
                 opacity: animation,
                 child: child,

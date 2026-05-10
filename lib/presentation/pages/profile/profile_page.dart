@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../domain/entities/userprofile.dart';
 
+import '../../../domain/services/achievement_service.dart';
+
 import '../../../domain/validation/profile_validation.dart';
 
 import '../../../injection_container.dart';
@@ -162,6 +164,14 @@ class _ProfilePageState extends State<ProfilePage>
     }
   }
 
+  String _formatTime(int seconds) {
+    final h = seconds ~/ 3600;
+    final m = (seconds % 3600) ~/ 60;
+    final s = seconds % 60;
+    if (h > 0) return '${h}h ${m}m';
+    return '${m}m ${s}s';
+  }
+
   // --- AMICIZIE E NOTIFICHE ---
 
   void _showFriendsList(UserProfile profile, ThemeData theme) async {
@@ -316,7 +326,8 @@ class _ProfilePageState extends State<ProfilePage>
 
                   return Container(
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceVariant.withValues(alpha: 0.3),
+                      color: theme.colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.3),
 
                       borderRadius: BorderRadius.circular(20),
 
@@ -338,7 +349,9 @@ class _ProfilePageState extends State<ProfilePage>
                           shape: BoxShape.circle,
 
                           border: Border.all(
-                            color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                            color: theme.colorScheme.primary.withValues(
+                              alpha: 0.2,
+                            ),
 
                             width: 2,
                           ),
@@ -507,7 +520,7 @@ class _ProfilePageState extends State<ProfilePage>
                           children: [
                             Container(
                               decoration: BoxDecoration(
-                                color: theme.colorScheme.surfaceVariant
+                                color: theme.colorScheme.surfaceContainerHighest
                                     .withValues(alpha: 0.4),
 
                                 shape: BoxShape.circle,
@@ -590,9 +603,9 @@ class _ProfilePageState extends State<ProfilePage>
 
                             points: profile.xp.toString(),
 
-                            level: profile.level.toString(),
-
                             friendsCount: profile.friends.length.toString(),
+
+                            toursCount: profile.totalToursCompleted.toString(),
 
                             onAvatarTap: () async {
                               await _showAvatarPicker();
@@ -638,71 +651,52 @@ class _ProfilePageState extends State<ProfilePage>
 
                             mainAxisSpacing: 16,
 
-                            childAspectRatio:
-                                1.4, // Card leggermente più alte per un look arioso
+                            childAspectRatio: 1.4,
 
                             children: [
                               _StatCard(
-                                icon: Icons
-                                    .emoji_events_outlined, // Icona aggiornata
-
-                                label: 'Traguardi',
-
-                                value: '${profile.achievementsCount}',
-
+                                icon: Icons.bolt_rounded,
+                                label: 'XP Totali',
+                                value: '${profile.xp}',
                                 color: AppPalette.olive,
                               ),
 
                               _StatCard(
-                                icon: Icons.speed_rounded,
-
-                                label: 'Miglior punteggio',
-
-                                value: '${profile.maxQuizScore}%',
-
+                                icon: Icons.emoji_events_outlined,
+                                label: 'Miglior tour (XP)',
+                                value: profile.maxSingleTourXp > 0
+                                    ? '${profile.maxSingleTourXp}'
+                                    : '--',
                                 color: AppPalette.tan,
                               ),
 
                               _StatCard(
                                 icon: Icons.map_outlined,
-
                                 label: 'Siti Visitati',
-
                                 value: '${profile.visitedCount}',
-
                                 color: AppPalette.moss,
                               ),
 
                               _StatCard(
-                                icon: Icons
-                                    .psychology_outlined, // Icona più pertinente al quiz
-
-                                label: 'Quiz Superati',
-
-                                value: '${profile.totalQuizCompleted}',
-
+                                icon: Icons.route_rounded,
+                                label: 'Tour Completati',
+                                value: '${profile.totalToursCompleted}',
                                 color: AppPalette.tan,
                               ),
 
                               _StatCard(
                                 icon: Icons.timer_outlined,
-
                                 label: 'Miglior tempo',
-
                                 value: profile.bestTourTimeSeconds > 0
-                                    ? '${profile.bestTourTimeSeconds ~/ 60}m ${profile.bestTourTimeSeconds % 60}s'
+                                    ? _formatTime(profile.bestTourTimeSeconds)
                                     : '--',
-
                                 color: AppPalette.olive,
                               ),
 
                               _StatCard(
-                                icon: Icons.check_circle_outline_rounded,
-
-                                label: 'Risposte esatte',
-
-                                value: '${profile.totalCorrectAnswers}',
-
+                                icon: Icons.military_tech_rounded,
+                                label: 'Achievement',
+                                value: '${profile.achievementsCount}',
                                 color: AppPalette.moss,
                               ),
                             ],
@@ -710,13 +704,15 @@ class _ProfilePageState extends State<ProfilePage>
 
                           const SizedBox(height: 36),
 
-                          const _SectionLabel('Ultimi badge'),
+                          const _SectionLabel('Achievement'),
 
                           const SizedBox(height: 16),
 
-                          _BadgesRow(),
+                          _AchievementsGrid(
+                            unlockedIds: profile.unlockedAchievements,
+                          ),
 
-                          const SizedBox(height: 48), // Padding finale generoso
+                          const SizedBox(height: 48),
                         ],
                       ),
                     ),

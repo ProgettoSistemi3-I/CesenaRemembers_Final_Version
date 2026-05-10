@@ -15,6 +15,7 @@ class UserProgressUseCases {
     required int correctAnswers,
     required int totalQuestions,
     required int tourElapsedSeconds,
+    bool isTourComplete = false,
   }) => _repository.registerQuizCompletion(
     uid: uid,
     poiId: poiId,
@@ -22,5 +23,6 @@ class UserProgressUseCases {
     correctAnswers: correctAnswers,
     totalQuestions: totalQuestions,
     tourElapsedSeconds: tourElapsedSeconds,
+    isTourComplete: isTourComplete,
   );
 }
