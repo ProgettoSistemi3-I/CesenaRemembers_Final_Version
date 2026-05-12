@@ -152,6 +152,33 @@ class SocialController extends ChangeNotifier {
     });
   }
 
+
+  Future<void> _tryResolveIncomingRequest({
+    required bool accept,
+    required String currentUid,
+    required String targetUid,
+  }) async {
+    Future<void> runPrimary() {
+      if (accept) {
+        return _socialUseCases.acceptFriendRequest(currentUid, targetUid);
+      }
+      return _socialUseCases.rejectFriendRequest(currentUid, targetUid);
+    }
+
+    Future<void> runFallback() {
+      if (accept) {
+        return _socialUseCases.acceptFriendRequest(targetUid, currentUid);
+      }
+      return _socialUseCases.rejectFriendRequest(targetUid, currentUid);
+    }
+
+    try {
+      await runPrimary();
+    } catch (_) {
+      await runFallback();
+    }
+  }
+
   @override
   void dispose() {
     _isDisposed = true;
@@ -178,10 +205,18 @@ class SocialController extends ChangeNotifier {
           await _socialUseCases.cancelFriendRequest(cUid, targetUid);
           break;
         case 'accept':
-          await _socialUseCases.acceptFriendRequest(cUid, targetUid);
+          await _tryResolveIncomingRequest(
+            accept: true,
+            currentUid: cUid,
+            targetUid: targetUid,
+          );
           break;
         case 'reject':
-          await _socialUseCases.rejectFriendRequest(cUid, targetUid);
+          await _tryResolveIncomingRequest(
+            accept: false,
+            currentUid: cUid,
+            targetUid: targetUid,
+          );
           break;
         case 'remove':
           await _socialUseCases.removeFriend(cUid, targetUid);
