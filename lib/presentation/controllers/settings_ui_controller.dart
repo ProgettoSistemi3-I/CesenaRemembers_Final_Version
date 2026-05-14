@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../services/locale_preference_store.dart';
+
 class SettingsUiController extends ChangeNotifier {
   SettingsUiController(this._localeNotifier)
     : selectedLanguage = _localeNotifier.value.languageCode == 'en'
@@ -10,10 +12,12 @@ class SettingsUiController extends ChangeNotifier {
   final ValueNotifier<Locale> _localeNotifier;
   String selectedLanguage;
 
-  void setLanguage(String value) {
+  Future<void> setLanguage(String value) async {
     if (selectedLanguage == value) return;
     selectedLanguage = value;
-    _localeNotifier.value = Locale(value == 'English' ? 'en' : 'it');
+    final locale = Locale(value == 'English' ? 'en' : 'it');
+    _localeNotifier.value = locale;
+    await LocalePreferenceStore.saveLocale(locale);
     notifyListeners();
   }
 }

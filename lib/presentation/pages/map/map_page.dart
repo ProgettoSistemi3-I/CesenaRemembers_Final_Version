@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cesena_remembers/l10n/app_localizations.dart';
 import 'package:cesena_remembers/l10n/l10n_extensions.dart';
-
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_cache/flutter_map_cache.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
@@ -80,6 +79,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   bool _isCheckingLocation = true;
   bool _isCenteringOnUser = false;
   bool _isSavingQuizResult = false;
+  Locale? _lastLocale;
 
   List<Poi> _pois = [];
   List<Marker> _markers = const [];
@@ -136,6 +136,20 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     _tourController.dispose();
     _mapController.dispose();
     super.dispose();
+  }
+  
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final locale = Localizations.localeOf(context);
+    if (_lastLocale == locale) return;
+    _lastLocale = locale;
+
+    if (_pois.isNotEmpty) {
+      setState(() {
+        _markers = _buildMarkers(_pois);
+      });
+    }
   }
 
   @override

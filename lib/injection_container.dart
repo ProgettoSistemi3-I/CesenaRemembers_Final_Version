@@ -22,6 +22,7 @@ import 'presentation/theme/theme_controller.dart';
 import 'presentation/controllers/poi_quiz_controller.dart';
 // 🔴 IMPORT AGGIUNTO
 import 'presentation/controllers/settings_ui_controller.dart'; 
+import 'presentation/services/locale_preference_store.dart';
 
 final sl = GetIt.instance;
 
@@ -81,8 +82,9 @@ Future<void> init() async {
   
   // 1. Prima registriamo il ValueNotifier (perché serve al SettingsUiController)
   if (!sl.isRegistered<ValueNotifier<Locale>>()) {
+    final initialLocale = await LocalePreferenceStore.loadLocale();
     sl.registerLazySingleton<ValueNotifier<Locale>>(
-      () => ValueNotifier<Locale>(const Locale('it')),
+      () => ValueNotifier<Locale>(initialLocale),
     );
   }
 
