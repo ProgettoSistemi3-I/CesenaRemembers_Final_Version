@@ -568,6 +568,39 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Order stops'**
   String get tourOrderButton;
+
+  String get tourStartButton;
+  String get tourArrivedTapOpen;
+  String get tourStopShort;
+  String get currentLabel;
+  String get firstTourStop;
+  String get fromPrevious;
+  String get takeQuizThisStop;
+  String get noQuizForStop;
+  String get questionLabel;
+  String get ofLabel;
+  String get finishQuiz;
+  String get quizNotice;
+  String get nextQuestion;
+  String get offlineRetry;
+  String get loginRetrySoon;
+  String get loginCheckConnection;
+  String get statisticsLabel;
+  String get totalXp;
+  String get bestTourXp;
+  String get visitedSites;
+  String get bestTime;
+  String get achievementsLabel;
+
+  String get noLeaderboardUsers;
+  String get noUsersFound;
+  String get operationFailedRestored;
+  String get detailedStats;
+  String get bestScore;
+  String get fundingLabel;
+  String get fundingSubtitle;
+  String get missingPermissions;
+  String get nextStop;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

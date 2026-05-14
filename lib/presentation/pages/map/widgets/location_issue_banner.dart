@@ -64,7 +64,7 @@ class LocationIssueBanner extends StatelessWidget {
                     Text(
                       isGpsEnabled
                           ? (isGpsPreferenceEnabled
-                                ? 'Permessi mancanti'
+                                ? AppLocalizations.of(context)!.missingPermissions
                                 : AppLocalizations.of(
                                     context,
                                   )!.locationDisabled)

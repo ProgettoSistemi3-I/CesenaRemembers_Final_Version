@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_palette.dart';
+import '../../l10n/app_localizations.dart';
 
 class CreditsPage extends StatelessWidget {
   const CreditsPage({super.key});
@@ -16,7 +17,7 @@ class CreditsPage extends StatelessWidget {
         elevation: 0,
         centerTitle: false,
         title: Text(
-          'Riconoscimenti',
+          AppLocalizations.of(context)!.creditsPageTitle,
           style: TextStyle(
             color: theme.colorScheme.onSurface,
             fontWeight: FontWeight.w800,
@@ -59,7 +60,7 @@ class CreditsPage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Realizzato con passione per preservare la memoria storica della nostra città.',
+            AppLocalizations.of(context)!.creditsAppDescription,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 15,
@@ -70,15 +71,15 @@ class CreditsPage extends StatelessWidget {
           const SizedBox(height: 48),
 
           // 🔴 NUOVA SEZIONE: FINANZIAMENTO
-          const _SectionLabel('Finanziamento'),
+          _SectionLabel(AppLocalizations.of(context)!.fundingLabel),
           const SizedBox(height: 16),
           _CreditsCard(
             children: [
               _CreditRow(
                 imageAsset: 'assets/icon/diplo_logo.png', // <-- Assicurati di avere l'immagine qui
                 fallbackIcon: Icons.public,
-                title: 'Rappresentanze Diplomatiche Tedesche in Italia',
-                subtitle: 'Sviluppato grazie al loro prezioso contributo',
+                title: Localizations.localeOf(context).languageCode == 'it' ? 'Rappresentanze Diplomatiche Tedesche in Italia' : 'German Diplomatic Missions in Italy',
+                subtitle: AppLocalizations.of(context)!.fundingSubtitle,
                 accent: AppPalette.tan,
                 onTap: () => launchUrl(
                   Uri.parse('https://italien.diplo.de/it-it'),

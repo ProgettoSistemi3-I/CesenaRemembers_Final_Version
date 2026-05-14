@@ -637,7 +637,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                           const SizedBox(height: 32),
 
-                          const _SectionLabel('Statistiche'),
+                          _SectionLabel(AppLocalizations.of(context)!.statisticsLabel),
 
                           const SizedBox(height: 16),
 
@@ -657,14 +657,14 @@ class _ProfilePageState extends State<ProfilePage>
                             children: [
                               _StatCard(
                                 icon: Icons.bolt_rounded,
-                                label: 'XP Totali',
+                                label: AppLocalizations.of(context)!.totalXp,
                                 value: '${profile.xp}',
                                 color: AppPalette.olive,
                               ),
 
                               _StatCard(
                                 icon: Icons.emoji_events_outlined,
-                                label: 'Miglior tour (XP)',
+                                label: AppLocalizations.of(context)!.bestTourXp,
                                 value: profile.maxSingleTourXp > 0
                                     ? '${profile.maxSingleTourXp}'
                                     : '--',
@@ -673,7 +673,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                               _StatCard(
                                 icon: Icons.map_outlined,
-                                label: 'Siti Visitati',
+                                label: AppLocalizations.of(context)!.visitedSites,
                                 value: '${profile.visitedCount}',
                                 color: AppPalette.moss,
                               ),
@@ -687,7 +687,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                               _StatCard(
                                 icon: Icons.timer_outlined,
-                                label: 'Miglior tempo',
+                                label: AppLocalizations.of(context)!.bestTime,
                                 value: profile.bestTourTimeSeconds > 0
                                     ? _formatTime(profile.bestTourTimeSeconds)
                                     : '--',
@@ -696,7 +696,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                               _StatCard(
                                 icon: Icons.military_tech_rounded,
-                                label: 'Achievement',
+                                label: AppLocalizations.of(context)!.achievementsLabel,
                                 value: '${profile.achievementsCount}',
                                 color: AppPalette.moss,
                               ),
@@ -705,7 +705,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                           const SizedBox(height: 36),
 
-                          const _SectionLabel('Achievement'),
+                          _SectionLabel(AppLocalizations.of(context)!.achievementsLabel),
 
                           const SizedBox(height: 16),
 

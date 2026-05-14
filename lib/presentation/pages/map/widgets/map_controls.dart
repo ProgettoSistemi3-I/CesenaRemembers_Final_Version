@@ -178,7 +178,7 @@ class StartTourButton extends StatelessWidget {
             Icon(Icons.explore_outlined, color: Colors.white, size: 22),
             SizedBox(width: 10),
             Text(
-              'Inizia il tour',
+              AppLocalizations.of(context)!.tourStartButton,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,
@@ -387,8 +387,8 @@ class NextStopCard extends StatelessWidget {
                       Flexible(
                         child: Text(
                           arrived
-                              ? 'Sei arrivato! Tocca per aprire'
-                              : '${formatDistance(distanceMeters)} · tappa ${stopIndex + 1}/$totalStops',
+                              ? AppLocalizations.of(context)!.tourArrivedTapOpen
+                              : '${formatDistance(distanceMeters)} · ${AppLocalizations.of(context)!.tourStopShort} ${stopIndex + 1}/$totalStops',
                           style: TextStyle(
                             fontSize: 11.5,
                             color: arrived
@@ -601,7 +601,7 @@ class TourPlanSheet extends StatelessWidget {
                                         borderRadius: BorderRadius.circular(99),
                                       ),
                                       child: const Text(
-                                        'Attuale',
+                                        AppLocalizations.of(context)!.currentLabel,
                                         style: TextStyle(
                                           color: AppPalette.olive,
                                           fontSize: 10.5,
@@ -614,8 +614,8 @@ class TourPlanSheet extends StatelessWidget {
                               const SizedBox(height: 4),
                               Text(
                                 legDistance == null
-                                    ? 'Prima tappa del tour'
-                                    : '${formatDistance(legDistance)} dalla precedente',
+                                    ? AppLocalizations.of(context)!.firstTourStop
+                                    : '${formatDistance(legDistance)} ${AppLocalizations.of(context)!.fromPrevious}',
                                 style: TextStyle(
                                   color: theme.colorScheme.onSurfaceVariant,
                                   fontSize: 12,

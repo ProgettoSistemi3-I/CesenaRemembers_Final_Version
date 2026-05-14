@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cesena_remembers/l10n/app_localizations.dart';
 import '../../../injection_container.dart';
 import '../../controllers/social_controller.dart';
 import '../../services/shell_navigation_store.dart';
@@ -150,7 +151,7 @@ class _SocialPageState extends State<SocialPage> {
     if (_controller.leaderboard.isEmpty) {
       return Center(
         child: Text(
-          'Nessun utente in classifica al momento.',
+          AppLocalizations.of(context)!.noLeaderboardUsers,
           style: TextStyle(
             color: theme.colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w600,
@@ -408,7 +409,7 @@ class _SocialPageState extends State<SocialPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Nessun utente trovato.',
+              AppLocalizations.of(context)!.noUsersFound,
               style: TextStyle(
                 color: theme.colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,

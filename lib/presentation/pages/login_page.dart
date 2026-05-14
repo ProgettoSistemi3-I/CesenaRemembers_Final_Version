@@ -88,7 +88,7 @@ class _LoginPageState extends State<LoginPage>
       if (!mounted) return;
       setState(
         () => _error =
-            'Accesso non riuscito. Controlla la connessione e riprova.',
+            AppLocalizations.of(context)!.loginCheckConnection,
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -98,9 +98,9 @@ class _LoginPageState extends State<LoginPage>
   String _mapAuthErrorMessage(FirebaseAuthException exception) {
     switch (exception.code) {
       case 'network-request-failed':
-        return 'Sei offline. Controlla la connessione Internet e riprova.';
+        return AppLocalizations.of(context)!.offlineRetry;
       default:
-        return 'Accesso non riuscito. Riprova tra qualche secondo.';
+        return AppLocalizations.of(context)!.loginRetrySoon;
     }
   }
 

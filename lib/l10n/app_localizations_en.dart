@@ -250,4 +250,76 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tourOrderButton => 'Order stops';
+
+  @override
+  String get tourStartButton => 'Start tour';
+  @override
+  String get tourArrivedTapOpen => 'You arrived! Tap to open';
+  @override
+  String get tourStopShort => 'stop';
+  @override
+  String get currentLabel => 'Current';
+  @override
+  String get firstTourStop => 'First tour stop';
+  @override
+  String get fromPrevious => 'from previous';
+  @override
+  String get takeQuizThisStop => 'Take the quiz for this stop →';
+  @override
+  String get noQuizForStop => 'No quiz available for this stop.';
+  @override
+  String get questionLabel => 'Question';
+  @override
+  String get ofLabel => 'of';
+  @override
+  String get finishQuiz => 'Finish quiz →';
+  @override
+  String get quizNotice => 'Quiz notice';
+  @override
+  String get nextQuestion => 'Next question →';
+  @override
+  String get offlineRetry => 'You are offline. Check your Internet connection and try again.';
+  @override
+  String get loginRetrySoon => 'Sign-in failed. Try again in a few seconds.';
+  @override
+  String get loginCheckConnection => 'Sign-in failed. Check your connection and try again.';
+  @override
+  String get statisticsLabel => 'Statistics';
+  @override
+  String get totalXp => 'Total XP';
+  @override
+  String get bestTourXp => 'Best tour (XP)';
+  @override
+  String get visitedSites => 'Visited Sites';
+  @override
+  String get bestTime => 'Best Time';
+  @override
+  String get achievementsLabel => 'Achievements';
+
+  @override
+  String get noLeaderboardUsers => 'No users in leaderboard yet.';
+
+  @override
+  String get noUsersFound => 'No users found.';
+
+  @override
+  String get operationFailedRestored => 'Operation failed. State restored.';
+
+  @override
+  String get detailedStats => 'Detailed Statistics';
+
+  @override
+  String get bestScore => 'Best Score';
+
+  @override
+  String get fundingLabel => 'Funding';
+
+  @override
+  String get fundingSubtitle => 'Developed thanks to their valuable support';
+
+  @override
+  String get missingPermissions => 'Missing permissions';
+
+  @override
+  String get nextStop => 'Next stop →';
 }

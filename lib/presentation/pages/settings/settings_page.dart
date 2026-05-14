@@ -204,7 +204,7 @@ class _SettingsPageState extends State<SettingsPage>
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       builder: (_) => _ChoiceSheet(
-        title: 'Lingua',
+        title: AppLocalizations.of(context)!.languageTitle,
         options: const ['Italiano', 'English'],
         selected: _uiController.selectedLanguage,
         onSelect: _uiController.setLanguage,
@@ -285,7 +285,7 @@ class _SettingsPageState extends State<SettingsPage>
         content: Text(
           deleted
               ? 'Account eliminato definitivamente.'
-              : 'Impossibile completare ora. Controlla il messaggio di errore.',
+              : AppLocalizations.of(context)!.deleteAccountFailure,
         ),
         backgroundColor: deleted ? AppPalette.olive : AppPalette.danger,
         behavior: SnackBarBehavior.floating,
@@ -413,7 +413,7 @@ class _SettingsPageState extends State<SettingsPage>
                         children: [
                           const SizedBox(height: 16),
                           const _HeaderCard(
-                            title: 'Tour interattivo WWII',
+                            title: AppLocalizations.of(context)!.settingsHeaderTitle,
                             subtitle:
                                 'Gestisci privacy, notifiche e lingua in un unico posto.',
                             icon: Icons.tour_outlined,
@@ -427,7 +427,7 @@ class _SettingsPageState extends State<SettingsPage>
                             children: [
                               _ActionRow(
                                 icon: Icons.stars_rounded,
-                                title: 'Crediti e Riconoscimenti',
+                                title: AppLocalizations.of(context)!.creditsTitle,
                                 subtitle:
                                     'Scopri il team dietro Cesena Remembers',
                                 accent: AppPalette.olive,
@@ -497,7 +497,7 @@ class _SettingsPageState extends State<SettingsPage>
                               const _ThinDivider(),
                               _SwitchRow(
                                 icon: Icons.dark_mode_outlined,
-                                title: 'Modalità Notte',
+                                title: AppLocalizations.of(context)!.darkModeTitle,
                                 subtitle: 'Tema scuro per l\'intera app',
                                 accent: AppPalette.olive,
                                 value: _controller.modalitaNotte,
@@ -549,7 +549,7 @@ class _SettingsPageState extends State<SettingsPage>
                             children: [
                               _ActionRow(
                                 icon: Icons.language,
-                                title: 'Lingua',
+                                title: AppLocalizations.of(context)!.languageTitle,
                                 subtitle: _uiController.selectedLanguage,
                                 accent: AppPalette.olive,
                                 onTap: _showLanguagePicker,
@@ -565,19 +565,19 @@ class _SettingsPageState extends State<SettingsPage>
                             children: [
                               _ActionRow(
                                 icon: Icons.info_outline,
-                                title: 'Versione',
+                                title: AppLocalizations.of(context)!.versionTitle,
                                 subtitle: '1.0.0',
                                 accent: AppPalette.moss,
                                 onTap: () => _showActionSheet(
-                                  'Versione app',
+                                  AppLocalizations.of(context)!.versionSheetTitle,
                                   'Build number: 1.0.0',
                                 ),
                               ),
                               const _ThinDivider(),
                               _ActionRow(
                                 icon: Icons.description_outlined,
-                                title: 'Termini di servizio',
-                                subtitle: 'Regole d’uso e responsabilità',
+                                title: AppLocalizations.of(context)!.termsTitle,
+                                subtitle: AppLocalizations.of(context)!.termsSubtitle,
                                 accent: AppPalette.olive,
                                 onTap: () => launchUrl(
                                   Uri.parse(
@@ -588,11 +588,11 @@ class _SettingsPageState extends State<SettingsPage>
                               const _ThinDivider(),
                               _ActionRow(
                                 icon: Icons.mail_outline,
-                                title: 'Contatti',
+                                title: AppLocalizations.of(context)!.contactsTitle,
                                 subtitle: 'cesenaremembers@gmail.com',
                                 accent: AppPalette.tan,
                                 onTap: () => _showActionSheet(
-                                  'Contatti',
+                                  AppLocalizations.of(context)!.contactsTitle,
                                   'cesenaremembers@gmail.com',
                                 ),
                               ),

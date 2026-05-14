@@ -310,7 +310,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                                   ),
                                   SizedBox(width: 8),
                                   Text(
-                                    'Fai il quiz su questa tappa →',
+                                    AppLocalizations.of(context)!.takeQuizThisStop,
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: AppPalette.tan,
@@ -377,7 +377,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
       return Column(
         children: [
           Text(
-            'Nessun quiz disponibile per questa tappa.',
+            AppLocalizations.of(context)!.noQuizForStop,
             style: TextStyle(
               fontSize: 14,
               color: theme.colorScheme.onSurfaceVariant,
@@ -413,7 +413,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         Row(
           children: [
             Text(
-              'Domanda ${quizController.questionIndex + 1} di ${quizController.totalQuestions}',
+              '${AppLocalizations.of(context)!.questionLabel} ${quizController.questionIndex + 1} ${AppLocalizations.of(context)!.ofLabel} ${quizController.totalQuestions}',
               style: TextStyle(
                 fontSize: 12,
                 color: theme.colorScheme.onSurfaceVariant,
@@ -559,7 +559,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                 ),
                 child: const Center(
                   child: Text(
-                    'Prossima domanda →',
+                    AppLocalizations.of(context)!.nextQuestion,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -585,7 +585,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                 ),
                 child: const Center(
                   child: Text(
-                    'Termina quiz →',
+                    AppLocalizations.of(context)!.finishQuiz,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -622,7 +622,7 @@ class _QuizFallbackBanner extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Avviso quiz',
+            AppLocalizations.of(context)!.quizNotice,
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
@@ -760,7 +760,7 @@ class NextStopActionButton extends StatelessWidget {
             Icon(Icons.directions_walk, color: Colors.white, size: 20),
             SizedBox(width: 10),
             Text(
-              'Prossima tappa →',
+              AppLocalizations.of(context)!.nextStop,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 15,

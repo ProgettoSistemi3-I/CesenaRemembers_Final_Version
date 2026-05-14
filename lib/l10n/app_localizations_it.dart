@@ -250,4 +250,76 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get tourOrderButton => 'Ordina tappe';
+
+  @override
+  String get tourStartButton => 'Inizia il tour';
+  @override
+  String get tourArrivedTapOpen => 'Sei arrivato! Tocca per aprire';
+  @override
+  String get tourStopShort => 'tappa';
+  @override
+  String get currentLabel => 'Attuale';
+  @override
+  String get firstTourStop => 'Prima tappa del tour';
+  @override
+  String get fromPrevious => 'dalla precedente';
+  @override
+  String get takeQuizThisStop => 'Fai il quiz su questa tappa →';
+  @override
+  String get noQuizForStop => 'Nessun quiz disponibile per questa tappa.';
+  @override
+  String get questionLabel => 'Domanda';
+  @override
+  String get ofLabel => 'di';
+  @override
+  String get finishQuiz => 'Termina quiz →';
+  @override
+  String get quizNotice => 'Avviso quiz';
+  @override
+  String get nextQuestion => 'Prossima domanda →';
+  @override
+  String get offlineRetry => 'Sei offline. Controlla la connessione Internet e riprova.';
+  @override
+  String get loginRetrySoon => 'Accesso non riuscito. Riprova tra qualche secondo.';
+  @override
+  String get loginCheckConnection => 'Accesso non riuscito. Controlla la connessione e riprova.';
+  @override
+  String get statisticsLabel => 'Statistiche';
+  @override
+  String get totalXp => 'XP Totali';
+  @override
+  String get bestTourXp => 'Miglior tour (XP)';
+  @override
+  String get visitedSites => 'Siti Visitati';
+  @override
+  String get bestTime => 'Miglior tempo';
+  @override
+  String get achievementsLabel => 'Achievement';
+
+  @override
+  String get noLeaderboardUsers => 'Nessun utente in classifica al momento.';
+
+  @override
+  String get noUsersFound => 'Nessun utente trovato.';
+
+  @override
+  String get operationFailedRestored => 'Operazione non riuscita. Stato ripristinato.';
+
+  @override
+  String get detailedStats => 'Statistiche Dettagliate';
+
+  @override
+  String get bestScore => 'Miglior Score';
+
+  @override
+  String get fundingLabel => 'Finanziamento';
+
+  @override
+  String get fundingSubtitle => 'Sviluppato grazie al loro prezioso contributo';
+
+  @override
+  String get missingPermissions => 'Permessi mancanti';
+
+  @override
+  String get nextStop => 'Prossima tappa →';
 }

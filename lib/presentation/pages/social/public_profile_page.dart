@@ -135,7 +135,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Operazione non riuscita. Stato ripristinato.'),
+        content: Text(AppLocalizations.of(context)!.operationFailedRestored),
 
         backgroundColor: AppPalette.danger,
 
@@ -233,7 +233,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
               Expanded(
                 child: Center(
                   child: Text(
-                    'Nessun utente trovato.',
+                    AppLocalizations.of(context)!.noUsersFound,
 
                     style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
                   ),
@@ -814,7 +814,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
 
             const SizedBox(height: 32),
 
-            const _SectionLabel('Statistiche Dettagliate'),
+            _SectionLabel(AppLocalizations.of(context)!.detailedStats),
 
             const SizedBox(height: 16),
 
@@ -846,7 +846,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                 ),
 
                 _buildStatCard(
-                  'Miglior Score',
+                  AppLocalizations.of(context)!.bestScore,
 
                   '${profile.maxQuizScore}%',
 
@@ -882,7 +882,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                 ),
 
                 _buildStatCard(
-                  'Tempo Migliore',
+                  AppLocalizations.of(context)!.bestTime,
 
                   bestTourTimeLabel,
 
