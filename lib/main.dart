@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'firebase_options.dart';
 import 'injection_container.dart' as di;
@@ -31,9 +32,10 @@ class CesenaRemembersApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeCtrl = di.sl<ThemeController>();
+    final localeNotifier = di.sl<ValueNotifier<Locale>>();
 
     return ListenableBuilder(
-      listenable: themeCtrl,
+      listenable: Listenable.merge([themeCtrl, localeNotifier]),
       builder: (context, _) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -41,6 +43,9 @@ class CesenaRemembersApp extends StatelessWidget {
           themeMode: themeCtrl.themeMode,
           theme: AppPalette.lightTheme,
           darkTheme: AppPalette.darkTheme,
+          locale: localeNotifier.value,
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
           home: const SplashScreen(),
         );
       },

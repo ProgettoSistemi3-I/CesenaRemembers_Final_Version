@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../domain/usecases/auth_use_cases.dart';
@@ -51,7 +52,7 @@ class _SettingsPageState extends State<SettingsPage>
     );
 
     _controller.addListener(_onControllerError);
-    _uiController = SettingsUiController();
+    _uiController = SettingsUiController(sl<ValueNotifier<Locale>>());
     // Animazioni
     _animCtrl = AnimationController(
       vsync: this,
@@ -186,8 +187,8 @@ class _SettingsPageState extends State<SettingsPage>
                   elevation: 0,
                 ),
                 onPressed: () => Navigator.pop(context),
-                child: const Text(
-                  'Chiudi',
+                child: Text(
+                  AppLocalizations.of(context)!.buttonClose,
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -206,7 +207,7 @@ class _SettingsPageState extends State<SettingsPage>
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       builder: (_) => _ChoiceSheet(
-        title: 'Lingua',
+        title: AppLocalizations.of(context)!.languageTitle,
         options: const ['Italiano', 'English'],
         selected: _uiController.selectedLanguage,
         onSelect: _uiController.setLanguage,
@@ -228,7 +229,7 @@ class _SettingsPageState extends State<SettingsPage>
           ),
         ),
         title: Text(
-          'Eliminare account?',
+          AppLocalizations.of(context)!.deleteAccountDialogTitle,
           style: TextStyle(
             fontWeight: FontWeight.w800,
             fontSize: 20,
@@ -236,7 +237,7 @@ class _SettingsPageState extends State<SettingsPage>
           ),
         ),
         content: Text(
-          'Questa operazione rimuove account, progressi e dati associati in modo permanente.',
+          AppLocalizations.of(context)!.deleteAccountDialogBody,
           style: TextStyle(
             color: theme.colorScheme.onSurfaceVariant,
             height: 1.5,
@@ -250,8 +251,8 @@ class _SettingsPageState extends State<SettingsPage>
             style: TextButton.styleFrom(
               foregroundColor: theme.colorScheme.onSurfaceVariant,
             ),
-            child: const Text(
-              'Annulla',
+            child: Text(
+              AppLocalizations.of(context)!.buttonCancel,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -268,8 +269,8 @@ class _SettingsPageState extends State<SettingsPage>
               Navigator.pop(context);
               _deleteAccount();
             },
-            child: const Text(
-              'Elimina',
+            child: Text(
+              AppLocalizations.of(context)!.buttonDelete,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -286,8 +287,8 @@ class _SettingsPageState extends State<SettingsPage>
       SnackBar(
         content: Text(
           deleted
-              ? 'Account eliminato definitivamente.'
-              : 'Impossibile completare ora. Controlla il messaggio di errore.',
+              ? AppLocalizations.of(context)!.deleteAccountSuccess
+              : AppLocalizations.of(context)!.deleteAccountFailure,
         ),
         backgroundColor: deleted ? AppPalette.olive : AppPalette.danger,
         behavior: SnackBarBehavior.floating,
@@ -551,7 +552,7 @@ class _SettingsPageState extends State<SettingsPage>
                             children: [
                               _ActionRow(
                                 icon: Icons.language,
-                                title: 'Lingua',
+                                title: AppLocalizations.of(context)!.languageTitle,
                                 subtitle: _uiController.selectedLanguage,
                                 accent: AppPalette.olive,
                                 onTap: _showLanguagePicker,

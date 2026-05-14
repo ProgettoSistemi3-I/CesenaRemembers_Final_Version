@@ -67,7 +67,7 @@ extension _MapPageTourActions on _MapPageState {
     _tourController.stopTour();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Tour interrotto.'),
+        content: Text(AppLocalizations.of(context)!.tourStopped),
         backgroundColor: AppPalette.danger,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -230,9 +230,7 @@ extension _MapPageTourActions on _MapPageState {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text(
-            'Errore nel salvataggio del punteggio. Riprova tra poco.',
-          ),
+          content: Text(AppLocalizations.of(context)!.errorSaveScore),
           backgroundColor: AppPalette.danger,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
