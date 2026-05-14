@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:cesena_remembers/l10n/app_localizations.dart';
+import 'package:cesena_remembers/l10n/l10n_extensions.dart';
 import '../../../../domain/entities/tour_stop.dart';
 import '../../../theme/app_palette.dart';
 import '../../../services/tour_formatters.dart';
@@ -366,7 +367,7 @@ class NextStopCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    stop.name,
+                    AppLocalizations.of(context)!.getPoiName(stop.id),
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -586,7 +587,9 @@ class TourPlanSheet extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      stop.name,
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.getPoiName(stop.id),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(

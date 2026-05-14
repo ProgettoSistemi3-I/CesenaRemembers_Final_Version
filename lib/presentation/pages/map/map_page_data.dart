@@ -52,10 +52,20 @@ extension _MapPageDataLogic on _MapPageState {
   // ricalcolati solo quando la lista POI cambia (o la rotazione della mappa),
   // non ad ogni tick del timer.
   List<Marker> _buildMarkers(List<Poi> pois) {
+    final l10n = AppLocalizations.of(context)!;
     return pois
         .map(
           (poi) => _poiMarkerFactory.fromPoi(
-            poi,
+            Poi(
+              id: poi.id,
+              name: l10n.getPoiName(poi.id),
+              latitude: poi.latitude,
+              longitude: poi.longitude,
+              type: poi.type,
+              period: poi.period,
+              description: poi.description,
+              questions: poi.questions,
+            ),
             counterRotationDegrees: _currentRotation,
           ),
         )
