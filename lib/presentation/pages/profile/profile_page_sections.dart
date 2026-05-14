@@ -308,7 +308,7 @@ class _HeroCard extends StatelessWidget {
                 const _VerticalDivider(),
 
                 _MiniStat(
-                  label: 'Tour',
+                  label: AppLocalizations.of(context)!.tourLabel,
 
                   value: toursCount,
 

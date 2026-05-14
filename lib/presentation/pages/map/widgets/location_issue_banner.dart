@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:cesena_remembers/l10n/app_localizations.dart';
 
 import '../../../theme/app_palette.dart';
 
@@ -63,8 +64,10 @@ class LocationIssueBanner extends StatelessWidget {
                     Text(
                       isGpsEnabled
                           ? (isGpsPreferenceEnabled
-                              ? 'Permessi mancanti'
-                              : 'Posizione disattivata')
+                                ? 'Permessi mancanti'
+                                : AppLocalizations.of(
+                                    context,
+                                  )!.locationDisabled)
                           : 'GPS Disattivato',
                       style: TextStyle(
                         fontSize: 14,

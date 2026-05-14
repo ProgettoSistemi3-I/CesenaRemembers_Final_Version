@@ -10,8 +10,8 @@ extension _MapPageTourActions on _MapPageState {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text(
-            'Per iniziare il tour attiva GPS, permessi posizione e opzione nell’app.',
+          content: Text(
+            AppLocalizations.of(context)!.tourStartGpsRequired,
           ),
           backgroundColor: AppPalette.danger,
           behavior: SnackBarBehavior.floating,
@@ -40,22 +40,22 @@ extension _MapPageTourActions on _MapPageState {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
-          title: const Text('Interrompere il tour?'),
-          content: const Text(
-            'Il tour verrà terminato e perderai l’ordine attuale delle tappe.',
+          title: Text(AppLocalizations.of(context)!.tourConfirmStopTitle),
+          content: Text(
+            AppLocalizations.of(context)!.tourConfirmStopBody,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
               child: Text(
-                'Annulla',
+                AppLocalizations.of(context)!.buttonCancel,
                 style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
               ),
             ),
             FilledButton(
               style: FilledButton.styleFrom(backgroundColor: AppPalette.danger),
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('Interrompi'),
+              child: Text(AppLocalizations.of(context)!.buttonStop),
             ),
           ],
         );
@@ -67,7 +67,7 @@ extension _MapPageTourActions on _MapPageState {
     _tourController.stopTour();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Tour interrotto.'),
+        content: Text(AppLocalizations.of(context)!.tourStopped),
         backgroundColor: AppPalette.danger,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -162,7 +162,7 @@ extension _MapPageTourActions on _MapPageState {
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text('🎉 Tour completato! Ottimo lavoro.'),
+                content: Text(AppLocalizations.of(context)!.tourCompleted),
                 backgroundColor: AppPalette.olive,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
@@ -230,9 +230,7 @@ extension _MapPageTourActions on _MapPageState {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text(
-            'Errore nel salvataggio del punteggio. Riprova tra poco.',
-          ),
+          content: Text(AppLocalizations.of(context)!.errorSaveScore),
           backgroundColor: AppPalette.danger,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(

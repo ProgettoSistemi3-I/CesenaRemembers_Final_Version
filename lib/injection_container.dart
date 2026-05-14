@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
 
@@ -91,5 +92,11 @@ Future<void> init() async {
 
   if (!sl.isRegistered<PoiQuizController>()) {
     sl.registerFactory(() => PoiQuizController(getQuizUseCase: sl()));
+  }
+
+  if (!sl.isRegistered<ValueNotifier<Locale>>()) {
+    sl.registerLazySingleton<ValueNotifier<Locale>>(
+      () => ValueNotifier<Locale>(const Locale('it')),
+    );
   }
 }

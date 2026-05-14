@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cesena_remembers/l10n/app_localizations.dart';
 import '../pages/map/map_page.dart';
 import '../pages/profile/profile_page.dart';
 import '../pages/settings/settings_page.dart';
@@ -53,11 +54,11 @@ class _MainShellState extends State<MainShell> {
         currentIndex: _currentIndex,
         onTap: _onTapBottomBar,
         type: BottomNavigationBarType.fixed,
-        items: const [
+        items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.map_outlined),
             activeIcon: Icon(Icons.map),
-            label: 'Mappa',
+            label: AppLocalizations.of(context)!.navMap,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.people_outline),
@@ -67,12 +68,12 @@ class _MainShellState extends State<MainShell> {
           BottomNavigationBarItem(
             icon: Icon(Icons.emoji_events_outlined),
             activeIcon: Icon(Icons.emoji_events),
-            label: 'Profilo',
+            label: AppLocalizations.of(context)!.navProfile,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings_outlined),
             activeIcon: Icon(Icons.settings),
-            label: 'Impostazioni',
+            label: AppLocalizations.of(context)!.navSettings,
           ),
         ],
       ),

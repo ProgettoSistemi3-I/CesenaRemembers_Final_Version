@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cesena_remembers/l10n/app_localizations.dart';
 
 import '../../../../domain/entities/tour_stop.dart';
 import '../../../../injection_container.dart';
@@ -24,6 +25,7 @@ class PoiBottomSheet extends StatefulWidget {
   final int elapsedSeconds;
   final ValueChanged<QuizCompletionData> onQuizCompleted;
   final VoidCallback onNextStop;
+
   /// XP dell'utente passato dal genitore per evitare una lettura Firestore extra.
   final int userXp;
 
@@ -91,8 +93,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
       widget.onQuizCompleted(
         QuizCompletionData(
           score: quizController.score,
-          totalQuestions:
-              quizController.totalQuestions,
+          totalQuestions: quizController.totalQuestions,
         ),
       );
     }
@@ -688,7 +689,9 @@ class QuizResultCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            perfect ? 'Perfetto!' : 'Molto bravo!',
+            perfect
+                ? AppLocalizations.of(context)!.quizAnswerPerfect
+                : AppLocalizations.of(context)!.quizAnswerGood,
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w800,

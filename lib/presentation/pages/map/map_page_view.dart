@@ -151,14 +151,14 @@ extension _MapPageView on _MapPageState {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TourQuickActionButton(
-                    label: 'Interrompi tour',
+                    label: AppLocalizations.of(context)!.tourStopButton,
                     icon: Icons.stop_circle_outlined,
                     color: AppPalette.danger,
                     onTap: _confirmStopTour,
                   ),
                   const SizedBox(height: 10),
                   TourQuickActionButton(
-                    label: 'Ordina tappe',
+                    label: AppLocalizations.of(context)!.tourOrderButton,
                     icon: Icons.format_list_bulleted_rounded,
                     color: AppPalette.olive,
                     onTap: _openTourPlanSheet,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cesena_remembers/l10n/app_localizations.dart';
 
 import '../../../domain/entities/userprofile.dart';
 
@@ -583,9 +584,9 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
 
                         icon: const Icon(Icons.person_remove_rounded, size: 20),
 
-                        label: const Text(
-                          'Rimuovi amicizia',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        label: Text(
+                          AppLocalizations.of(context)!.removeFriendship,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
 
                         style: FilledButton.styleFrom(

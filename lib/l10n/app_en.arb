@@ -1,0 +1,103 @@
+{
+  "@@locale": "en",
+  "appTitle": "Cesena Remembers 1945",
+  "settingsTitle": "Settings",
+  "settingsHeaderTitle": "Interactive WWII Tour",
+  "settingsHeaderSubtitle": "Manage privacy, notifications and language in one place.",
+  "sectionCredits": "Credits",
+  "creditsTitle": "Credits & Acknowledgements",
+  "creditsSubtitle": "Discover the team behind Cesena Remembers",
+  "creditsPageTitle": "Acknowledgements",
+  "creditsAppName": "Cesena Remembers",
+  "creditsAppDescription": "Made with passion to preserve the historical memory of our city.",
+  "sectionTeam": "The Team",
+  "sectionThanks": "Thanks",
+  "creditRoleDev": "Development & Architecture",
+  "creditRoleTeacher": "Supervising Teacher",
+  "creditRoleClass": "Support & Ideation",
+  "creditSchoolSubtitle": "Visit the school website",
+  "sectionAccount": "Account",
+  "logoutTitle": "Logout",
+  "logoutSubtitle": "Sign out of the current account",
+  "loggingOut": "Signing out...",
+  "deleteAccountTitle": "Delete account",
+  "deleteAccountSubtitle": "Remove profile and associated data",
+  "deletingAccount": "Deleting...",
+  "deleteAccountDialogTitle": "Delete account?",
+  "deleteAccountDialogBody": "This action permanently removes the account, progress and all associated data.",
+  "deleteAccountSuccess": "Account permanently deleted.",
+  "deleteAccountFailure": "Could not complete now. Check the error message.",
+  "sectionPreferences": "App Preferences",
+  "notificationsTitle": "Notifications",
+  "notificationsSubtitle": "Receive alerts on stops and rewards",
+  "darkModeTitle": "Night Mode",
+  "darkModeSubtitle": "Dark theme for the entire app",
+  "sectionPrivacy": "Privacy",
+  "gpsTitle": "GPS Location",
+  "gpsSubtitle": "Required to explore the map",
+  "privacyPolicyTitle": "Privacy policy",
+  "privacyPolicySubtitle": "Read how your data is handled",
+  "gpsPermissionDenied": "Permission denied or GPS disabled. Check your phone settings.",
+  "sectionGeneral": "General",
+  "languageTitle": "Language",
+  "sectionInfo": "Info",
+  "versionTitle": "Version",
+  "versionSubtitle": "1.0.0",
+  "versionSheetTitle": "App version",
+  "versionSheetBody": "Build number: 1.0.0",
+  "termsTitle": "Terms of service",
+  "termsSubtitle": "Usage rules and responsibilities",
+  "contactsTitle": "Contacts",
+  "contactsSubtitle": "cesenaremembers@gmail.com",
+  "buttonClose": "Close",
+  "buttonCancel": "Cancel",
+  "buttonDelete": "Delete",
+  "buttonOk": "Got it",
+  "navMap": "Map",
+  "navProfile": "Profile",
+  "navSettings": "Settings",
+  "errorLoadPreferences": "Error loading preferences: {error}",
+  "@errorLoadPreferences": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorConnection": "Connection error. Change cancelled.",
+  "errorLogout": "Logout failed: {error}",
+  "@errorLogout": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDeleteAccountPartial": "Account not fully deleted. App data was removed, but auth deletion failed. You will be signed out for safety.",
+  "errorDeleteData": "Unable to delete data: {error}",
+  "@errorDeleteData": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "tourStopped": "Tour stopped.",
+  "errorSaveScore": "Error saving score. Try again in a moment.",
+  "errorLoadPoi": "Error loading points of interest.",
+  "errorSearch": "Error during search.",
+  "errorAction": "Error during action.",
+  "removeFriendship": "Remove friendship",
+  "locationDisabled": "Location disabled",
+  "quizAnswerPerfect": "Perfect!",
+  "quizAnswerGood": "Well done!",
+  "toursCompleted": "Tours Completed",
+  "tourLabel": "Tour",
+  "tourConfirmStopTitle": "Stop the tour?",
+  "tourConfirmStopBody": "The tour will be ended and you will lose the current stop order.",
+  "buttonStop": "Stop",
+  "tourStartGpsRequired": "To start the tour, enable GPS, location permission and the in-app option.",
+  "tourCompleted": "🎉 Tour completed! Great job.",
+  "tourStopButton": "Stop tour",
+  "tourOrderButton": "Order stops"
+}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cesena_remembers/l10n/app_localizations.dart';
 
 import '../../../domain/entities/userprofile.dart';
 
@@ -679,7 +680,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                               _StatCard(
                                 icon: Icons.route_rounded,
-                                label: 'Tour Completati',
+                                label: AppLocalizations.of(context)!.toursCompleted,
                                 value: '${profile.totalToursCompleted}',
                                 color: AppPalette.tan,
                               ),
