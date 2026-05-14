@@ -63,7 +63,7 @@ extension _MapPageDataLogic on _MapPageState {
               longitude: poi.longitude,
               type: poi.type,
               period: poi.period,
-              description: poi.description,
+              description: l10n.getPoiDescription(poi.id),
               questions: poi.questions,
             ),
             counterRotationDegrees: _currentRotation,

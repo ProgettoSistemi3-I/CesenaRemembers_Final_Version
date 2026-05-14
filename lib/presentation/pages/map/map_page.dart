@@ -80,6 +80,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   bool _isCenteringOnUser = false;
   bool _isSavingQuizResult = false;
   Locale? _lastLocale;
+  late VoidCallback _onLocaleChanged;
 
   List<Poi> _pois = [];
   List<Marker> _markers = const [];
@@ -123,6 +124,16 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     _bindTourUpdates();
     LocationPreferenceStore.gpsEnabled.addListener(_onGpsPreferenceChanged);
 
+    final localeNotifier = sl<ValueNotifier<Locale>>();
+    _onLocaleChanged = () {
+      if (_pois.isNotEmpty && mounted) {
+        setState(() {
+          _markers = _buildMarkers(_pois);
+        });
+      }
+    };
+    localeNotifier.addListener(_onLocaleChanged);
+
     _initLocationLogic();
     _loadPois();
   }
@@ -133,11 +144,12 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     _serviceStatusSub?.cancel();
     _tourUpdatesSub?.cancel();
     LocationPreferenceStore.gpsEnabled.removeListener(_onGpsPreferenceChanged);
+    sl<ValueNotifier<Locale>>().removeListener(_onLocaleChanged);
     _tourController.dispose();
     _mapController.dispose();
     super.dispose();
   }
-  
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
