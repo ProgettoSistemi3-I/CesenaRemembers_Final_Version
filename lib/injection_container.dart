@@ -20,6 +20,8 @@ import 'domain/usecases/get_poi_quiz_usecases.dart';
 import 'presentation/controllers/social_controller.dart';
 import 'presentation/theme/theme_controller.dart';
 import 'presentation/controllers/poi_quiz_controller.dart';
+// 🔴 IMPORT AGGIUNTO
+import 'presentation/controllers/settings_ui_controller.dart'; 
 
 final sl = GetIt.instance;
 
@@ -76,6 +78,14 @@ Future<void> init() async {
   }
 
   // --- CONTROLLERS ---
+  
+  // 1. Prima registriamo il ValueNotifier (perché serve al SettingsUiController)
+  if (!sl.isRegistered<ValueNotifier<Locale>>()) {
+    sl.registerLazySingleton<ValueNotifier<Locale>>(
+      () => ValueNotifier<Locale>(const Locale('it')),
+    );
+  }
+
   if (!sl.isRegistered<ThemeController>()) {
     sl.registerLazySingleton(() => ThemeController(profileUseCases: sl()));
   }
@@ -94,9 +104,8 @@ Future<void> init() async {
     sl.registerFactory(() => PoiQuizController(getQuizUseCase: sl()));
   }
 
-  if (!sl.isRegistered<ValueNotifier<Locale>>()) {
-    sl.registerLazySingleton<ValueNotifier<Locale>>(
-      () => ValueNotifier<Locale>(const Locale('it')),
-    );
+  // 🔴 2. Ora registriamo il SettingsUiController passandogli sl() (che pescherà in automatico il ValueNotifier)
+  if (!sl.isRegistered<SettingsUiController>()) {
+    sl.registerLazySingleton(() => SettingsUiController(sl()));
   }
 }
