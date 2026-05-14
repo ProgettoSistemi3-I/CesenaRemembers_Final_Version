@@ -10,7 +10,7 @@ class LocalePreferenceStore {
     final prefs = await SharedPreferences.getInstance();
     final code = prefs.getString(_localeCodeKey);
     if (code == 'en' || code == 'it') {
-      return Locale(code);
+      return Locale(code!);
     }
     return const Locale('it');
   }
