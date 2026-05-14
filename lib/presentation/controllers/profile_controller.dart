@@ -29,7 +29,7 @@ class ProfileController extends ChangeNotifier {
 
     if (uid == null) {
       isLoading = false;
-      errorMessage = 'Utente non autenticato.';
+      errorMessage = 'Utente non autenticato. User not authenticated.';
       _safeNotifyListeners();
       return;
     }
@@ -53,7 +53,7 @@ class ProfileController extends ChangeNotifier {
           },
           onError: (error) {
             isLoading = false;
-            errorMessage = 'Impossibile sincronizzare il profilo.';
+            errorMessage = 'Impossibile sincronizzare il profilo. Unable to sync profile.';
             _safeNotifyListeners();
           },
         );
@@ -64,7 +64,7 @@ class ProfileController extends ChangeNotifier {
       profile = await _profileUseCases.getUserProfile(uid);
       errorMessage = null;
     } catch (e) {
-      errorMessage = 'Impossibile caricare il profilo.';
+      errorMessage = 'Impossibile caricare il profilo. Unable to load profile.';
     } finally {
       isLoading = false;
       _safeNotifyListeners();
@@ -92,7 +92,7 @@ class ProfileController extends ChangeNotifier {
       );
       errorMessage = null;
     } catch (e) {
-      errorMessage = 'Salvataggio profilo non riuscito.';
+      errorMessage = 'Salvataggio profilo non riuscito. Profile save failed.';
       _safeNotifyListeners();
     }
   }

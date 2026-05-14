@@ -79,7 +79,7 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Text(
-                  'Errore di inizializzazione profilo: ${ensureSnapshot.error}',
+                  'Errore di inizializzazione profilo: ${ensureSnapshot.error}. Profile initialization error: ${ensureSnapshot.error}',
                   textAlign: TextAlign.center,
                 ),
               ),

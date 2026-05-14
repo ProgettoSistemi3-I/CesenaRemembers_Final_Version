@@ -220,9 +220,9 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                   fontWeight: FontWeight.w500,
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                tabs: const [
-                  Tab(text: 'Informazioni'),
-                  Tab(text: 'Quiz'),
+                tabs: [
+                  Tab(text: Localizations.localeOf(context).languageCode == 'en' ? 'Info' : 'Informazioni'),
+                  Tab(text: Localizations.localeOf(context).languageCode == 'en' ? 'Quiz' : 'Quiz'),
                 ],
               ),
               Expanded(
@@ -262,7 +262,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                                 ),
                               ),
                               Text(
-                                'Storia',
+                                AppLocalizations.of(context)!.storyTab,
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
@@ -273,7 +273,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            widget.stop.description,
+                            _localizedStopDescription(context),
                             style: TextStyle(
                               fontSize: 14,
                               height: 1.65,
@@ -300,7 +300,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                                             .surfaceContainerHighest,
                                 ),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
@@ -310,7 +310,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                                   ),
                                   SizedBox(width: 8),
                                   Text(
-                                    'Fai il quiz su questa tappa →',
+                                    AppLocalizations.of(context)!.takeQuizForStop,
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: AppPalette.tan,
@@ -337,6 +337,23 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         );
       },
     );
+  }
+
+
+  String _localizedStopDescription(BuildContext context) {
+    if (Localizations.localeOf(context).languageCode != 'en') {
+      return widget.stop.description;
+    }
+    const descriptionsEn = <String, String>{
+      'santa_cristina': 'Historic church with a hemispherical dome and bell tower set in Cesena's residential fabric. During WWII it likely served as a visual landmark during bombings and for civilian orientation.',
+      'rocca': 'Medieval fortress overlooking Cesena, built by the Malatesta family. During WWII its massive structure and hill area were used as air-raid shelter spaces for civilians.',
+      'san_rocco': 'Church in a historic working-class district, dedicated to Saint Roch. During WWII the area suffered bombing difficulties and the church likely served as a gathering and transit point toward shelters.',
+      'abbazia_monte': 'Monastic complex on a hill above the city, a key religious symbol for over a millennium. Its elevated position made it useful as an observation/reference point during WWII.',
+      'osservanza': 'Franciscan church and convent in Cesena's countryside, historically apart from the urban center. During WWII its isolation made it a possible refuge and support place for displaced civilians.',
+      'palazzo_ridotto': 'Historic civic building facing Piazza del Popolo, central to public life since the Middle Ages. During WWII it hosted an air-raid siren crucial for warning and coordination.',
+      'stazione': 'Major railway hub on the Bologna–Rimini Adriatic line. During WWII it was a primary Allied bombing target due to its strategic supply role and suffered heavy destruction.',
+    };
+    return descriptionsEn[widget.stop.id] ?? widget.stop.description;
   }
 
   Widget _buildQuizContent(ThemeData theme) {
@@ -377,7 +394,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
       return Column(
         children: [
           Text(
-            'Nessun quiz disponibile per questa tappa.',
+            AppLocalizations.of(context)!.noQuizForStop,
             style: TextStyle(
               fontSize: 14,
               color: theme.colorScheme.onSurfaceVariant,
@@ -413,7 +430,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         Row(
           children: [
             Text(
-              'Domanda ${quizController.questionIndex + 1} di ${quizController.totalQuestions}',
+              AppLocalizations.of(context)!.questionProgress(quizController.questionIndex + 1, quizController.totalQuestions),
               style: TextStyle(
                 fontSize: 12,
                 color: theme.colorScheme.onSurfaceVariant,
@@ -559,7 +576,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                 ),
                 child: const Center(
                   child: Text(
-                    'Prossima domanda →',
+                    AppLocalizations.of(context)!.nextQuestion,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -585,7 +602,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                 ),
                 child: const Center(
                   child: Text(
-                    'Termina quiz →',
+                    AppLocalizations.of(context)!.finishQuiz,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -622,7 +639,7 @@ class _QuizFallbackBanner extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Avviso quiz',
+            AppLocalizations.of(context)!.quizNotice,
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
@@ -700,7 +717,7 @@ class QuizResultCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '$score / $total risposte corrette',
+            AppLocalizations.of(context)!.correctAnswersCount(score, total),
             style: TextStyle(
               fontSize: 15,
               color: theme.colorScheme.onSurfaceVariant,
@@ -717,7 +734,7 @@ class QuizResultCard extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                'Tempo: ${formatElapsed(elapsed)}',
+                AppLocalizations.of(context)!.timeLabel(formatElapsed(elapsed)),
                 style: TextStyle(
                   fontSize: 13,
                   color: theme.colorScheme.onSurfaceVariant,
@@ -754,13 +771,13 @@ class NextStopActionButton extends StatelessWidget {
             ),
           ],
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.directions_walk, color: Colors.white, size: 20),
             SizedBox(width: 10),
             Text(
-              'Prossima tappa →',
+              AppLocalizations.of(context)!.nextStop,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 15,

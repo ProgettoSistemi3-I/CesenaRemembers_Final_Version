@@ -567,7 +567,59 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Order stops'**
+
   String get tourOrderButton;
+
+  String get statsSection;
+  String get achievementsSection;
+  String get totalXp;
+  String get bestTourXp;
+  String get visitedSites;
+  String get bestTime;
+  String get achievementsLabel;
+  String get startTour;
+  String get iArrived;
+  String get currentStop;
+  String get firstTourStop;
+  String fromPrevious(String distance);
+  String get storyTab;
+  String get takeQuizForStop;
+  String get noQuizForStop;
+  String questionProgress(int current, int total);
+  String get nextQuestion;
+  String get finishQuiz;
+  String get quizNotice;
+  String correctAnswersCount(int score, int total);
+  String timeLabel(String elapsed);
+  String get nextStop;
+  String get loginFailedCheckConnection;
+  String get offlineCheckInternet;
+  String get loginFailedRetry;
+  String get achievementFirstQuizTitle;
+  String get achievementFirstQuizDesc;
+  String get achievementFirstTourTitle;
+  String get achievementFirstTourDesc;
+  String get achievementQuiz15Title;
+  String get achievementQuiz15Desc;
+  String get achievementPerfectTourTitle;
+  String get achievementPerfectTourDesc;
+  String get achievementExplorerTitle;
+  String get achievementExplorerDesc;
+  String get achievementTourUnder1hTitle;
+  String get achievementTourUnder1hDesc;
+  String get achievementTourUnder30mTitle;
+  String get achievementTourUnder30mDesc;
+  String achievementLocked(String description);
+
+  String get arrivedTapToOpen;
+  String get stopsOrderTitle;
+  String get dragHandleReorderHint;
+  String get missingPermissions;
+  String get gpsDisabled;
+  String get enableLocationRealtime;
+  String get reenableLocationInSettings;
+  String get resolve;
+  String get retry;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

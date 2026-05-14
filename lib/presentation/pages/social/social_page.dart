@@ -14,6 +14,7 @@ class SocialPage extends StatefulWidget {
 }
 
 class _SocialPageState extends State<SocialPage> {
+  String _loc(String it, String en) => Localizations.localeOf(context).languageCode == "en" ? en : it;
   late final SocialController _controller;
   final TextEditingController _searchController = TextEditingController();
 
@@ -58,7 +59,7 @@ class _SocialPageState extends State<SocialPage> {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          'Community',
+          _loc('Community', 'Community'),
           style: TextStyle(
             color: theme.colorScheme.onSurface,
             fontWeight: FontWeight.w800,
@@ -88,7 +89,7 @@ class _SocialPageState extends State<SocialPage> {
                       fontWeight: FontWeight.w500,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'Cerca utente...',
+                      hintText: _loc('Cerca utente...', 'Search user...'),
                       hintStyle: TextStyle(
                         color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                         fontWeight: FontWeight.w400,
@@ -150,7 +151,7 @@ class _SocialPageState extends State<SocialPage> {
     if (_controller.leaderboard.isEmpty) {
       return Center(
         child: Text(
-          'Nessun utente in classifica al momento.',
+          _loc('Nessun utente in classifica al momento.', 'No users in the leaderboard right now.'),
           style: TextStyle(
             color: theme.colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w600,
@@ -181,7 +182,7 @@ class _SocialPageState extends State<SocialPage> {
               ),
               const SizedBox(width: 12),
               Text(
-                'Classifica Globale',
+                _loc('Classifica Globale', 'Global Leaderboard'),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
@@ -316,7 +317,7 @@ class _SocialPageState extends State<SocialPage> {
                     children: [
                       Text(
                         isCurrentUser && isPinned
-                            ? "${entry.displayName} (Tu)"
+                            ? Localizations.localeOf(context).languageCode == "en" ? "${entry.displayName} (You)" : "${entry.displayName} (Tu)"
                             : entry.displayName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -330,7 +331,7 @@ class _SocialPageState extends State<SocialPage> {
                       Text(
                         entry.username.isNotEmpty
                             ? '@${entry.username}'
-                            : '@utente',
+                            : _loc('@utente','@user'),
                         style: TextStyle(
                           color: theme.colorScheme.onSurfaceVariant,
                           fontSize: 13,
@@ -386,7 +387,7 @@ class _SocialPageState extends State<SocialPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Digita almeno 2 caratteri per cercare.',
+              _loc('Digita almeno 2 caratteri per cercare.', 'Type at least 2 characters to search.'),
               style: TextStyle(
                 color: theme.colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
@@ -408,7 +409,7 @@ class _SocialPageState extends State<SocialPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Nessun utente trovato.',
+              _loc('Nessun utente trovato.', 'No users found.'),
               style: TextStyle(
                 color: theme.colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,

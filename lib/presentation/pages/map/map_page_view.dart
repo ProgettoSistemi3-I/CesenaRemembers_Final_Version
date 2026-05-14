@@ -222,7 +222,7 @@ extension _MapPageView on _MapPageState {
                 backgroundColor: AppPalette.olive,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Riprova'),
+              child: Text(AppLocalizations.of(context)!.retry),
             ),
           ],
         ),

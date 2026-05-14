@@ -43,6 +43,35 @@ class _HeroCard extends StatelessWidget {
     required this.onFriendsTap,
   });
 
+
+  String _localizedTitle(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (achievement.id) {
+      case 'first_quiz': return l10n.achievementFirstQuizTitle;
+      case 'first_tour': return l10n.achievementFirstTourTitle;
+      case 'quiz_15': return l10n.achievementQuiz15Title;
+      case 'perfect_tour': return l10n.achievementPerfectTourTitle;
+      case 'explorer': return l10n.achievementExplorerTitle;
+      case 'tour_under_1h': return l10n.achievementTourUnder1hTitle;
+      case 'tour_under_30m': return l10n.achievementTourUnder30mTitle;
+      default: return _localizedTitle(context);
+    }
+  }
+
+  String _localizedDescription(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (achievement.id) {
+      case 'first_quiz': return l10n.achievementFirstQuizDesc;
+      case 'first_tour': return l10n.achievementFirstTourDesc;
+      case 'quiz_15': return l10n.achievementQuiz15Desc;
+      case 'perfect_tour': return l10n.achievementPerfectTourDesc;
+      case 'explorer': return l10n.achievementExplorerDesc;
+      case 'tour_under_1h': return l10n.achievementTourUnder1hDesc;
+      case 'tour_under_30m': return l10n.achievementTourUnder30mDesc;
+      default: return _localizedDescription(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -298,7 +327,7 @@ class _HeroCard extends StatelessWidget {
                 const _VerticalDivider(),
 
                 _MiniStat(
-                  label: 'Punti',
+                  label: AppLocalizations.of(context)!.totalXp,
 
                   value: points,
 
@@ -572,7 +601,7 @@ class _AchievementTile extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    achievement.title,
+                    _localizedTitle(context),
                     style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
                   ),
                 ),
@@ -580,8 +609,8 @@ class _AchievementTile extends StatelessWidget {
             ),
             content: Text(
               isUnlocked
-                  ? achievement.description
-                  : '🔒  ${achievement.description}',
+                  ? _localizedDescription(context)
+                  : AppLocalizations.of(context)!.achievementLocked(_localizedDescription(context)),
               style: TextStyle(
                 color: isUnlocked
                     ? theme.colorScheme.onSurface
@@ -619,7 +648,7 @@ class _AchievementTile extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            isUnlocked ? achievement.title : '???',
+            isUnlocked ? _localizedTitle(context) : '???',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
@@ -718,7 +747,7 @@ class _AvatarPickerSheet extends StatelessWidget {
           ),
 
           Text(
-            'Scegli il tuo Avatar',
+            Localizations.localeOf(context).languageCode == 'en' ? 'Choose your avatar' : 'Scegli il tuo Avatar',
 
             style: TextStyle(
               fontSize: 20,
@@ -732,7 +761,7 @@ class _AvatarPickerSheet extends StatelessWidget {
           const SizedBox(height: 8),
 
           Text(
-            'Personalizza il tuo profilo',
+            Localizations.localeOf(context).languageCode == 'en' ? 'Customize your profile' : 'Personalizza il tuo profilo',
 
             style: TextStyle(
               fontSize: 14,

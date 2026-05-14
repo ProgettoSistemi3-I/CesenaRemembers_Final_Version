@@ -250,4 +250,106 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get tourOrderButton => 'Ordina tappe';
+
+  @override
+  String get statsSection => 'Statistiche';
+  @override
+  String get achievementsSection => 'Achievement';
+  @override
+  String get totalXp => 'XP Totali';
+  @override
+  String get bestTourXp => 'Miglior tour (XP)';
+  @override
+  String get visitedSites => 'Siti Visitati';
+  @override
+  String get bestTime => 'Miglior tempo';
+  @override
+  String get achievementsLabel => 'Achievement';
+  @override
+  String get startTour => 'Inizia il tour';
+  @override
+  String get iArrived => 'Sono arrivato';
+  @override
+  String get currentStop => 'Attuale';
+  @override
+  String get firstTourStop => 'Prima tappa del tour';
+  @override
+  String fromPrevious(String distance) => '$distance dalla precedente';
+  @override
+  String get storyTab => 'Storia';
+  @override
+  String get takeQuizForStop => 'Fai il quiz su questa tappa →';
+  @override
+  String get noQuizForStop => 'Nessun quiz disponibile per questa tappa.';
+  @override
+  String questionProgress(int current, int total) => 'Domanda $current di $total';
+  @override
+  String get nextQuestion => 'Prossima domanda →';
+  @override
+  String get finishQuiz => 'Termina quiz →';
+  @override
+  String get quizNotice => 'Avviso quiz';
+  @override
+  String correctAnswersCount(int score, int total) => '$score / $total risposte corrette';
+  @override
+  String timeLabel(String elapsed) => 'Tempo: $elapsed';
+  @override
+  String get nextStop => 'Prossima tappa →';
+  @override
+  String get loginFailedCheckConnection => 'Accesso non riuscito. Controlla la connessione e riprova.';
+  @override
+  String get offlineCheckInternet => 'Sei offline. Controlla la connessione Internet e riprova.';
+  @override
+  String get loginFailedRetry => 'Accesso non riuscito. Riprova tra qualche secondo.';
+  @override
+  String get achievementFirstQuizTitle => 'Primo Quiz';
+  @override
+  String get achievementFirstQuizDesc => 'Completa il tuo primo quiz';
+  @override
+  String get achievementFirstTourTitle => 'Primo Tour';
+  @override
+  String get achievementFirstTourDesc => 'Finisci il tuo primo tour completo';
+  @override
+  String get achievementQuiz15Title => 'Appassionato di Quiz';
+  @override
+  String get achievementQuiz15Desc => 'Completa 15 quiz';
+  @override
+  String get achievementPerfectTourTitle => 'Tour Perfetto';
+  @override
+  String get achievementPerfectTourDesc => 'Rispondi correttamente a tutte le domande in un tour';
+  @override
+  String get achievementExplorerTitle => 'Esploratore';
+  @override
+  String get achievementExplorerDesc => 'Visita 10 siti storici';
+  @override
+  String get achievementTourUnder1hTitle => 'Passo Veloce';
+  @override
+  String get achievementTourUnder1hDesc => 'Completa un tour in meno di 1 ora';
+  @override
+  String get achievementTourUnder30mTitle => 'Speed Runner';
+  @override
+  String get achievementTourUnder30mDesc => 'Completa un tour in meno di 30 minuti';
+  @override
+  String achievementLocked(String description) => '🔒  $description';
+
+
+  @override
+  String get arrivedTapToOpen => 'Sei arrivato! Tocca per aprire';
+  @override
+  String get stopsOrderTitle => 'Ordine tappe';
+  @override
+  String get dragHandleReorderHint => 'Trascina dalla maniglia per riordinare il percorso.';
+  @override
+  String get missingPermissions => 'Permessi mancanti';
+  @override
+  String get gpsDisabled => 'GPS disattivato';
+  @override
+  String get enableLocationRealtime => 'Attiva la posizione per esplorare la mappa in tempo reale.';
+  @override
+  String get reenableLocationInSettings => 'Riattiva la posizione nelle impostazioni per mostrare la tua posizione sulla mappa.';
+  @override
+  String get resolve => 'Risolvi';
+  @override
+  String get retry => 'Riprova';
+
 }

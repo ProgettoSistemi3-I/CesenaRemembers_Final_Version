@@ -37,6 +37,7 @@ class PublicProfilePage extends StatefulWidget {
 }
 
 class _PublicProfilePageState extends State<PublicProfilePage> {
+  String _loc(String it, String en) => Localizations.localeOf(context).languageCode == "en" ? en : it;
   UserProfile? _targetProfile;
 
   bool _isLoading = true;
@@ -81,7 +82,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
       setState(() {
         _isLoading = false;
 
-        _loadError = 'Errore nel caricamento del profilo.';
+        _loadError = AppLocalizations.of(context)!.errorAction;
       });
     }
   }
@@ -233,7 +234,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
               Expanded(
                 child: Center(
                   child: Text(
-                    'Nessun utente trovato.',
+                    _loc('Nessun utente trovato.', 'No users found.'),
 
                     style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
                   ),
@@ -400,7 +401,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
 
                     icon: const Icon(Icons.refresh),
 
-                    label: const Text('Riprova'),
+                    label: Text(_loc('Riprova', 'Retry')),
 
                     style: FilledButton.styleFrom(
                       backgroundColor: theme.colorScheme.error,
@@ -612,8 +613,8 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
 
                         icon: const Icon(Icons.how_to_reg_rounded, size: 20),
 
-                        label: const Text(
-                          'Richiesta inviata',
+                        label: Text(
+                          _loc('Richiesta inviata', 'Request sent'),
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
 
@@ -655,8 +656,8 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                                 ),
                               ),
 
-                              child: const Text(
-                                'Accetta',
+                              child: Text(
+                                _loc('Accetta', 'Accept'),
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -687,8 +688,8 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                                 ),
                               ),
 
-                              child: const Text(
-                                'Rifiuta',
+                              child: Text(
+                                _loc('Rifiuta', 'Reject'),
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -701,8 +702,8 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
 
                         icon: const Icon(Icons.person_add_rounded, size: 20),
 
-                        label: const Text(
-                          'Aggiungi agli amici',
+                        label: Text(
+                          _loc('Aggiungi agli amici', 'Add friend'),
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
 
@@ -742,7 +743,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                       children: [
                         Expanded(
                           child: _buildMiniStat(
-                            'Amici',
+                            _loc('Amici', 'Friends'),
 
                             profile.friends.length.toString(),
 
@@ -754,7 +755,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: const Text(
-                                          'Devi essere amico per vedere la sua lista amici.',
+                                          _loc('Devi essere amico per vedere la sua lista amici.', 'You must be friends to view this friend list.'),
                                         ),
 
                                         behavior: SnackBarBehavior.floating,
@@ -782,7 +783,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
 
                         Expanded(
                           child: _buildMiniStat(
-                            'Punti',
+                            _loc('Punti', 'Points'),
                             profile.xp.toString(),
                             theme,
                           ),
@@ -800,7 +801,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
 
                         Expanded(
                           child: _buildMiniStat(
-                            'Livello',
+                            _loc('Livello', 'Level'),
                             profile.level.toString(),
                             theme,
                           ),
@@ -814,7 +815,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
 
             const SizedBox(height: 32),
 
-            const _SectionLabel('Statistiche Dettagliate'),
+            _SectionLabel(_loc('Statistiche Dettagliate', 'Detailed statistics')),
 
             const SizedBox(height: 16),
 
@@ -834,7 +835,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
 
               children: [
                 _buildStatCard(
-                  'Traguardi',
+                  _loc('Traguardi', 'Achievements'),
 
                   '${profile.achievementsCount}',
 
@@ -846,7 +847,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                 ),
 
                 _buildStatCard(
-                  'Miglior Score',
+                  _loc('Miglior Score', 'Best score'),
 
                   '${profile.maxQuizScore}%',
 
@@ -858,7 +859,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                 ),
 
                 _buildStatCard(
-                  'Siti Visitati',
+                  _loc('Siti Visitati', 'Visited sites'),
 
                   '${profile.visitedCount}',
 
@@ -870,7 +871,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                 ),
 
                 _buildStatCard(
-                  'Quiz Superati',
+                  _loc('Quiz Superati', 'Completed quizzes'),
 
                   '${profile.totalQuizCompleted}',
 
@@ -882,7 +883,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                 ),
 
                 _buildStatCard(
-                  'Tempo Migliore',
+                  _loc('Tempo Migliore', 'Best time'),
 
                   bestTourTimeLabel,
 
@@ -894,7 +895,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                 ),
 
                 _buildStatCard(
-                  'Risposte Esatte',
+                  _loc('Risposte Esatte', 'Correct answers'),
 
                   '${profile.totalCorrectAnswers}',
 

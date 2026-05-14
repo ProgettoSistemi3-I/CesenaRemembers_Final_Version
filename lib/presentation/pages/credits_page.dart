@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_palette.dart';
 
 class CreditsPage extends StatelessWidget {
+  String _loc(BuildContext context, String it, String en) => Localizations.localeOf(context).languageCode == "en" ? en : it;
   const CreditsPage({super.key});
 
   @override
@@ -59,7 +60,7 @@ class CreditsPage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Realizzato con impegno per preservare la memoria storica della nostra città.',
+            _loc(context, 'Realizzato con impegno per preservare la memoria storica della nostra città.', 'Made with commitment to preserve our city's historical memory.'),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 15,

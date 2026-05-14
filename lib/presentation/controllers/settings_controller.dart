@@ -84,7 +84,7 @@ class SettingsController extends ChangeNotifier {
 
       _themeController.toggleTheme(modalitaNotte);
     } catch (e) {
-      errorMessage = 'Errore nel caricamento preferenze: $e';
+      errorMessage = 'Errore nel caricamento preferenze: $e. Error loading preferences: $e';
     } finally {
       isLoading = false;
       _safeNotifyListeners();
@@ -100,7 +100,7 @@ class SettingsController extends ChangeNotifier {
       final status = await _locationService.ensureLocationAccess();
       if (status != LocationAccessStatus.granted) {
         errorMessage =
-            'Permesso negato o GPS disattivato. Controlla le impostazioni del telefono.';
+            'Permesso negato o GPS disattivato. Controlla le impostazioni del telefono. Permission denied or GPS disabled. Check your phone settings.';
         posizione = false;
         LocationPreferenceStore.setGpsEnabled(false);
         _safeNotifyListeners();
@@ -130,7 +130,7 @@ class SettingsController extends ChangeNotifier {
       );
     } catch (e) {
       // 3) Rollback
-      errorMessage = 'Errore di connessione. Modifica annullata.';
+      errorMessage = 'Errore di connessione. Modifica annullata. Connection error. Change cancelled.';
       await loadUserPreferences();
       _themeController.toggleTheme(modalitaNotte);
       LocationPreferenceStore.setGpsEnabled(posizione);
@@ -146,7 +146,7 @@ class SettingsController extends ChangeNotifier {
       await _signOutUseCase();
       return true;
     } catch (e) {
-      errorMessage = 'Logout fallito: $e';
+      errorMessage = 'Logout fallito: $e. Logout failed: $e';
       isLoggingOut = false;
       _safeNotifyListeners();
       return false;
@@ -168,7 +168,7 @@ class SettingsController extends ChangeNotifier {
         error: e,
         name: 'SettingsController',
       );
-      errorMessage = 'Impossibile eliminare i dati: $e';
+      errorMessage = 'Impossibile eliminare i dati: $e. Unable to delete data: $e';
       isDeletingAccount = false;
       _safeNotifyListeners();
       return false;

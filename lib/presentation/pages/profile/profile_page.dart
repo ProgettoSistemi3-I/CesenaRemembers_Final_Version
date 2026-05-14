@@ -220,7 +220,7 @@ class _ProfilePageState extends State<ProfilePage>
       builder: (_) => FractionallySizedBox(
         heightFactor: 0.8,
 
-        child: _buildUserListSheet('Richieste d\'amicizia', users, theme),
+        child: _buildUserListSheet(_loc('Richieste d\'amicizia', 'Friend requests'), users, theme),
       ),
     );
   }
@@ -297,7 +297,7 @@ class _ProfilePageState extends State<ProfilePage>
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Nessuna richiesta al momento.',
+                        _loc('Nessuna richiesta al momento.', 'No requests right now.'),
                         style: TextStyle(
                           color: theme.colorScheme.onSurfaceVariant,
                           fontSize: 14,
@@ -493,7 +493,7 @@ class _ProfilePageState extends State<ProfilePage>
                     pinned: true,
 
                     title: Text(
-                      'Il mio profilo',
+                      _loc('Il mio profilo', 'My profile'),
 
                       style: TextStyle(
                         color: theme.colorScheme.onSurface,
@@ -637,7 +637,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                           const SizedBox(height: 32),
 
-                          const _SectionLabel('Statistiche'),
+                          _SectionLabel(AppLocalizations.of(context)!.statsSection),
 
                           const SizedBox(height: 16),
 
@@ -657,14 +657,14 @@ class _ProfilePageState extends State<ProfilePage>
                             children: [
                               _StatCard(
                                 icon: Icons.bolt_rounded,
-                                label: 'XP Totali',
+                                label: AppLocalizations.of(context)!.totalXp,
                                 value: '${profile.xp}',
                                 color: AppPalette.olive,
                               ),
 
                               _StatCard(
                                 icon: Icons.emoji_events_outlined,
-                                label: 'Miglior tour (XP)',
+                                label: AppLocalizations.of(context)!.bestTourXp,
                                 value: profile.maxSingleTourXp > 0
                                     ? '${profile.maxSingleTourXp}'
                                     : '--',
@@ -673,7 +673,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                               _StatCard(
                                 icon: Icons.map_outlined,
-                                label: 'Siti Visitati',
+                                label: AppLocalizations.of(context)!.visitedSites,
                                 value: '${profile.visitedCount}',
                                 color: AppPalette.moss,
                               ),
@@ -687,7 +687,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                               _StatCard(
                                 icon: Icons.timer_outlined,
-                                label: 'Miglior tempo',
+                                label: AppLocalizations.of(context)!.bestTime,
                                 value: profile.bestTourTimeSeconds > 0
                                     ? _formatTime(profile.bestTourTimeSeconds)
                                     : '--',
@@ -696,7 +696,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                               _StatCard(
                                 icon: Icons.military_tech_rounded,
-                                label: 'Achievement',
+                                label: AppLocalizations.of(context)!.achievementsLabel,
                                 value: '${profile.achievementsCount}',
                                 color: AppPalette.moss,
                               ),
@@ -705,7 +705,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                           const SizedBox(height: 36),
 
-                          const _SectionLabel('Achievement'),
+                          _SectionLabel(AppLocalizations.of(context)!.achievementsSection),
 
                           const SizedBox(height: 16),
 

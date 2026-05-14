@@ -64,11 +64,11 @@ class LocationIssueBanner extends StatelessWidget {
                     Text(
                       isGpsEnabled
                           ? (isGpsPreferenceEnabled
-                                ? 'Permessi mancanti'
+                                ? AppLocalizations.of(context)!.missingPermissions
                                 : AppLocalizations.of(
                                     context,
                                   )!.locationDisabled)
-                          : 'GPS Disattivato',
+                          : AppLocalizations.of(context)!.gpsDisabled,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
@@ -78,8 +78,8 @@ class LocationIssueBanner extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       isGpsPreferenceEnabled
-                          ? 'Attiva la posizione per esplorare la mappa in tempo reale.'
-                          : 'Riattiva la posizione nelle impostazioni per mostrare la tua posizione sulla mappa.',
+                          ? AppLocalizations.of(context)!.enableLocationRealtime
+                          : AppLocalizations.of(context)!.reenableLocationInSettings,
                       style: TextStyle(
                         fontSize: 12,
                         height: 1.3,
@@ -100,7 +100,7 @@ class LocationIssueBanner extends StatelessWidget {
                 ),
                 onPressed: onResolve,
                 child: const Text(
-                  'Risolvi',
+                  AppLocalizations.of(context)!.resolve,
                   style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
                 ),
               ),

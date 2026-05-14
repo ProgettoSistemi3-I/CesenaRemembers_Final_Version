@@ -24,6 +24,7 @@ class ProfileSetupPage extends StatefulWidget {
 }
 
 class _ProfileSetupPageState extends State<ProfileSetupPage> {
+  String _loc(String it, String en) => Localizations.localeOf(context).languageCode == 'en' ? en : it;
   final UserProfileUseCases _profileUseCases = sl<UserProfileUseCases>();
 
   late final TextEditingController _nameController;
@@ -63,7 +64,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
     if (ProfileValidation.hasOffensiveDisplayName(displayName)) {
       setState(
         () => _error =
-            'Il nome in app contiene termini non consentiti. Scegline uno diverso.',
+            _loc('Il nome in app contiene termini non consentiti. Scegline uno diverso.', 'Display name contains forbidden terms. Choose a different one.'),
       );
       return;
     }
@@ -78,7 +79,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
     if (ProfileValidation.hasOffensiveUsername(normalizedUsername)) {
       setState(
         () => _error =
-            'Username contiene termini non consentiti. Scegline uno diverso.',
+            _loc('Username contiene termini non consentiti. Scegline uno diverso.', 'Username contains forbidden terms. Choose a different one.'),
       );
       return;
     }
@@ -97,7 +98,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
         );
         if (!available) {
           setState(() {
-            _error = 'Username già in uso. Scegline un altro.';
+            _error = _loc('Username già in uso. Scegline un altro.', 'Username already in use. Choose another one.');
             _isSaving = false;
           });
           return;
@@ -120,7 +121,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
       final message = e.toString();
       setState(() {
         if (message.contains('USERNAME_NOT_AVAILABLE')) {
-          _error = 'Username già in uso. Scegline un altro.';
+          _error = _loc('Username già in uso. Scegline un altro.', 'Username already in use. Choose another one.');
         } else if (message.contains('USERNAME_INDEX_PERMISSION_DENIED')) {
           _error =
               'Configurazione Firestore non valida: servono permessi di lettura/scrittura su usernames/{username}.';
@@ -132,14 +133,14 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
               'Username non valido (usa ${ProfileValidation.minUsernameLength}-${ProfileValidation.maxUsernameLength} caratteri).';
         } else if (message.contains('OFFENSIVE_DISPLAY_NAME')) {
           _error =
-              'Il nome in app contiene termini non consentiti. Scegline uno diverso.';
+              _loc('Il nome in app contiene termini non consentiti. Scegline uno diverso.', 'Display name contains forbidden terms. Choose a different one.');
         } else if (message.contains('OFFENSIVE_USERNAME')) {
-          _error = 'Username contiene termini non consentiti. Scegline uno diverso.';
+          _error = _loc('Username contiene termini non consentiti. Scegline uno diverso.', 'Username contains forbidden terms. Choose a different one.');
         } else if (e is FirebaseException && e.code == 'permission-denied') {
           _error =
-              'Permessi Firestore insufficienti per completare il profilo. Controlla le regole del progetto.';
+              _loc('Permessi Firestore insufficienti per completare il profilo. Controlla le regole del progetto.', 'Insufficient Firestore permissions to complete the profile. Check project rules.');
         } else {
-          _error = 'Impossibile salvare il profilo. Riprova tra qualche secondo.';
+          _error = _loc('Impossibile salvare il profilo. Riprova tra qualche secondo.', 'Unable to save profile. Try again in a few seconds.');
         }
         _isSaving = false;
       });
@@ -160,21 +161,21 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
             children: [
               const SizedBox(height: 24),
               Text(
-                'Crea il tuo profilo',
+                _loc('Crea il tuo profilo', 'Create your profile'),
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Scegli username univoco (non modificabile), nome in app e avatar.',
+                _loc('Scegli username univoco (non modificabile), nome in app e avatar.', 'Choose a unique username (not editable), a display name and an avatar.'),
                 style: theme.textTheme.bodyMedium,
               ),
               const SizedBox(height: 28),
               TextField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nome in app',
+                decoration: InputDecoration(
+                  labelText: _loc('Nome in app', 'Display name'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -183,16 +184,16 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                 controller: _usernameController,
                 autocorrect: false,
                 textInputAction: TextInputAction.done,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Username',
-                  hintText: 'es. cesena_explorer',
+                  hintText: _loc('es. cesena_explorer', 'e.g. cesena_explorer'),
                   prefixText: '@',
                   border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 20),
               Text(
-                'Scegli avatar',
+                _loc('Scegli avatar', 'Choose avatar'),
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -242,7 +243,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                           width: 18,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('Conferma profilo'),
+                      : Text(_loc('Conferma profilo', 'Confirm profile')),
                 ),
               ),
             ],
