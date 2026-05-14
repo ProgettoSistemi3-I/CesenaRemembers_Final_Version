@@ -543,7 +543,7 @@ class _SettingsPageState extends State<SettingsPage>
                           const SizedBox(height: 32),
 
                           // --- GENERALE ---
-                          const _SectionLabel(AppLocalizations.of(context)!.sectionGeneral),
+                          _SectionLabel(AppLocalizations.of(context)!.sectionGeneral),
                           const SizedBox(height: 16),
                           _SettingsCard(
                             children: [

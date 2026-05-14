@@ -44,34 +44,6 @@ class _HeroCard extends StatelessWidget {
   });
 
 
-  String _localizedTitle(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    switch (achievement.id) {
-      case 'first_quiz': return l10n.achievementFirstQuizTitle;
-      case 'first_tour': return l10n.achievementFirstTourTitle;
-      case 'quiz_15': return l10n.achievementQuiz15Title;
-      case 'perfect_tour': return l10n.achievementPerfectTourTitle;
-      case 'explorer': return l10n.achievementExplorerTitle;
-      case 'tour_under_1h': return l10n.achievementTourUnder1hTitle;
-      case 'tour_under_30m': return l10n.achievementTourUnder30mTitle;
-      default: return _localizedTitle(context);
-    }
-  }
-
-  String _localizedDescription(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    switch (achievement.id) {
-      case 'first_quiz': return l10n.achievementFirstQuizDesc;
-      case 'first_tour': return l10n.achievementFirstTourDesc;
-      case 'quiz_15': return l10n.achievementQuiz15Desc;
-      case 'perfect_tour': return l10n.achievementPerfectTourDesc;
-      case 'explorer': return l10n.achievementExplorerDesc;
-      case 'tour_under_1h': return l10n.achievementTourUnder1hDesc;
-      case 'tour_under_30m': return l10n.achievementTourUnder30mDesc;
-      default: return _localizedDescription(context);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -579,6 +551,35 @@ class _AchievementTile extends StatelessWidget {
     required this.achievement,
     required this.isUnlocked,
   });
+
+
+  String _localizedTitle(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (achievement.id) {
+      case 'first_quiz': return l10n.achievementFirstQuizTitle;
+      case 'first_tour': return l10n.achievementFirstTourTitle;
+      case 'quiz_15': return l10n.achievementQuiz15Title;
+      case 'perfect_tour': return l10n.achievementPerfectTourTitle;
+      case 'explorer': return l10n.achievementExplorerTitle;
+      case 'tour_under_1h': return l10n.achievementTourUnder1hTitle;
+      case 'tour_under_30m': return l10n.achievementTourUnder30mTitle;
+      default: return achievement.title;
+    }
+  }
+
+  String _localizedDescription(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (achievement.id) {
+      case 'first_quiz': return l10n.achievementFirstQuizDesc;
+      case 'first_tour': return l10n.achievementFirstTourDesc;
+      case 'quiz_15': return l10n.achievementQuiz15Desc;
+      case 'perfect_tour': return l10n.achievementPerfectTourDesc;
+      case 'explorer': return l10n.achievementExplorerDesc;
+      case 'tour_under_1h': return l10n.achievementTourUnder1hDesc;
+      case 'tour_under_30m': return l10n.achievementTourUnder30mDesc;
+      default: return achievement.description;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

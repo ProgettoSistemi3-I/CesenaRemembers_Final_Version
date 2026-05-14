@@ -574,7 +574,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                   color: AppPalette.olive,
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
                     AppLocalizations.of(context)!.nextQuestion,
                     style: TextStyle(
@@ -600,7 +600,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                   color: AppPalette.olive,
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
                     AppLocalizations.of(context)!.finishQuiz,
                     style: TextStyle(
