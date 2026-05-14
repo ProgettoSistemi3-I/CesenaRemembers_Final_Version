@@ -10,6 +10,7 @@ import '../../controllers/settings_ui_controller.dart';
 import '../../services/shell_navigation_store.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/theme_controller.dart';
+import 'package:cesena_remembers/l10n/app_localizations.dart';
 import '../credits_page.dart'; // 🔴 IMPORT DEL NUOVO FILE!
 
 // Dichiariamo che la parte visiva dei widget si trova in questo file separato
@@ -98,11 +99,24 @@ class _SettingsPageState extends State<SettingsPage>
     });
   }
 
+  String _getLocalizedError(BuildContext context, String code) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (code) {
+      case 'errorLoadPrefs': return l10n.errorLoadPrefs;
+      case 'errorGpsDenied': return l10n.errorGpsDenied;
+      case 'errorConnectionSettings': return l10n.errorConnectionSettings;
+      case 'errorLogout': return l10n.errorLogout('');
+      case 'errorDeleteAccount': return l10n.errorDeleteAccount;
+      case 'errorDeleteAccountAuth': return l10n.errorDeleteAccountAuth;
+      default: return code;
+    }
+  }
+
   void _onControllerError() {
     if (_controller.errorMessage != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_controller.errorMessage!),
+          content: Text(_getLocalizedError(context, _controller.errorMessage!)),
           backgroundColor: AppPalette.danger,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -184,9 +198,9 @@ class _SettingsPageState extends State<SettingsPage>
                   elevation: 0,
                 ),
                 onPressed: () => Navigator.pop(context),
-                child: const Text(
-                  'Chiudi',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                child: Text(
+                  AppLocalizations.of(context)!.settingsClose,
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -204,7 +218,7 @@ class _SettingsPageState extends State<SettingsPage>
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       builder: (_) => _ChoiceSheet(
-        title: 'Lingua',
+        title: AppLocalizations.of(context)!.settingsLanguage,
         options: const ['Italiano', 'English'],
         selected: _uiController.selectedLanguage,
         onSelect: _uiController.setLanguage,
@@ -226,7 +240,7 @@ class _SettingsPageState extends State<SettingsPage>
           ),
         ),
         title: Text(
-          'Eliminare account?',
+          AppLocalizations.of(context)!.settingsDeleteConfirmTitle,
           style: TextStyle(
             fontWeight: FontWeight.w800,
             fontSize: 20,
@@ -234,7 +248,7 @@ class _SettingsPageState extends State<SettingsPage>
           ),
         ),
         content: Text(
-          'Questa operazione rimuove account, progressi e dati associati in modo permanente.',
+          AppLocalizations.of(context)!.settingsDeleteConfirmBody,
           style: TextStyle(
             color: theme.colorScheme.onSurfaceVariant,
             height: 1.5,
@@ -248,9 +262,9 @@ class _SettingsPageState extends State<SettingsPage>
             style: TextButton.styleFrom(
               foregroundColor: theme.colorScheme.onSurfaceVariant,
             ),
-            child: const Text(
-              'Annulla',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            child: Text(
+              AppLocalizations.of(context)!.settingsCancel,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           FilledButton(
@@ -266,9 +280,9 @@ class _SettingsPageState extends State<SettingsPage>
               Navigator.pop(context);
               _deleteAccount();
             },
-            child: const Text(
-              'Elimina',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            child: Text(
+              AppLocalizations.of(context)!.settingsDeleteConfirmBtn,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -284,8 +298,8 @@ class _SettingsPageState extends State<SettingsPage>
       SnackBar(
         content: Text(
           deleted
-              ? 'Account eliminato definitivamente.'
-              : 'Impossibile completare ora. Controlla il messaggio di errore.',
+              ? AppLocalizations.of(context)!.settingsDeleteSuccess
+              : AppLocalizations.of(context)!.settingsDeleteError,
         ),
         backgroundColor: deleted ? AppPalette.olive : AppPalette.danger,
         behavior: SnackBarBehavior.floating,
@@ -351,9 +365,9 @@ class _SettingsPageState extends State<SettingsPage>
                   elevation: 0,
                 ),
                 onPressed: () => Navigator.pop(context),
-                child: const Text(
-                  'Perfetto',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                child: Text(
+                  AppLocalizations.of(context)!.settingsPerfect,
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -395,7 +409,7 @@ class _SettingsPageState extends State<SettingsPage>
                     title: Padding(
                       padding: const EdgeInsets.only(left: 8.0),
                       child: Text(
-                        'Impostazioni',
+                        AppLocalizations.of(context)!.settingsTitle,
                         style: TextStyle(
                           color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.w800,
@@ -412,24 +426,24 @@ class _SettingsPageState extends State<SettingsPage>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 16),
-                          const _HeaderCard(
-                            title: 'Tour interattivo WWII',
+                          _HeaderCard(
+                            title: AppLocalizations.of(context)!.settingsTourTitle,
                             subtitle:
-                                'Gestisci privacy, notifiche e lingua in un unico posto.',
+                                AppLocalizations.of(context)!.settingsTourSubtitle,
                             icon: Icons.tour_outlined,
                           ),
                           const SizedBox(height: 32),
 
                           // --- CREDITI E RICONOSCIMENTI ---
-                          const _SectionLabel('Crediti'),
+                          _SectionLabel(AppLocalizations.of(context)!.settingsCredits),
                           const SizedBox(height: 16),
                           _SettingsCard(
                             children: [
                               _ActionRow(
                                 icon: Icons.stars_rounded,
-                                title: 'Crediti e Riconoscimenti',
+                                title: AppLocalizations.of(context)!.settingsCreditsTitle,
                                 subtitle:
-                                    'Scopri il team dietro Cesena Remembers',
+                                    AppLocalizations.of(context)!.settingsCreditsSubtitle,
                                 accent: AppPalette.olive,
                                 onTap: () => Navigator.push(
                                   context,
@@ -443,7 +457,7 @@ class _SettingsPageState extends State<SettingsPage>
                           const SizedBox(height: 32),
 
                           // --- ACCOUNT ---
-                          const _SectionLabel('Account'),
+                          _SectionLabel(AppLocalizations.of(context)!.settingsAccount),
                           const SizedBox(height: 16),
                           _SettingsCard(
                             children: [
@@ -451,10 +465,10 @@ class _SettingsPageState extends State<SettingsPage>
                                 icon: _controller.isLoggingOut
                                     ? Icons.hourglass_top
                                     : Icons.logout,
-                                title: 'Logout',
+                                title: AppLocalizations.of(context)!.settingsLogout,
                                 subtitle: _controller.isLoggingOut
-                                    ? 'Uscita in corso...'
-                                    : 'Esci dall’account corrente',
+                                    ? AppLocalizations.of(context)!.settingsLogoutInProgress
+                                    : AppLocalizations.of(context)!.settingsLogoutSubtitle,
                                 accent: AppPalette.olive,
                                 onTap: _controller.isLoggingOut
                                     ? () {}
@@ -465,10 +479,10 @@ class _SettingsPageState extends State<SettingsPage>
                                 icon: _controller.isDeletingAccount
                                     ? Icons.hourglass_top
                                     : Icons.delete_outline,
-                                title: 'Elimina account',
+                                title: AppLocalizations.of(context)!.settingsDelete,
                                 subtitle: _controller.isDeletingAccount
-                                    ? 'Eliminazione in corso...'
-                                    : 'Rimuovi profilo e dati associati',
+                                    ? AppLocalizations.of(context)!.settingsDeleteInProgress
+                                    : AppLocalizations.of(context)!.settingsDeleteSubtitle,
                                 accent: AppPalette.danger,
                                 onTap: _controller.isDeletingAccount
                                     ? () {}
@@ -480,14 +494,14 @@ class _SettingsPageState extends State<SettingsPage>
                           const SizedBox(height: 32),
 
                           // --- PREFERENZE APP ---
-                          const _SectionLabel('Preferenze App'),
+                          _SectionLabel(AppLocalizations.of(context)!.settingsAppPrefs),
                           const SizedBox(height: 16),
                           _SettingsCard(
                             children: [
                               _SwitchRow(
                                 icon: Icons.notifications_active_outlined,
-                                title: 'Notifiche',
-                                subtitle: 'Ricevi avvisi su tappe e premi',
+                                title: AppLocalizations.of(context)!.settingsNotifications,
+                                subtitle: AppLocalizations.of(context)!.settingsNotifSubtitle,
                                 accent: AppPalette.tan,
                                 value: _controller.notifiche,
                                 onChanged: (v) => _controller.updatePreference(
@@ -497,8 +511,8 @@ class _SettingsPageState extends State<SettingsPage>
                               const _ThinDivider(),
                               _SwitchRow(
                                 icon: Icons.dark_mode_outlined,
-                                title: 'Modalità Notte',
-                                subtitle: 'Tema scuro per l\'intera app',
+                                title: AppLocalizations.of(context)!.settingsDarkMode,
+                                subtitle: AppLocalizations.of(context)!.settingsDarkModeSubtitle,
                                 accent: AppPalette.olive,
                                 value: _controller.modalitaNotte,
                                 onChanged: (v) => _controller.updatePreference(
@@ -510,7 +524,7 @@ class _SettingsPageState extends State<SettingsPage>
                           const SizedBox(height: 32),
 
                           // --- PRIVACY ---
-                          const _SectionLabel('Privacy'),
+                          _SectionLabel(AppLocalizations.of(context)!.settingsPrivacy),
                           const SizedBox(height: 16),
                           _SettingsCard(
                             children: [
@@ -518,8 +532,8 @@ class _SettingsPageState extends State<SettingsPage>
                                 key: _gpsToggleKey,
                                 child: _SwitchRow(
                                   icon: Icons.location_on_outlined,
-                                  title: 'Posizione GPS',
-                                  subtitle: 'Necessario per esplorare la mappa',
+                                  title: AppLocalizations.of(context)!.settingsGps,
+                                  subtitle: AppLocalizations.of(context)!.settingsGpsSubtitle,
                                   accent: AppPalette.moss,
                                   value: _controller.posizione,
                                   onChanged: (v) => _controller
@@ -529,8 +543,8 @@ class _SettingsPageState extends State<SettingsPage>
                               const _ThinDivider(),
                               _ActionRow(
                                 icon: Icons.privacy_tip_outlined,
-                                title: 'Informativa privacy',
-                                subtitle: 'Leggi come vengono trattati i dati',
+                                title: AppLocalizations.of(context)!.settingsPrivacyPolicy,
+                                subtitle: AppLocalizations.of(context)!.settingsPrivacySubtitle,
                                 accent: AppPalette.tan,
                                 onTap: () => launchUrl(
                                   Uri.parse(
@@ -543,13 +557,13 @@ class _SettingsPageState extends State<SettingsPage>
                           const SizedBox(height: 32),
 
                           // --- GENERALE ---
-                          const _SectionLabel('Generale'),
+                          _SectionLabel(AppLocalizations.of(context)!.settingsGeneral),
                           const SizedBox(height: 16),
                           _SettingsCard(
                             children: [
                               _ActionRow(
                                 icon: Icons.language,
-                                title: 'Lingua',
+                                title: AppLocalizations.of(context)!.settingsLanguage,
                                 subtitle: _uiController.selectedLanguage,
                                 accent: AppPalette.olive,
                                 onTap: _showLanguagePicker,
@@ -559,25 +573,25 @@ class _SettingsPageState extends State<SettingsPage>
                           const SizedBox(height: 32),
 
                           // --- INFO ---
-                          const _SectionLabel('Info'),
+                          _SectionLabel(AppLocalizations.of(context)!.settingsInfo),
                           const SizedBox(height: 16),
                           _SettingsCard(
                             children: [
                               _ActionRow(
                                 icon: Icons.info_outline,
-                                title: 'Versione',
-                                subtitle: '1.0.0',
+                                title: AppLocalizations.of(context)!.settingsVersion,
+                                subtitle: AppLocalizations.of(context)!.versionSubtitle,
                                 accent: AppPalette.moss,
                                 onTap: () => _showActionSheet(
-                                  'Versione app',
-                                  'Build number: 1.0.0',
+                                  AppLocalizations.of(context)!.versionSheetTitle,
+                                  AppLocalizations.of(context)!.versionSheetBody,
                                 ),
                               ),
                               const _ThinDivider(),
                               _ActionRow(
                                 icon: Icons.description_outlined,
-                                title: 'Termini di servizio',
-                                subtitle: 'Regole d’uso e responsabilità',
+                                title: AppLocalizations.of(context)!.settingsTerms,
+                                subtitle: AppLocalizations.of(context)!.settingsTermsSubtitle,
                                 accent: AppPalette.olive,
                                 onTap: () => launchUrl(
                                   Uri.parse(
@@ -588,11 +602,11 @@ class _SettingsPageState extends State<SettingsPage>
                               const _ThinDivider(),
                               _ActionRow(
                                 icon: Icons.mail_outline,
-                                title: 'Contatti',
+                                title: AppLocalizations.of(context)!.settingsContacts,
                                 subtitle: 'cesenaremembers@gmail.com',
                                 accent: AppPalette.tan,
                                 onTap: () => _showActionSheet(
-                                  'Contatti',
+                                  AppLocalizations.of(context)!.settingsContacts,
                                   'cesenaremembers@gmail.com',
                                 ),
                               ),

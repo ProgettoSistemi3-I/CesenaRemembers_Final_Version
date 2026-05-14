@@ -27,7 +27,7 @@ class LeaderboardEntry {
       uid: data['uid'] as String,
       displayName: (data['displayName'] as String?)?.trim().isNotEmpty == true
           ? (data['displayName'] as String).trim()
-          : 'Utente',
+          : 'default_user',
       username: (data['username'] as String?)?.trim() ?? '',
       avatarId: (data['avatarId'] as String?)?.trim().isNotEmpty == true
           ? (data['avatarId'] as String).trim()
@@ -105,7 +105,7 @@ class SocialController extends ChangeNotifier {
           },
           onError: (error) {
             isLeaderboardLoading = false;
-            errorMessage = 'Impossibile caricare la classifica.';
+            errorMessage = 'errorLoadLeaderboard';
             _safeNotifyListeners();
           },
         );
@@ -143,7 +143,7 @@ class SocialController extends ChangeNotifier {
         searchResults = results;
       } catch (e) {
         if (_isDisposed || searchId != _searchSequence) return;
-        errorMessage = 'Errore durante la ricerca.';
+        errorMessage = 'errorSearch';
       } finally {
         if (_isDisposed || searchId != _searchSequence) return;
         isSearching = false;
@@ -189,7 +189,7 @@ class SocialController extends ChangeNotifier {
       }
       return true;
     } catch (e) {
-      errorMessage = 'Errore durante l\'azione.';
+      errorMessage = 'errorAction';
       _safeNotifyListeners();
       return false;
     }

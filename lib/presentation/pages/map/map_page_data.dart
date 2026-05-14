@@ -42,7 +42,7 @@ extension _MapPageDataLogic on _MapPageState {
       setState(() {
         _pois = [];
         _markers = const [];
-        _loadError = 'Errore nel caricamento dei punti di interesse.';
+        _loadError = 'errorLoadPoi';
         _isLoading = false;
       });
     }

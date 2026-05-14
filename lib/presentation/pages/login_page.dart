@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../domain/usecases/auth_use_cases.dart';
 import '../../injection_container.dart';
+import 'package:cesena_remembers/l10n/app_localizations.dart';
 
 const String _googleLogoSvg = '''
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -88,7 +89,7 @@ class _LoginPageState extends State<LoginPage>
       if (!mounted) return;
       setState(
         () => _error =
-            'Accesso non riuscito. Controlla la connessione e riprova.',
+            AppLocalizations.of(context)!.errorLoginFailed,
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -98,9 +99,9 @@ class _LoginPageState extends State<LoginPage>
   String _mapAuthErrorMessage(FirebaseAuthException exception) {
     switch (exception.code) {
       case 'network-request-failed':
-        return 'Sei offline. Controlla la connessione Internet e riprova.';
+        return AppLocalizations.of(context)!.errorOffline;
       default:
-        return 'Accesso non riuscito. Riprova tra qualche secondo.';
+        return AppLocalizations.of(context)!.errorLoginGeneric;
     }
   }
 
@@ -304,7 +305,7 @@ class _LoginPageState extends State<LoginPage>
             ),
             SizedBox(width: logoSize * 0.5),
             Text(
-              "ACCEDI CON GOOGLE",
+              AppLocalizations.of(context)!.loginGoogleButton,
               style: TextStyle(
                 fontSize: btnFontSize,
                 fontWeight: FontWeight.bold,

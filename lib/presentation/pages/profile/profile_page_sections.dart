@@ -286,7 +286,7 @@ class _HeroCard extends StatelessWidget {
 
               children: [
                 _MiniStat(
-                  label: 'Amici',
+                  label: AppLocalizations.of(context)!.profileFriends,
 
                   value: friendsCount,
 
@@ -298,7 +298,7 @@ class _HeroCard extends StatelessWidget {
                 const _VerticalDivider(),
 
                 _MiniStat(
-                  label: 'Punti',
+                  label: AppLocalizations.of(context)!.profilePoints,
 
                   value: points,
 
@@ -572,7 +572,7 @@ class _AchievementTile extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    achievement.title,
+                    AppLocalizations.of(context)!.achievementTitle(achievement.id),
                     style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
                   ),
                 ),
@@ -580,8 +580,8 @@ class _AchievementTile extends StatelessWidget {
             ),
             content: Text(
               isUnlocked
-                  ? achievement.description
-                  : '🔒  ${achievement.description}',
+                  ? AppLocalizations.of(context)!.achievementDescription(achievement.id)
+                  : '🔒  ${AppLocalizations.of(context)!.achievementDescription(achievement.id)}',
               style: TextStyle(
                 color: isUnlocked
                     ? theme.colorScheme.onSurface
@@ -619,7 +619,7 @@ class _AchievementTile extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            isUnlocked ? achievement.title : '???',
+            isUnlocked ? AppLocalizations.of(context)!.achievementTitle(achievement.id) : '???',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
@@ -718,7 +718,7 @@ class _AvatarPickerSheet extends StatelessWidget {
           ),
 
           Text(
-            'Scegli il tuo Avatar',
+            AppLocalizations.of(context)!.avatarPickerTitle,
 
             style: TextStyle(
               fontSize: 20,
@@ -732,7 +732,7 @@ class _AvatarPickerSheet extends StatelessWidget {
           const SizedBox(height: 8),
 
           Text(
-            'Personalizza il tuo profilo',
+            AppLocalizations.of(context)!.avatarPickerSubtitle,
 
             style: TextStyle(
               fontSize: 14,

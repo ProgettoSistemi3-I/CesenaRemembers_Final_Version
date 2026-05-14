@@ -64,11 +64,9 @@ class LocationIssueBanner extends StatelessWidget {
                     Text(
                       isGpsEnabled
                           ? (isGpsPreferenceEnabled
-                                ? 'Permessi mancanti'
-                                : AppLocalizations.of(
-                                    context,
-                                  )!.locationDisabled)
-                          : 'GPS Disattivato',
+                                ? AppLocalizations.of(context)!.locationBannerMissingPermission
+                                : AppLocalizations.of(context)!.locationDisabled)
+                          : AppLocalizations.of(context)!.locationBannerGpsOff,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
@@ -78,8 +76,8 @@ class LocationIssueBanner extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       isGpsPreferenceEnabled
-                          ? 'Attiva la posizione per esplorare la mappa in tempo reale.'
-                          : 'Riattiva la posizione nelle impostazioni per mostrare la tua posizione sulla mappa.',
+                          ? AppLocalizations.of(context)!.locationBannerEnableLocation
+                          : AppLocalizations.of(context)!.locationBannerReEnableLocation,
                       style: TextStyle(
                         fontSize: 12,
                         height: 1.3,
@@ -99,9 +97,9 @@ class LocationIssueBanner extends StatelessWidget {
                   ),
                 ),
                 onPressed: onResolve,
-                child: const Text(
-                  'Risolvi',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                child: Text(
+                  AppLocalizations.of(context)!.locationBannerResolve,
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
                 ),
               ),
             ],

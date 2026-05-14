@@ -8,6 +8,7 @@ import '../../injection_container.dart';
 import '../pages/login_page.dart';
 import '../pages/profile/profile_setup_page.dart';
 import '../theme/theme_controller.dart';
+import 'package:cesena_remembers/l10n/app_localizations.dart';
 import 'main_shell.dart';
 
 class AuthGate extends StatelessWidget {
@@ -79,7 +80,7 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Text(
-                  'Errore di inizializzazione profilo: ${ensureSnapshot.error}',
+                  '${AppLocalizations.of(context)!.errorLoadProfile}: ${ensureSnapshot.error}',
                   textAlign: TextAlign.center,
                 ),
               ),

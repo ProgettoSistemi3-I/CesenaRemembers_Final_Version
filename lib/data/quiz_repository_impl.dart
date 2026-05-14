@@ -10,7 +10,7 @@ import 'seeds/historic_places_seed.dart';
 
 class QuizRepositoryImpl implements IQuizRepository {
   static const String _baseUrl = 'https://sharika-matripotestal-ina.ngrok-free.dev';
-  static const _fallbackDifficultyLabel = 'Difficoltà standard (seed locale)';
+  static const _fallbackDifficultyLabel = 'quiz_fallback_name';
 
   @override
   Future<QuizLoadResult> getQuizForPoi(
@@ -27,7 +27,7 @@ class QuizRepositoryImpl implements IQuizRepository {
               'id': poiId,
               'name': poiName,
               'description':
-                  'Informazioni storiche generali su $poiName della città di Cesena.',
+                  'General historical information about $poiName in the city of Cesena.',
               'userXp': userXp,
             }),
           )
@@ -57,7 +57,7 @@ class QuizRepositoryImpl implements IQuizRepository {
         questions: _fallbackQuestions(poiId),
         usesPersonalizedQuestions: false,
         fallbackNotice:
-            'Per un errore del server le domande non sono personalizzate e usano una difficoltà locale specifica.',
+            'quiz_fallback_desc',
         fallbackDifficultyLabel: _fallbackDifficultyLabel,
       );
     }

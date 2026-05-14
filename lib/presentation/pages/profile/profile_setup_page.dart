@@ -6,6 +6,7 @@ import '../../../domain/usecases/user_profile_use_cases.dart';
 import '../../../injection_container.dart';
 import '../../theme/app_palette.dart';
 import 'avatar_catalog.dart';
+import 'package:cesena_remembers/l10n/app_localizations.dart';
 
 class ProfileSetupPage extends StatefulWidget {
   const ProfileSetupPage({
@@ -56,14 +57,14 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
     if (!ProfileValidation.isValidDisplayName(displayName)) {
       setState(
         () => _error =
-            'Il nome in app deve avere ${ProfileValidation.minDisplayNameLength}-${ProfileValidation.maxDisplayNameLength} caratteri.',
+            AppLocalizations.of(context)!.profileNameTooShort(ProfileValidation.minDisplayNameLength, ProfileValidation.maxDisplayNameLength),
       );
       return;
     }
     if (ProfileValidation.hasOffensiveDisplayName(displayName)) {
       setState(
         () => _error =
-            'Il nome in app contiene termini non consentiti. Scegline uno diverso.',
+            AppLocalizations.of(context)!.profileNameOffensive,
       );
       return;
     }
@@ -71,14 +72,14 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
     if (!ProfileValidation.isValidUsername(normalizedUsername)) {
       setState(
         () => _error =
-            'Username non valido (usa ${ProfileValidation.minUsernameLength}-${ProfileValidation.maxUsernameLength} caratteri: a-z, 0-9, _ o .).',
+            AppLocalizations.of(context)!.setupUsernameInvalid(ProfileValidation.minUsernameLength, ProfileValidation.maxUsernameLength),
       );
       return;
     }
     if (ProfileValidation.hasOffensiveUsername(normalizedUsername)) {
       setState(
         () => _error =
-            'Username contiene termini non consentiti. Scegline uno diverso.',
+            AppLocalizations.of(context)!.setupUsernameOffensive,
       );
       return;
     }
@@ -97,7 +98,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
         );
         if (!available) {
           setState(() {
-            _error = 'Username già in uso. Scegline un altro.';
+            _error = AppLocalizations.of(context)!.setupUsernameTaken;
             _isSaving = false;
           });
           return;
@@ -120,26 +121,26 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
       final message = e.toString();
       setState(() {
         if (message.contains('USERNAME_NOT_AVAILABLE')) {
-          _error = 'Username già in uso. Scegline un altro.';
+          _error = AppLocalizations.of(context)!.setupUsernameTaken;
         } else if (message.contains('USERNAME_INDEX_PERMISSION_DENIED')) {
           _error =
-              'Configurazione Firestore non valida: servono permessi di lettura/scrittura su usernames/{username}.';
+              AppLocalizations.of(context)!.setupFirestoreError(normalizedUsername);
         } else if (message.contains('INVALID_DISPLAY_NAME')) {
           _error =
-              'Il nome in app deve avere ${ProfileValidation.minDisplayNameLength}-${ProfileValidation.maxDisplayNameLength} caratteri.';
+              AppLocalizations.of(context)!.profileNameTooShort(ProfileValidation.minDisplayNameLength, ProfileValidation.maxDisplayNameLength);
         } else if (message.contains('INVALID_USERNAME')) {
           _error =
-              'Username non valido (usa ${ProfileValidation.minUsernameLength}-${ProfileValidation.maxUsernameLength} caratteri).';
+              AppLocalizations.of(context)!.setupUsernameInvalid(ProfileValidation.minUsernameLength, ProfileValidation.maxUsernameLength);
         } else if (message.contains('OFFENSIVE_DISPLAY_NAME')) {
           _error =
-              'Il nome in app contiene termini non consentiti. Scegline uno diverso.';
+              AppLocalizations.of(context)!.profileNameOffensive;
         } else if (message.contains('OFFENSIVE_USERNAME')) {
-          _error = 'Username contiene termini non consentiti. Scegline uno diverso.';
+          _error = AppLocalizations.of(context)!.setupUsernameOffensive;
         } else if (e is FirebaseException && e.code == 'permission-denied') {
           _error =
-              'Permessi Firestore insufficienti per completare il profilo. Controlla le regole del progetto.';
+              AppLocalizations.of(context)!.setupPermissionDenied;
         } else {
-          _error = 'Impossibile salvare il profilo. Riprova tra qualche secondo.';
+          _error = AppLocalizations.of(context)!.setupGenericError;
         }
         _isSaving = false;
       });
@@ -160,22 +161,22 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
             children: [
               const SizedBox(height: 24),
               Text(
-                'Crea il tuo profilo',
+                AppLocalizations.of(context)!.setupTitle,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Scegli username univoco (non modificabile), nome in app e avatar.',
+                AppLocalizations.of(context)!.setupSubtitle,
                 style: theme.textTheme.bodyMedium,
               ),
               const SizedBox(height: 28),
               TextField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nome in app',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.setupNameLabel,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
@@ -183,16 +184,16 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                 controller: _usernameController,
                 autocorrect: false,
                 textInputAction: TextInputAction.done,
-                decoration: const InputDecoration(
-                  labelText: 'Username',
-                  hintText: 'es. cesena_explorer',
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.setupUsernameLabel,
+                  hintText: AppLocalizations.of(context)!.setupUsernameHint,
                   prefixText: '@',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 20),
               Text(
-                'Scegli avatar',
+                AppLocalizations.of(context)!.setupAvatarLabel,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -242,7 +243,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                           width: 18,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('Conferma profilo'),
+                      : Text(AppLocalizations.of(context)!.setupSubmitButton),
                 ),
               ),
             ],

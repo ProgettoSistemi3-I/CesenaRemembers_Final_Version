@@ -6,6 +6,7 @@ import '../../../../injection_container.dart';
 import '../../../controllers/poi_quiz_controller.dart';
 import '../../../theme/app_palette.dart';
 import '../../../services/tour_formatters.dart';
+import '../../../../l10n/l10n_extensions.dart';
 
 class PoiBottomSheet extends StatefulWidget {
   const PoiBottomSheet({
@@ -72,7 +73,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
   }
 
   Future<void> _initQuizWithUserXp() async {
-    _quizController!.initQuiz(widget.stop.id, widget.stop.name, widget.userXp);
+    _quizController!.initQuiz(widget.stop.id, AppLocalizations.of(context)!.getPoiName(widget.stop.id), widget.userXp);
   }
 
   void _onAnswerTap(int index) {
@@ -148,7 +149,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.stop.name,
+                            AppLocalizations.of(context)!.getPoiName(widget.stop.id),
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w700,
@@ -220,9 +221,9 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                   fontWeight: FontWeight.w500,
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                tabs: const [
-                  Tab(text: 'Informazioni'),
-                  Tab(text: 'Quiz'),
+                tabs: [
+                  Tab(text: AppLocalizations.of(context)!.poiTabInfo),
+                  Tab(text: AppLocalizations.of(context)!.poiTabQuiz),
                 ],
               ),
               Expanded(
@@ -262,7 +263,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                                 ),
                               ),
                               Text(
-                                'Storia',
+                                AppLocalizations.of(context)!.poiSectionHistory,
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
@@ -273,7 +274,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            widget.stop.description,
+                            AppLocalizations.of(context)!.getPoiDescription(widget.stop.id),
                             style: TextStyle(
                               fontSize: 14,
                               height: 1.65,
@@ -300,18 +301,18 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                                             .surfaceContainerHighest,
                                 ),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(
+                                  const Icon(
                                     Icons.quiz_outlined,
                                     size: 16,
                                     color: AppPalette.tan,
                                   ),
-                                  SizedBox(width: 8),
+                                  const SizedBox(width: 8),
                                   Text(
-                                    'Fai il quiz su questa tappa →',
-                                    style: TextStyle(
+                                    AppLocalizations.of(context)!.poiStartQuiz,
+                                    style: const TextStyle(
                                       fontSize: 13,
                                       color: AppPalette.tan,
                                       fontWeight: FontWeight.w600,
@@ -377,7 +378,7 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
       return Column(
         children: [
           Text(
-            'Nessun quiz disponibile per questa tappa.',
+            AppLocalizations.of(context)!.poiNoQuiz,
             style: TextStyle(
               fontSize: 14,
               color: theme.colorScheme.onSurfaceVariant,
@@ -413,7 +414,10 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         Row(
           children: [
             Text(
-              'Domanda ${quizController.questionIndex + 1} di ${quizController.totalQuestions}',
+              AppLocalizations.of(context)!.quizQuestion(
+                quizController.questionIndex + 1,
+                quizController.totalQuestions,
+              ),
               style: TextStyle(
                 fontSize: 12,
                 color: theme.colorScheme.onSurfaceVariant,
@@ -447,13 +451,15 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
         if (!quizController.usesPersonalizedQuestions &&
             quizController.fallbackNotice != null) ...[
           _QuizFallbackBanner(
-            notice: quizController.fallbackNotice!,
-            difficultyLabel: quizController.fallbackDifficultyLabel,
+            notice: AppLocalizations.of(context)!
+                .getQuizString(quizController.fallbackNotice!),
+            difficultyLabel: AppLocalizations.of(context)!
+                .getQuizString(quizController.fallbackDifficultyLabel!),
           ),
           const SizedBox(height: 14),
         ],
         Text(
-          question.question,
+          AppLocalizations.of(context)!.getQuizString(question.question),
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w700,
@@ -534,7 +540,8 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      question.options[index],
+                      AppLocalizations.of(context)!
+                          .getQuizString(question.options[index]),
                       style: TextStyle(fontSize: 14, color: textColor),
                     ),
                   ),
@@ -557,10 +564,10 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                   color: AppPalette.olive,
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'Prossima domanda →',
-                    style: TextStyle(
+                    AppLocalizations.of(context)!.quizNextQuestion,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -583,10 +590,10 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                   color: AppPalette.olive,
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'Termina quiz →',
-                    style: TextStyle(
+                    AppLocalizations.of(context)!.quizFinish,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -621,9 +628,9 @@ class _QuizFallbackBanner extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Avviso quiz',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.quizNotice,
+            style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
               color: AppPalette.tan,
@@ -700,7 +707,10 @@ class QuizResultCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '$score / $total risposte corrette',
+            AppLocalizations.of(context)!.quizCorrectAnswers(
+              score,
+              total,
+            ),
             style: TextStyle(
               fontSize: 15,
               color: theme.colorScheme.onSurfaceVariant,
@@ -717,7 +727,7 @@ class QuizResultCard extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                'Tempo: ${formatElapsed(elapsed)}',
+                AppLocalizations.of(context)!.quizTime(formatElapsed(elapsed)),
                 style: TextStyle(
                   fontSize: 13,
                   color: theme.colorScheme.onSurfaceVariant,
@@ -754,14 +764,14 @@ class NextStopActionButton extends StatelessWidget {
             ),
           ],
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.directions_walk, color: Colors.white, size: 20),
-            SizedBox(width: 10),
+            const Icon(Icons.directions_walk, color: Colors.white, size: 20),
+            const SizedBox(width: 10),
             Text(
-              'Prossima tappa →',
-              style: TextStyle(
+              AppLocalizations.of(context)!.quizNextStop,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 15,
                 fontWeight: FontWeight.w700,

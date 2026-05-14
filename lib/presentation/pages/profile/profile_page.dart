@@ -18,6 +18,7 @@ import '../../theme/app_palette.dart';
 import '../social/public_profile_page.dart';
 
 import 'avatar_catalog.dart';
+import 'package:cesena_remembers/l10n/l10n_extensions.dart';
 
 part 'profile_page_sections.dart';
 
@@ -127,7 +128,10 @@ class _ProfilePageState extends State<ProfilePage>
 
     if (!ProfileValidation.isValidDisplayName(updatedName)) {
       _profileController.setError(
-        'Il nome deve avere ${ProfileValidation.minDisplayNameLength}-${ProfileValidation.maxDisplayNameLength} caratteri.',
+        AppLocalizations.of(context)!.profileNameTooShort(
+          ProfileValidation.minDisplayNameLength,
+          ProfileValidation.maxDisplayNameLength,
+        ),
       );
 
       setState(() => _nameController.text = profile.displayName);
@@ -137,7 +141,7 @@ class _ProfilePageState extends State<ProfilePage>
 
     if (ProfileValidation.hasOffensiveDisplayName(updatedName)) {
       _profileController.setError(
-        'Il nome contiene termini non consentiti.\nInseriscine uno diverso.',
+        AppLocalizations.of(context)!.profileNameOffensive,
       );
 
       setState(() => _nameController.text = profile.displayName);
@@ -194,7 +198,7 @@ class _ProfilePageState extends State<ProfilePage>
       builder: (_) => FractionallySizedBox(
         heightFactor: 0.8,
 
-        child: _buildUserListSheet('I tuoi Amici', users, theme),
+        child: _buildUserListSheet(AppLocalizations.of(context)!.profileYourFriends, users, theme),
       ),
     );
   }
@@ -220,7 +224,7 @@ class _ProfilePageState extends State<ProfilePage>
       builder: (_) => FractionallySizedBox(
         heightFactor: 0.8,
 
-        child: _buildUserListSheet('Richieste d\'amicizia', users, theme),
+        child: _buildUserListSheet(AppLocalizations.of(context)!.profileFriendRequests, users, theme),
       ),
     );
   }
@@ -297,7 +301,7 @@ class _ProfilePageState extends State<ProfilePage>
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Nessuna richiesta al momento.',
+                        AppLocalizations.of(context)!.profileNoRequests,
                         style: TextStyle(
                           color: theme.colorScheme.onSurfaceVariant,
                           fontSize: 14,
@@ -493,7 +497,7 @@ class _ProfilePageState extends State<ProfilePage>
                     pinned: true,
 
                     title: Text(
-                      'Il mio profilo',
+                      AppLocalizations.of(context)!.profileTitle,
 
                       style: TextStyle(
                         color: theme.colorScheme.onSurface,
@@ -637,7 +641,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                           const SizedBox(height: 32),
 
-                          const _SectionLabel('Statistiche'),
+                          _SectionLabel(AppLocalizations.of(context)!.sectionStatistics),
 
                           const SizedBox(height: 16),
 
@@ -657,14 +661,14 @@ class _ProfilePageState extends State<ProfilePage>
                             children: [
                               _StatCard(
                                 icon: Icons.bolt_rounded,
-                                label: 'XP Totali',
+                                label: AppLocalizations.of(context)!.statTotalXp,
                                 value: '${profile.xp}',
                                 color: AppPalette.olive,
                               ),
 
                               _StatCard(
                                 icon: Icons.emoji_events_outlined,
-                                label: 'Miglior tour (XP)',
+                                label: AppLocalizations.of(context)!.statBestTour,
                                 value: profile.maxSingleTourXp > 0
                                     ? '${profile.maxSingleTourXp}'
                                     : '--',
@@ -673,7 +677,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                               _StatCard(
                                 icon: Icons.map_outlined,
-                                label: 'Siti Visitati',
+                                label: AppLocalizations.of(context)!.statVisitedSites,
                                 value: '${profile.visitedCount}',
                                 color: AppPalette.moss,
                               ),
@@ -687,7 +691,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                               _StatCard(
                                 icon: Icons.timer_outlined,
-                                label: 'Miglior tempo',
+                                label: AppLocalizations.of(context)!.statBestTime,
                                 value: profile.bestTourTimeSeconds > 0
                                     ? _formatTime(profile.bestTourTimeSeconds)
                                     : '--',
@@ -696,7 +700,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                               _StatCard(
                                 icon: Icons.military_tech_rounded,
-                                label: 'Achievement',
+                                label: AppLocalizations.of(context)!.statAchievements,
                                 value: '${profile.achievementsCount}',
                                 color: AppPalette.moss,
                               ),
@@ -705,7 +709,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                           const SizedBox(height: 36),
 
-                          const _SectionLabel('Achievement'),
+                          _SectionLabel(AppLocalizations.of(context)!.sectionAchievements),
 
                           const SizedBox(height: 16),
 

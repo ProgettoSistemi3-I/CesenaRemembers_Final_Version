@@ -49,8 +49,9 @@ class UserSocialDataSource {
     final currentData = currentSnap.data() ?? <String, dynamic>{};
 
     final currentFriends = List<String>.from(currentData['friends'] ?? []);
-    if (!currentFriends.contains(requesterUid))
+    if (!currentFriends.contains(requesterUid)) {
       currentFriends.add(requesterUid);
+    }
 
     final currentUnlocked = List<String>.from(
       currentData['unlockedAchievements'] ?? [],

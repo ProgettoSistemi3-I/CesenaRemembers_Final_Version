@@ -55,7 +55,7 @@ class PoiQuizController extends ChangeNotifier {
       _quizDone = _questions.isEmpty;
       _lastQuestionAnswered = false;
     } catch (_) {
-      _error = 'Errore durante la comunicazione con il server.';
+      _error = 'errorCommunication';
     } finally {
       _isLoading = false;
       notifyListeners();

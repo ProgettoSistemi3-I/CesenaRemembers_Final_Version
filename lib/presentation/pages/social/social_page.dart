@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cesena_remembers/l10n/app_localizations.dart';
 import '../../../injection_container.dart';
 import '../../controllers/social_controller.dart';
 import '../../services/shell_navigation_store.dart';
@@ -88,7 +89,7 @@ class _SocialPageState extends State<SocialPage> {
                       fontWeight: FontWeight.w500,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'Cerca utente...',
+                      hintText: AppLocalizations.of(context)!.socialSearchHint,
                       hintStyle: TextStyle(
                         color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                         fontWeight: FontWeight.w400,
@@ -150,7 +151,7 @@ class _SocialPageState extends State<SocialPage> {
     if (_controller.leaderboard.isEmpty) {
       return Center(
         child: Text(
-          'Nessun utente in classifica al momento.',
+          AppLocalizations.of(context)!.socialLeaderboardEmpty,
           style: TextStyle(
             color: theme.colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w600,
@@ -181,7 +182,7 @@ class _SocialPageState extends State<SocialPage> {
               ),
               const SizedBox(width: 12),
               Text(
-                'Classifica Globale',
+                AppLocalizations.of(context)!.socialLeaderboard,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
@@ -316,7 +317,7 @@ class _SocialPageState extends State<SocialPage> {
                     children: [
                       Text(
                         isCurrentUser && isPinned
-                            ? "${entry.displayName} (Tu)"
+                            ? "${entry.displayName} (${AppLocalizations.of(context)!.socialYou})"
                             : entry.displayName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -330,7 +331,7 @@ class _SocialPageState extends State<SocialPage> {
                       Text(
                         entry.username.isNotEmpty
                             ? '@${entry.username}'
-                            : '@utente',
+                            : '@${AppLocalizations.of(context)!.socialDefaultUsername}',
                         style: TextStyle(
                           color: theme.colorScheme.onSurfaceVariant,
                           fontSize: 13,
@@ -386,7 +387,7 @@ class _SocialPageState extends State<SocialPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Digita almeno 2 caratteri per cercare.',
+              AppLocalizations.of(context)!.socialTypeMoreChars,
               style: TextStyle(
                 color: theme.colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
@@ -408,7 +409,7 @@ class _SocialPageState extends State<SocialPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Nessun utente trovato.',
+              AppLocalizations.of(context)!.socialNoUserFound,
               style: TextStyle(
                 color: theme.colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,

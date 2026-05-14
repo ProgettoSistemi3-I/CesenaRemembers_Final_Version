@@ -53,6 +53,7 @@
   "buttonCancel": "Annulla",
   "buttonDelete": "Elimina",
   "buttonOk": "Perfetto",
+  "buttonRetry": "Riprova",
   "navMap": "Mappa",
   "navProfile": "Profilo",
   "navSettings": "Impostazioni",
@@ -65,7 +66,7 @@
     }
   },
   "errorConnection": "Errore di connessione. Modifica annullata.",
-  "errorLogout": "Logout fallito: {error}",
+  "errorLogout": "Logout fallito.",
   "@errorLogout": {
     "placeholders": {
       "error": {
@@ -82,6 +83,8 @@
       }
     }
   },
+  "errorLoadProfile": "Impossibile caricare il profilo.",
+  "errorOperationFailed": "Operazione non riuscita. Stato ripristinato.",
   "tourStopped": "Tour interrotto.",
   "errorSaveScore": "Errore nel salvataggio del punteggio. Riprova tra poco.",
   "errorLoadPoi": "Errore nel caricamento dei punti di interesse.",
@@ -99,5 +102,338 @@
   "tourStartGpsRequired": "Per iniziare il tour attiva GPS, permessi posizione e opzione nell'app.",
   "tourCompleted": "🎉 Tour completato! Ottimo lavoro.",
   "tourStopButton": "Interrompi tour",
-  "tourOrderButton": "Ordina tappe"
+  "tourOrderButton": "Ordina tappe",
+  "profileTitle": "Il mio profilo",
+  "sectionStatistics": "Statistiche",
+  "sectionAchievements": "Achievement",
+  "statTotalXp": "XP Totali",
+  "statBestTour": "Miglior tour (XP)",
+  "statVisitedSites": "Siti Visitati",
+  "statBestTime": "Miglior tempo",
+  "statAchievements": "Achievement",
+  "profileFriends": "Amici",
+  "profilePoints": "Punti",
+  "profileNoRequests": "Nessuna richiesta al momento.",
+  "profileYourFriends": "I tuoi Amici",
+  "profileFriendRequests": "Richieste d'amicizia",
+  "profileNameTooShort": "Il nome deve avere {min}-{max} caratteri.",
+  "@profileNameTooShort": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "profileNameOffensive": "Il nome contiene termini non consentiti.\nInseriscine uno diverso.",
+  "avatarPickerTitle": "Scegli il tuo Avatar",
+  "avatarPickerSubtitle": "Personalizza il tuo profilo",
+  "poiTabInfo": "Informazioni",
+  "poiTabQuiz": "Quiz",
+  "poiSectionHistory": "Storia",
+  "poiStartQuiz": "Fai il quiz su questa tappa →",
+  "poiNoQuiz": "Nessun quiz disponibile per questa tappa.",
+  "quizNextQuestion": "Prossima domanda →",
+  "quizFinish": "Termina quiz →",
+  "quizNextStop": "Prossima tappa →",
+  "quizNotice": "Avviso quiz",
+  "quizCorrectAnswers": "{score} / {total} risposte corrette",
+  "@quizCorrectAnswers": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "quizTime": "Tempo: {time}",
+  "@quizTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "quizQuestion": "Domanda {current} di {total}",
+  "@quizQuestion": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "tourStartButton": "Inizia il tour",
+  "tourArrivedButton": "Sono arrivato",
+  "tourStopCardArrived": "Sei arrivato! Tocca per aprire",
+  "tourStopCardDistance": "{distance} · tappa {index}/{total}",
+  "@tourStopCardDistance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      },
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "tourPlanTitle": "Ordine tappe",
+  "tourPlanSubtitle": "Trascina dalla maniglia per riordinare il percorso.",
+  "tourPlanFirstStop": "Prima tappa del tour",
+  "tourPlanDistanceFromPrev": "{distance} dalla precedente",
+  "@tourPlanDistanceFromPrev": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "tourPlanCurrentLabel": "Attuale",
+  "locationBannerMissingPermission": "Permessi mancanti",
+  "locationBannerGpsOff": "GPS Disattivato",
+  "locationBannerEnableLocation": "Attiva la posizione per esplorare la mappa in tempo reale.",
+  "locationBannerReEnableLocation": "Riattiva la posizione nelle impostazioni per mostrare la tua posizione sulla mappa.",
+  "locationBannerResolve": "Risolvi",
+  "socialSearchHint": "Cerca utente...",
+  "socialLeaderboardEmpty": "Nessun utente in classifica al momento.",
+  "socialLeaderboard": "Classifica Globale",
+  "socialNoUserFound": "Nessun utente trovato.",
+  "socialTypeMoreChars": "Digita almeno 2 caratteri per cercare.",
+  "socialYou": "Tu",
+  "socialDefaultUsername": "utente",
+  "socialFriendsOf": "Amici di {name}",
+  "@socialFriendsOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "socialMustBeFriend": "Devi essere amico per vedere la sua lista amici.",
+  "socialRequestSent": "Richiesta inviata",
+  "socialAccept": "Accetta",
+  "socialReject": "Rifiuta",
+  "socialAddFriend": "Aggiungi agli amici",
+  "publicStatDetailed": "Statistiche Dettagliate",
+  "publicStatAchievements": "Traguardi",
+  "publicStatBestScore": "Miglior Score",
+  "publicStatSites": "Siti Visitati",
+  "publicStatQuiz": "Quiz Superati",
+  "publicStatBestTime": "Tempo Migliore",
+  "publicStatCorrectAnswers": "Risposte Esatte",
+  "publicStatFriends": "Amici",
+  "publicStatPoints": "Punti",
+  "publicStatLevel": "Livello",
+  "errorLoginFailed": "Accesso non riuscito. Controlla la connessione e riprova.",
+  "errorOffline": "Sei offline. Controlla la connessione Internet e riprova.",
+  "errorLoginGeneric": "Accesso non riuscito. Riprova tra qualche secondo.",
+  "loginGoogleButton": "ACCEDI CON GOOGLE",
+  "errorCommunication": "Errore durante la comunicazione con il server.",
+  "errorNotLoggedIn": "Utente non loggato.",
+  "errorLoadPrefs": "Errore nel caricamento preferenze.",
+  "errorGpsDenied": "Permesso negato o GPS disattivato. Controlla le impostazioni.",
+  "errorConnectionSettings": "Errore di connessione. Modifica annullata.",
+  "errorDeleteAccount": "Impossibile eliminare i dati.",
+  "errorDeleteAccountAuth": "Account non eliminato completamente. I dati app sono stati rimossi, ma la cancellazione auth è fallita. Verrai disconnesso per sicurezza.",
+  "errorSyncProfile": "Impossibile sincronizzare il profilo.",
+  "errorSaveProfile": "Salvataggio profilo non riuscito.",
+  "errorLoadLeaderboard": "Impossibile caricare la classifica.",
+  "settingsTourTitle": "Tour interattivo WWII",
+  "settingsTourSubtitle": "Gestisci privacy, notifiche e lingua in un unico posto.",
+  "settingsCredits": "Crediti",
+  "settingsCreditsTitle": "Crediti e Riconoscimenti",
+  "settingsCreditsSubtitle": "Scopri il team dietro Cesena Remembers",
+  "settingsAccount": "Account",
+  "settingsLogout": "Logout",
+  "settingsLogoutInProgress": "Uscita in corso...",
+  "settingsLogoutSubtitle": "Esci dall'account corrente",
+  "settingsDelete": "Elimina account",
+  "settingsDeleteInProgress": "Eliminazione in corso...",
+  "settingsDeleteSubtitle": "Rimuovi profilo e dati associati",
+  "settingsAppPrefs": "Preferenze App",
+  "settingsNotifications": "Notifiche",
+  "settingsNotifSubtitle": "Ricevi avvisi su tappe e premi",
+  "settingsDarkMode": "Modalità Notte",
+  "settingsDarkModeSubtitle": "Tema scuro per l'intera app",
+  "settingsPrivacy": "Privacy",
+  "settingsGps": "Posizione GPS",
+  "settingsGpsSubtitle": "Necessario per esplorare la mappa",
+  "settingsPrivacyPolicy": "Informativa privacy",
+  "settingsPrivacySubtitle": "Leggi come vengono trattati i dati",
+  "settingsGeneral": "Generale",
+  "settingsLanguage": "Lingua",
+  "settingsInfo": "Info",
+  "settingsVersion": "Versione",
+  "settingsTerms": "Termini di servizio",
+  "settingsTermsSubtitle": "Regole d'uso e responsabilità",
+  "settingsContacts": "Contatti",
+  "settingsClose": "Chiudi",
+  "settingsPerfect": "Perfetto",
+  "settingsDeleteConfirmTitle": "Eliminare account?",
+  "settingsDeleteConfirmBody": "Questa operazione rimuove account, progressi e dati associati in modo permanente.",
+  "settingsCancel": "Annulla",
+  "settingsDeleteConfirmBtn": "Elimina",
+  "settingsDeleteSuccess": "Account eliminato definitivamente.",
+  "settingsDeleteError": "Impossibile completare ora. Controlla il messaggio di errore.",
+  "achievement_first_visit_title": "Primo passo",
+  "achievement_first_visit_desc": "Visita il tuo primo sito storico",
+  "achievement_first_quiz_title": "Studente",
+  "achievement_first_quiz_desc": "Completa il tuo primo quiz",
+  "achievement_first_tour_title": "Pioniere",
+  "achievement_first_tour_desc": "Finisci il tuo primo tour completo",
+  "achievement_quiz_15_title": "Veterano",
+  "achievement_quiz_15_desc": "Completa 15 quiz",
+  "achievement_perfect_tour_title": "Infallibile",
+  "achievement_perfect_tour_desc": "Rispondi correttamente a tutte le domande in un tour",
+  "achievement_xp_500_title": "Collezionista",
+  "achievement_xp_500_desc": "Raggiungi 500 XP totali",
+  "achievement_tour_under_1h_title": "In marcia",
+  "achievement_tour_under_1h_desc": "Completa un tour in meno di 1 ora",
+  "achievement_tour_under_30m_title": "Fulmine",
+  "achievement_tour_under_30m_desc": "Completa un tour in meno di 30 minuti",
+  "achievement_friend_1_title": "Cittadino",
+  "achievement_friend_1_desc": "Aggiungi il tuo primo amico",
+  "achievement_friend_5_title": "Circolo storico",
+  "achievement_friend_5_desc": "Raggiungi 5 amici",
+  "poi_santa_cristina_name": "Chiesa di Santa Cristina",
+  "poi_santa_cristina_desc": "Chiesa storica con cupola emisferica e campanile, inserita nel tessuto urbano residenziale di Cesena. Rappresenta l'equilibrio tra architettura religiosa e sviluppo cittadino. Durante la Seconda Guerra Mondiale fu un probabile punto di riferimento visivo durante i bombardamenti, utile per l'orientamento della popolazione. L'area circostante venne parzialmente colpita o modificata nel dopoguerra, con spazi urbani ridefiniti.",
+  "poi_rocca_name": "Rocca Malatestiana",
+  "poi_rocca_desc": "Fortezza medievale dominante sulla città, con mura merlate e torrioni; elemento difensivo e simbolico centrale di Cesena. Costruita dai Malatesta nel 1380, ospita la Biblioteca Malatestiana, patrimonio UNESCO dal 2005. Durante la Seconda Guerra Mondiale fu riutilizzata come rifugio naturale grazie alla sua struttura massiccia: il colle ospitò gallerie e rifugi antiaerei per la protezione della popolazione civile durante i bombardamenti.",
+  "poi_san_rocco_name": "Chiesa di San Rocco",
+  "poi_san_rocco_desc": "Chiesa situata in un quartiere popolare di Cesena, con edifici semplici e strade storicamente sterrate. Dedicata a San Rocco, patrono degli appestati, è da secoli un punto di riferimento spirituale per le classi lavoratrici. Durante la Seconda Guerra Mondiale il quartiere, abitato da famiglie operaie, fu direttamente esposto alle difficoltà dei bombardamenti e la chiesa rappresentò un possibile luogo di raccolta e transito verso i rifugi durante gli allarmi aerei.",
+  "poi_abbazia_monte_name": "Abbazia di Santa Maria del Monte",
+  "poi_abbazia_monte_desc": "Complesso monastico su un colle dominante la città, circondato da campagna coltivata; forte simbolo religioso e territoriale di Cesena da oltre mille anni. La sua posizione elevata la rese strategicamente significativa durante la Seconda Guerra Mondiale: fu usata come punto di osservazione o riferimento visivo per le operazioni militari. L'area collinare offrì rifugio e isolamento rispetto ai bombardamenti del centro urbano.",
+  "poi_osservanza_name": "Chiesa e Convento dell'Osservanza",
+  "poi_osservanza_desc": "Complesso religioso francescano immerso nella campagna cesenate, storicamente separato dal centro urbano. La chiesa conserva pregevoli opere d'arte del Quattrocento e Cinquecento. Durante la Seconda Guerra Mondiale l'isolamento rispetto alla città lo rendeva meno esposto agli attacchi diretti, diventando un possibile luogo di rifugio e assistenza spirituale per sfollati e popolazione rurale in fuga dai bombardamenti.",
+  "poi_palazzo_ridotto_name": "Palazzo del Ridotto",
+  "poi_palazzo_ridotto_desc": "Edificio storico con torre civica, simbolo del centro cittadino e della vita pubblica di Cesena. Affaccia sulla Piazza del Popolo, cuore della città fin dal Medioevo, dominata anche dalla fontana del Masini. Durante la Seconda Guerra Mondiale ospitava una sirena antiaerea fondamentale per segnalare l'arrivo dei bombardamenti, costituendo un nodo vitale nel sistema di allarme e coordinamento della popolazione civile.",
+  "poi_stazione_name": "Stazione Ferroviaria di Cesena",
+  "poi_stazione_desc": "Importante nodo ferroviario per il trasporto merci e passeggeri tra l'Ottocento e il Novecento, sulla linea adriatica Bologna–Rimini. Durante la Seconda Guerra Mondiale fu uno degli obiettivi strategici primari dei bombardamenti alleati, poiché interromperne i rifornimenti era essenziale per bloccare l'avanzata tedesca. Subì gravi distruzioni, diventando uno dei punti più colpiti della città.",
+  "poi_arrigoni_name": "Stabilimento Arrigoni",
+  "poi_arrigoni_desc": "Grande industria conserviera fondata nel 1880, cuore dell'economia locale e del lavoro operaio cesenate per oltre un secolo. Specializzata in conserve ittiche, fu tra le più importanti aziende della Romagna. Durante la Seconda Guerra Mondiale la struttura produttiva era strategicamente rilevante per la logistica alimentare, e fu teatro di scioperi e forti tensioni sociali, soprattutto nel biennio 1943–1944.",
+  "poi_fantaguzzi_name": "Palazzo Fantaguzzi",
+  "poi_fantaguzzi_desc": "Palazzo storico nel cuore di Cesena, sede del Partito Nazionale Fascista locale durante il regime mussoliniano. Rappresenta uno dei simboli del ventennio fascista in città. Durante la Seconda Guerra Mondiale fu il centro del potere politico e amministrativo fascista a livello cittadino, probabile luogo di repressione, controllo della popolazione e organizzazione delle attività belliche sul territorio.",
+  "poi_rifugi_antiaerei_name": "Rifugi Antiaerei della Rocca",
+  "poi_rifugi_antiaerei_desc": "Sistema di tunnel sotterranei scavati sotto e intorno alla Rocca Malatestiana per proteggere la popolazione civile dai bombardamenti aerei. Durante la Seconda Guerra Mondiale furono fondamentali per la sopravvivenza di centinaia di cesenati: i rifugi accolsero famiglie intere, diventando veri e propri spazi di vita temporanea sotterranea durante gli attacchi alleati tra il 1943 e il 1944.",
+  "setupUsernameInvalid": "Username non valido (usa {min}-{max} caratteri: a-z, 0-9, _ o .).",
+  "@setupUsernameInvalid": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "setupUsernameOffensive": "Username contiene termini non consentiti. Scegline uno diverso.",
+  "setupUsernameTaken": "Username già in uso. Scegline un altro.",
+  "setupFirestoreError": "Configurazione Firestore non valida: servono permessi di lettura/scrittura su usernames/{username}.",
+  "setupPermissionDenied": "Permessi Firestore insufficienti per completare il profilo. Controlla le regole del progetto.",
+  "setupGenericError": "Impossibile salvare il profilo. Riprova tra qualche secondo.",
+  "setupTitle": "Crea il tuo profilo",
+  "setupSubtitle": "Scegli username univoco (non modificabile), nome in app e avatar.",
+  "setupNameLabel": "Nome in app",
+  "setupUsernameLabel": "Username",
+  "setupUsernameHint": "es. cesena_explorer",
+  "setupAvatarLabel": "Scegli avatar",
+  "setupSubmitButton": "Conferma profilo",
+  "creditRoleDiplo": "Rappresentanze Diplomatiche Tedesche in Italia",
+  "creditRoleDiploDesc": "Sviluppato grazie al loro prezioso contributo",
+  "sectionSupport": "Collaboratori e Supporto",
+  "quiz_fallback_name": "Difficoltà standard (seed locale)",
+  "quiz_fallback_desc": "Per un errore del server le domande non sono personalizzate e usano una difficoltà locale specifica.",
+  "quiz_santa_cristina_q1": "Quale elemento architettonico caratterizza la chiesa?",
+  "quiz_santa_cristina_q1_o1": "Un campanile gotico",
+  "quiz_santa_cristina_q1_o2": "Una cupola emisferica",
+  "quiz_santa_cristina_q1_o3": "Un rosone rinascimentale",
+  "quiz_santa_cristina_q2": "Quale ruolo ebbe la chiesa durante la Seconda Guerra Mondiale?",
+  "quiz_santa_cristina_q2_o1": "Fu usata come ospedale da campo",
+  "quiz_santa_cristina_q2_o2": "Fu un riferimento visivo per orientarsi durante i bombardamenti",
+  "quiz_santa_cristina_q2_o3": "Fu sede del comando militare tedesco",
+  "quiz_rocca_q1": "Chi ha fatto costruire la Rocca?",
+  "quiz_rocca_q1_o1": "I Visconti",
+  "quiz_rocca_q1_o2": "I Malatesta",
+  "quiz_rocca_q1_o3": "Federico da Montefeltro",
+  "quiz_rocca_q2": "In quale anno la Biblioteca Malatestiana è diventata patrimonio UNESCO?",
+  "quiz_rocca_q2_o1": "1995",
+  "quiz_rocca_q2_o2": "2005",
+  "quiz_rocca_q2_o3": "2015",
+  "quiz_rocca_q3": "Come fu usata la Rocca durante la Seconda Guerra Mondiale?",
+  "quiz_rocca_q3_o1": "Come prigione per i partigiani",
+  "quiz_rocca_q3_o2": "Come rifugio antiaereo per i civili",
+  "quiz_rocca_q3_o3": "Come deposito di munizioni",
+  "quiz_san_rocco_q1": "A quale santo è dedicata la chiesa?",
+  "quiz_san_rocco_q1_o1": "San Francesco",
+  "quiz_san_rocco_q1_o2": "San Rocco",
+  "quiz_san_rocco_q1_o3": "Sant'Antonio",
+  "quiz_san_rocco_q2": "In quale tipo di quartiere sorge la chiesa?",
+  "quiz_san_rocco_q2_o1": "Quartiere nobiliare",
+  "quiz_san_rocco_q2_o2": "Quartiere popolare operaio",
+  "quiz_san_rocco_q2_o3": "Quartiere universitario",
+  "quiz_abbazia_monte_q1": "Dove sorge l'abbazia?",
+  "quiz_abbazia_monte_q1_o1": "In pianura, vicino al fiume",
+  "quiz_abbazia_monte_q1_o2": "Su un colle dominante la città",
+  "quiz_abbazia_monte_q1_o3": "Nel centro storico",
+  "quiz_abbazia_monte_q2": "Quale vantaggio offrì l'abbazia durante la guerra?",
+  "quiz_abbazia_monte_q2_o1": "Ospitava un deposito di viveri militari",
+  "quiz_abbazia_monte_q2_o2": "La posizione elevata la rendeva utile come punto di osservazione",
+  "quiz_abbazia_monte_q2_o3": "Era sede del governo provvisorio",
+  "quiz_osservanza_q1": "A quale ordine religioso appartiene il convento?",
+  "quiz_osservanza_q1_o1": "Domenicani",
+  "quiz_osservanza_q1_o2": "Francescani",
+  "quiz_osservanza_q1_o3": "Benedettini",
+  "quiz_osservanza_q2": "Perché il convento era meno esposto ai bombardamenti?",
+  "quiz_osservanza_q2_o1": "Era protetto da bunker sotterranei",
+  "quiz_osservanza_q2_o2": "Era isolato rispetto al centro urbano",
+  "quiz_osservanza_q2_o3": "Era presidiato dall'esercito alleato",
+  "quiz_palazzo_ridotto_q1": "Come si chiama la fontana in Piazza del Popolo?",
+  "quiz_palazzo_ridotto_q1_o1": "Fontana di Nettuno",
+  "quiz_palazzo_ridotto_q1_o2": "Fontana del Masini",
+  "quiz_palazzo_ridotto_q1_o3": "Fontana dei Delfini",
+  "quiz_palazzo_ridotto_q2": "Quale dispositivo bellico era installato nel palazzo?",
+  "quiz_palazzo_ridotto_q2_o1": "Una mitragliatrice antiaerea",
+  "quiz_palazzo_ridotto_q2_o2": "Una sirena antiaerea",
+  "quiz_palazzo_ridotto_q2_o3": "Un radar di avvistamento",
+  "quiz_stazione_q1": "Perché la stazione era un obiettivo dei bombardamenti alleati?",
+  "quiz_stazione_q1_o1": "Ospitava il quartier generale tedesco",
+  "quiz_stazione_q1_o2": "Era un nodo strategico per i rifornimenti militari",
+  "quiz_stazione_q1_o3": "Era l'unico ospedale della città",
+  "quiz_stazione_q2": "Su quale linea ferroviaria si trova la stazione di Cesena?",
+  "quiz_stazione_q2_o1": "Bologna–Firenze",
+  "quiz_stazione_q2_o2": "Bologna–Rimini (linea adriatica)",
+  "quiz_stazione_q2_o3": "Rimini–Roma",
+  "quiz_arrigoni_q1": "In quale settore operava lo Stabilimento Arrigoni?",
+  "quiz_arrigoni_q1_o1": "Industria tessile",
+  "quiz_arrigoni_q1_o2": "Conserve ittiche e alimentari",
+  "quiz_arrigoni_q1_o3": "Meccanica pesante",
+  "quiz_arrigoni_q2": "Cosa accadde nello stabilimento nel 1943–1944?",
+  "quiz_arrigoni_q2_o1": "Fu convertito in ospedale militare",
+  "quiz_arrigoni_q2_o2": "Fu teatro di scioperi e tensioni sociali",
+  "quiz_arrigoni_q2_o3": "Fu utilizzato come prigione dai tedeschi",
+  "quiz_fantaguzzi_q1": "Quale organizzazione aveva sede nel Palazzo Fantaguzzi durante il regime?",
+  "quiz_fantaguzzi_q1_o1": "Il Comune di Cesena",
+  "quiz_fantaguzzi_q1_o2": "Il Partito Nazionale Fascista",
+  "quiz_fantaguzzi_q1_o3": "La Croce Rossa",
+  "quiz_fantaguzzi_q2": "Quale ruolo ebbe il palazzo durante la guerra?",
+  "quiz_fantaguzzi_q2_o1": "Centro di coordinamento della resistenza partigiana",
+  "quiz_fantaguzzi_q2_o2": "Centro del potere politico e amministrativo fascista",
+  "quiz_fantaguzzi_q2_o3": "Sede del tribunale militare alleato",
+  "quiz_rifugi_antiaerei_q1": "Dove erano scavati i rifugi antiaerei?",
+  "quiz_rifugi_antiaerei_q1_o1": "Sotto il Palazzo del Ridotto",
+  "quiz_rifugi_antiaerei_q1_o2": "Sotto e intorno alla Rocca Malatestiana",
+  "quiz_rifugi_antiaerei_q1_o3": "Sotto la stazione ferroviaria",
+  "quiz_rifugi_antiaerei_q2": "In quali anni furono principalmente utilizzati i rifugi?",
+  "quiz_rifugi_antiaerei_q2_o1": "1940–1941",
+  "quiz_rifugi_antiaerei_q2_o2": "1943–1944",
+  "quiz_rifugi_antiaerei_q2_o3": "1945–1946"
 }

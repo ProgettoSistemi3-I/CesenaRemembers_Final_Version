@@ -205,7 +205,7 @@ extension _MapPageView on _MapPageState {
             const Icon(Icons.error_outline, color: AppPalette.danger, size: 42),
             const SizedBox(height: 12),
             Text(
-              _loadError!,
+              AppLocalizations.of(context)!.errorLoadPoi,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
@@ -222,7 +222,7 @@ extension _MapPageView on _MapPageState {
                 backgroundColor: AppPalette.olive,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Riprova'),
+              child: Text(AppLocalizations.of(context)!.buttonRetry),
             ),
           ],
         ),

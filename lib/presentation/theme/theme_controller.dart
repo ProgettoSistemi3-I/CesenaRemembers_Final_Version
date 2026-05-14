@@ -30,7 +30,7 @@ class ThemeController extends ChangeNotifier {
       _themeMode = profile.darkModeEnabled ? ThemeMode.dark : ThemeMode.light;
     } catch (e, stackTrace) {
       AppLogger.error(
-        'Errore caricamento tema da profilo',
+        'Error loading theme from profile',
         error: e,
         stackTrace: stackTrace,
         name: 'ThemeController',

@@ -68,7 +68,7 @@ class FirebaseAuthRepository implements AuthRepository {
   Future<void> deleteCurrentUser() async {
     final user = _firebaseAuth.currentUser;
     if (user == null) {
-      throw Exception('Nessun utente autenticato.');
+      throw Exception('No authenticated user found.');
     }
 
     try {
@@ -83,7 +83,7 @@ class FirebaseAuthRepository implements AuthRepository {
 
         if (googleUser == null) {
           throw Exception(
-            'Riautenticazione necessaria ma annullata dall\'utente.',
+            'Re-authentication required but cancelled by user.',
           );
         }
 
