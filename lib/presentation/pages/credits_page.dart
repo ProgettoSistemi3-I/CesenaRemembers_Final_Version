@@ -59,7 +59,7 @@ class CreditsPage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Realizzato con passione per preservare la memoria storica della nostra città.',
+            'Realizzato con impegno per preservare la memoria storica della nostra città.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 15,
@@ -69,13 +69,14 @@ class CreditsPage extends StatelessWidget {
           ),
           const SizedBox(height: 48),
 
-          // 🔴 NUOVA SEZIONE: FINANZIAMENTO
-          const _SectionLabel('Finanziamento'),
+          // 🔴 SEZIONE: FINANZIAMENTO
+          const _SectionLabel('Ringraziamenti'),
           const SizedBox(height: 16),
           _CreditsCard(
             children: [
               _CreditRow(
-                imageAsset: 'assets/icon/diplo_logo.png', // <-- Assicurati di avere l'immagine qui
+                imageAsset:
+                    'assets/icon/diplo_logo.png', // Assicurati di avere l'immagine qui
                 fallbackIcon: Icons.public,
                 title: 'Rappresentanze Diplomatiche Tedesche in Italia',
                 subtitle: 'Sviluppato grazie al loro prezioso contributo',
@@ -115,12 +116,20 @@ class CreditsPage extends StatelessWidget {
                   mode: LaunchMode.externalApplication,
                 ),
               ),
+              const _ThinDivider(),
+              const _CreditRow(
+                icon: Icons.groups_outlined,
+                title: 'Classe 3I',
+                subtitle: 'Supporto e Ideazione',
+                accent: AppPalette.tan,
+                isStatic: true,
+              ),
             ],
           ),
           const SizedBox(height: 32),
 
-          // SEZIONE: RINGRAZIAMENTI
-          const _SectionLabel('Ringraziamenti'),
+          // SEZIONE: COLLABORATORI E SUPPORTO
+          const _SectionLabel('Collaboratori e Supporto'),
           const SizedBox(height: 16),
           _CreditsCard(
             children: [
@@ -132,16 +141,8 @@ class CreditsPage extends StatelessWidget {
                 isStatic: true,
               ),
               const _ThinDivider(),
-              const _CreditRow(
-                icon: Icons.groups_outlined,
-                title: 'Classe 3I',
-                subtitle: 'Supporto e Ideazione',
-                accent: AppPalette.tan,
-                isStatic: true,
-              ),
-              const _ThinDivider(),
               _CreditRow(
-                imageAsset: 'assets/icon/logoScuola.png', // 🔴 Logo scuola
+                imageAsset: 'assets/icon/logoScuola.png', // Logo scuola
                 fallbackIcon: Icons.account_balance_outlined,
                 title: 'ITT Blaise Pascal',
                 subtitle: 'Visita il sito web dell\'istituto',
@@ -215,7 +216,9 @@ class _ThinDivider extends StatelessWidget {
     return Container(
       height: 1,
       margin: const EdgeInsets.only(left: 68),
-      color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.3),
+      color: Theme.of(
+        context,
+      ).colorScheme.outlineVariant.withValues(alpha: 0.3),
     );
   }
 }
@@ -244,20 +247,18 @@ class _CreditRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
-    // Logica intelligente per caricare l'immagine o l'icona di fallback
+
+    // 🔴 Logica aggiornata per "zoomare" le immagini
     Widget imageWidget;
     if (imageAsset != null) {
       imageWidget = Image.asset(
         imageAsset!,
-        width: 24,
-        height: 24,
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) => Icon(
-          fallbackIcon ?? Icons.error,
-          color: accent,
-          size: 22,
-        ),
+        width: 53, // Aumentato da 24 a 48
+        height: 53, // Aumentato da 24 a 48
+        fit:
+            BoxFit.contain, // Mantiene le proporzioni senza tagliare l'immagine
+        errorBuilder: (context, error, stackTrace) =>
+            Icon(fallbackIcon ?? Icons.error, color: accent, size: 22),
       );
     } else {
       imageWidget = Icon(icon, color: accent, size: 22);
@@ -268,7 +269,8 @@ class _CreditRow extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            // 🔴 Ridotto il padding se c'è un'immagine, così sfrutta più spazio
+            padding: EdgeInsets.all(imageAsset != null ? 6 : 10),
             decoration: BoxDecoration(
               color: accent.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(16),
@@ -314,10 +316,7 @@ class _CreditRow extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        child: content,
-      ),
+      child: InkWell(onTap: onTap, child: content),
     );
   }
 }

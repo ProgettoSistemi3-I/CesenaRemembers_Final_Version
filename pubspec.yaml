@@ -77,6 +77,8 @@ flutter:
 
   assets:
     - assets/icon/app_icon.png
+    - assets/icon/diplo_logo.png
+    - assets/icon/logoScuola.png
     - assets/loginView.png
 
 flutter_launcher_icons:
