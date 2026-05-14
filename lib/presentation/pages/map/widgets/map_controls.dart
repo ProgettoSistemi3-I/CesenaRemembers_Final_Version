@@ -222,7 +222,7 @@ class ManualArrivalButton extends StatelessWidget {
                 Icon(Icons.place, size: 15, color: AppPalette.olive),
                 SizedBox(width: 5),
                 Text(
-                  AppLocalizations.of(context)!.iArrived,
+                  AppLocalizations.of(context)!.tourArrivedButton,
                   style: TextStyle(
                     fontSize: 11.5,
                     color: AppPalette.olive,
@@ -387,8 +387,16 @@ class NextStopCard extends StatelessWidget {
                       Flexible(
                         child: Text(
                           arrived
-                              ? AppLocalizations.of(context)!.arrivedTapToOpen
-                              : '${formatDistance(distanceMeters)} · tappa ${stopIndex + 1}/$totalStops',
+                              ? AppLocalizations.of(
+                                  context,
+                                )!.tourStopCardArrived
+                              : AppLocalizations.of(
+                                  context,
+                                )!.tourStopCardDistance(
+                                  formatDistance(distanceMeters),
+                                  stopIndex + 1,
+                                  totalStops,
+                                ),
                           style: TextStyle(
                             fontSize: 11.5,
                             color: arrived
@@ -491,7 +499,7 @@ class TourPlanSheet extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  AppLocalizations.of(context)!.stopsOrderTitle,
+                  AppLocalizations.of(context)!.tourPlanTitle,
                   style: TextStyle(
                     color: theme.colorScheme.onSurface,
                     fontSize: 18,
@@ -504,7 +512,7 @@ class TourPlanSheet extends StatelessWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                AppLocalizations.of(context)!.dragHandleReorderHint,
+                AppLocalizations.of(context)!.tourPlanSubtitle,
                 style: TextStyle(
                   color: theme.colorScheme.onSurfaceVariant,
                   fontSize: 12.5,
@@ -603,7 +611,7 @@ class TourPlanSheet extends StatelessWidget {
                                       child: Text(
                                         AppLocalizations.of(
                                           context,
-                                        )!.currentStop,
+                                        )!.tourPlanCurrentLabel,
                                         style: TextStyle(
                                           color: AppPalette.olive,
                                           fontSize: 10.5,
@@ -618,10 +626,10 @@ class TourPlanSheet extends StatelessWidget {
                                 legDistance == null
                                     ? AppLocalizations.of(
                                         context,
-                                      )!.firstTourStop
+                                      )!.tourPlanFirstStop
                                     : AppLocalizations.of(
                                         context,
-                                      )!.fromPrevious(
+                                      )!.tourPlanDistanceFromPrev(
                                         formatDistance(legDistance),
                                       ),
                                 style: TextStyle(
