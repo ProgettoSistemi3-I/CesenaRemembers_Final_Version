@@ -63,7 +63,7 @@ class _MainShellState extends State<MainShell> {
           BottomNavigationBarItem(
             icon: Icon(Icons.people_outline),
             activeIcon: Icon(Icons.people),
-            label: 'Community',
+            label: AppLocalizations.of(context)!.navCommunity,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.emoji_events_outlined),

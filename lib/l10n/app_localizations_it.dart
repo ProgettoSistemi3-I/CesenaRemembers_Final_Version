@@ -18,7 +18,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settingsHeaderTitle => 'Tour interattivo WWII';
 
   @override
-  String get settingsHeaderSubtitle => 'Gestisci privacy, notifiche e lingua in un unico posto.';
+  String get settingsHeaderSubtitle =>
+      'Gestisci privacy, notifiche e lingua in un unico posto.';
 
   @override
   String get sectionCredits => 'Crediti';
@@ -36,7 +37,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get creditsAppName => 'Cesena Remembers';
 
   @override
-  String get creditsAppDescription => 'Realizzato con passione per preservare la memoria storica della nostra città.';
+  String get creditsAppDescription =>
+      'Realizzato con passione per preservare la memoria storica della nostra città.';
 
   @override
   String get sectionTeam => 'Il Team';
@@ -81,13 +83,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String get deleteAccountDialogTitle => 'Eliminare account?';
 
   @override
-  String get deleteAccountDialogBody => 'Questa operazione rimuove account, progressi e dati associati in modo permanente.';
+  String get deleteAccountDialogBody =>
+      'Questa operazione rimuove account, progressi e dati associati in modo permanente.';
 
   @override
   String get deleteAccountSuccess => 'Account eliminato definitivamente.';
 
   @override
-  String get deleteAccountFailure => 'Impossibile completare ora. Controlla il messaggio di errore.';
+  String get deleteAccountFailure =>
+      'Impossibile completare ora. Controlla il messaggio di errore.';
 
   @override
   String get sectionPreferences => 'Preferenze App';
@@ -120,7 +124,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get privacyPolicySubtitle => 'Leggi come vengono trattati i dati';
 
   @override
-  String get gpsPermissionDenied => 'Permesso negato o GPS disattivato. Controlla le impostazioni del telefono.';
+  String get gpsPermissionDenied =>
+      'Permesso negato o GPS disattivato. Controlla le impostazioni del telefono.';
 
   @override
   String get sectionGeneral => 'Generale';
@@ -180,6 +185,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get navSettings => 'Impostazioni';
 
   @override
+  String get navCommunity => 'Community';
+
+  @override
   String errorLoadPreferences(String error) {
     return 'Errore nel caricamento preferenze: $error';
   }
@@ -193,7 +201,8 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get errorDeleteAccountPartial => 'Account non eliminato completamente. I dati app sono stati rimossi, ma la cancellazione auth è fallita. Verrai disconnesso per sicurezza.';
+  String get errorDeleteAccountPartial =>
+      'Account non eliminato completamente. I dati app sono stati rimossi, ma la cancellazione auth è fallita. Verrai disconnesso per sicurezza.';
 
   @override
   String errorDeleteData(String error) {
@@ -204,13 +213,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String get errorLoadProfile => 'Impossibile caricare il profilo.';
 
   @override
-  String get errorOperationFailed => 'Operazione non riuscita. Stato ripristinato.';
+  String get errorOperationFailed =>
+      'Operazione non riuscita. Stato ripristinato.';
 
   @override
   String get tourStopped => 'Tour interrotto.';
 
   @override
-  String get errorSaveScore => 'Errore nel salvataggio del punteggio. Riprova tra poco.';
+  String get errorSaveScore =>
+      'Errore nel salvataggio del punteggio. Riprova tra poco.';
 
   @override
   String get errorLoadPoi => 'Errore nel caricamento dei punti di interesse.';
@@ -243,13 +254,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tourConfirmStopTitle => 'Interrompere il tour?';
 
   @override
-  String get tourConfirmStopBody => 'Il tour verrà terminato e perderai l\'ordine attuale delle tappe.';
+  String get tourConfirmStopBody =>
+      'Il tour verrà terminato e perderai l\'ordine attuale delle tappe.';
 
   @override
   String get buttonStop => 'Interrompi';
 
   @override
-  String get tourStartGpsRequired => 'Per iniziare il tour attiva GPS, permessi posizione e opzione nell\'app.';
+  String get tourStartGpsRequired =>
+      'Per iniziare il tour attiva GPS, permessi posizione e opzione nell\'app.';
 
   @override
   String get tourCompleted => '🎉 Tour completato! Ottimo lavoro.';
@@ -305,7 +318,8 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get profileNameOffensive => 'Il nome contiene termini non consentiti.\nInseriscine uno diverso.';
+  String get profileNameOffensive =>
+      'Il nome contiene termini non consentiti.\nInseriscine uno diverso.';
 
   @override
   String get avatarPickerTitle => 'Scegli il tuo Avatar';
@@ -373,7 +387,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tourPlanTitle => 'Ordine tappe';
 
   @override
-  String get tourPlanSubtitle => 'Trascina dalla maniglia per riordinare il percorso.';
+  String get tourPlanSubtitle =>
+      'Trascina dalla maniglia per riordinare il percorso.';
 
   @override
   String get tourPlanFirstStop => 'Prima tappa del tour';
@@ -393,10 +408,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get locationBannerGpsOff => 'GPS Disattivato';
 
   @override
-  String get locationBannerEnableLocation => 'Attiva la posizione per esplorare la mappa in tempo reale.';
+  String get locationBannerEnableLocation =>
+      'Attiva la posizione per esplorare la mappa in tempo reale.';
 
   @override
-  String get locationBannerReEnableLocation => 'Riattiva la posizione nelle impostazioni per mostrare la tua posizione sulla mappa.';
+  String get locationBannerReEnableLocation =>
+      'Riattiva la posizione nelle impostazioni per mostrare la tua posizione sulla mappa.';
 
   @override
   String get locationBannerResolve => 'Risolvi';
@@ -405,7 +422,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get socialSearchHint => 'Cerca utente...';
 
   @override
-  String get socialLeaderboardEmpty => 'Nessun utente in classifica al momento.';
+  String get socialLeaderboardEmpty =>
+      'Nessun utente in classifica al momento.';
 
   @override
   String get socialLeaderboard => 'Classifica Globale';
@@ -428,7 +446,8 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get socialMustBeFriend => 'Devi essere amico per vedere la sua lista amici.';
+  String get socialMustBeFriend =>
+      'Devi essere amico per vedere la sua lista amici.';
 
   @override
   String get socialRequestSent => 'Richiesta inviata';
@@ -473,19 +492,23 @@ class AppLocalizationsIt extends AppLocalizations {
   String get publicStatLevel => 'Livello';
 
   @override
-  String get errorLoginFailed => 'Accesso non riuscito. Controlla la connessione e riprova.';
+  String get errorLoginFailed =>
+      'Accesso non riuscito. Controlla la connessione e riprova.';
 
   @override
-  String get errorOffline => 'Sei offline. Controlla la connessione Internet e riprova.';
+  String get errorOffline =>
+      'Sei offline. Controlla la connessione Internet e riprova.';
 
   @override
-  String get errorLoginGeneric => 'Accesso non riuscito. Riprova tra qualche secondo.';
+  String get errorLoginGeneric =>
+      'Accesso non riuscito. Riprova tra qualche secondo.';
 
   @override
   String get loginGoogleButton => 'ACCEDI CON GOOGLE';
 
   @override
-  String get errorCommunication => 'Errore durante la comunicazione con il server.';
+  String get errorCommunication =>
+      'Errore durante la comunicazione con il server.';
 
   @override
   String get errorNotLoggedIn => 'Utente non loggato.';
@@ -494,16 +517,19 @@ class AppLocalizationsIt extends AppLocalizations {
   String get errorLoadPrefs => 'Errore nel caricamento preferenze.';
 
   @override
-  String get errorGpsDenied => 'Permesso negato o GPS disattivato. Controlla le impostazioni.';
+  String get errorGpsDenied =>
+      'Permesso negato o GPS disattivato. Controlla le impostazioni.';
 
   @override
-  String get errorConnectionSettings => 'Errore di connessione. Modifica annullata.';
+  String get errorConnectionSettings =>
+      'Errore di connessione. Modifica annullata.';
 
   @override
   String get errorDeleteAccount => 'Impossibile eliminare i dati.';
 
   @override
-  String get errorDeleteAccountAuth => 'Account non eliminato completamente. I dati app sono stati rimossi, ma la cancellazione auth è fallita. Verrai disconnesso per sicurezza.';
+  String get errorDeleteAccountAuth =>
+      'Account non eliminato completamente. I dati app sono stati rimossi, ma la cancellazione auth è fallita. Verrai disconnesso per sicurezza.';
 
   @override
   String get errorSyncProfile => 'Impossibile sincronizzare il profilo.';
@@ -518,7 +544,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settingsTourTitle => 'Tour interattivo WWII';
 
   @override
-  String get settingsTourSubtitle => 'Gestisci privacy, notifiche e lingua in un unico posto.';
+  String get settingsTourSubtitle =>
+      'Gestisci privacy, notifiche e lingua in un unico posto.';
 
   @override
   String get settingsCredits => 'Crediti';
@@ -527,7 +554,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settingsCreditsTitle => 'Crediti e Riconoscimenti';
 
   @override
-  String get settingsCreditsSubtitle => 'Scopri il team dietro Cesena Remembers';
+  String get settingsCreditsSubtitle =>
+      'Scopri il team dietro Cesena Remembers';
 
   @override
   String get settingsAccount => 'Account';
@@ -611,7 +639,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settingsDeleteConfirmTitle => 'Eliminare account?';
 
   @override
-  String get settingsDeleteConfirmBody => 'Questa operazione rimuove account, progressi e dati associati in modo permanente.';
+  String get settingsDeleteConfirmBody =>
+      'Questa operazione rimuove account, progressi e dati associati in modo permanente.';
 
   @override
   String get settingsCancel => 'Annulla';
@@ -623,7 +652,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settingsDeleteSuccess => 'Account eliminato definitivamente.';
 
   @override
-  String get settingsDeleteError => 'Impossibile completare ora. Controlla il messaggio di errore.';
+  String get settingsDeleteError =>
+      'Impossibile completare ora. Controlla il messaggio di errore.';
 
   @override
   String get achievement_first_visit_title => 'Primo passo';
@@ -641,7 +671,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get achievement_first_tour_title => 'Pioniere';
 
   @override
-  String get achievement_first_tour_desc => 'Finisci il tuo primo tour completo';
+  String get achievement_first_tour_desc =>
+      'Finisci il tuo primo tour completo';
 
   @override
   String get achievement_quiz_15_title => 'Veterano';
@@ -653,7 +684,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get achievement_perfect_tour_title => 'Infallibile';
 
   @override
-  String get achievement_perfect_tour_desc => 'Rispondi correttamente a tutte le domande in un tour';
+  String get achievement_perfect_tour_desc =>
+      'Rispondi correttamente a tutte le domande in un tour';
 
   @override
   String get achievement_xp_500_title => 'Collezionista';
@@ -665,13 +697,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String get achievement_tour_under_1h_title => 'In marcia';
 
   @override
-  String get achievement_tour_under_1h_desc => 'Completa un tour in meno di 1 ora';
+  String get achievement_tour_under_1h_desc =>
+      'Completa un tour in meno di 1 ora';
 
   @override
   String get achievement_tour_under_30m_title => 'Fulmine';
 
   @override
-  String get achievement_tour_under_30m_desc => 'Completa un tour in meno di 30 minuti';
+  String get achievement_tour_under_30m_desc =>
+      'Completa un tour in meno di 30 minuti';
 
   @override
   String get achievement_friend_1_title => 'Cittadino';
@@ -689,61 +723,71 @@ class AppLocalizationsIt extends AppLocalizations {
   String get poi_santa_cristina_name => 'Chiesa di Santa Cristina';
 
   @override
-  String get poi_santa_cristina_desc => 'Chiesa storica con cupola emisferica e campanile, inserita nel tessuto urbano residenziale di Cesena. Rappresenta l\'equilibrio tra architettura religiosa e sviluppo cittadino. Durante la Seconda Guerra Mondiale fu un probabile punto di riferimento visivo durante i bombardamenti, utile per l\'orientamento della popolazione. L\'area circostante venne parzialmente colpita o modificata nel dopoguerra, con spazi urbani ridefiniti.';
+  String get poi_santa_cristina_desc =>
+      'Chiesa storica con cupola emisferica e campanile, inserita nel tessuto urbano residenziale di Cesena. Rappresenta l\'equilibrio tra architettura religiosa e sviluppo cittadino. Durante la Seconda Guerra Mondiale fu un probabile punto di riferimento visivo durante i bombardamenti, utile per l\'orientamento della popolazione. L\'area circostante venne parzialmente colpita o modificata nel dopoguerra, con spazi urbani ridefiniti.';
 
   @override
   String get poi_rocca_name => 'Rocca Malatestiana';
 
   @override
-  String get poi_rocca_desc => 'Fortezza medievale dominante sulla città, con mura merlate e torrioni; elemento difensivo e simbolico centrale di Cesena. Costruita dai Malatesta nel 1380, ospita la Biblioteca Malatestiana, patrimonio UNESCO dal 2005. Durante la Seconda Guerra Mondiale fu riutilizzata come rifugio naturale grazie alla sua struttura massiccia: il colle ospitò gallerie e rifugi antiaerei per la protezione della popolazione civile durante i bombardamenti.';
+  String get poi_rocca_desc =>
+      'Fortezza medievale dominante sulla città, con mura merlate e torrioni; elemento difensivo e simbolico centrale di Cesena. Costruita dai Malatesta nel 1380, ospita la Biblioteca Malatestiana, patrimonio UNESCO dal 2005. Durante la Seconda Guerra Mondiale fu riutilizzata come rifugio naturale grazie alla sua struttura massiccia: il colle ospitò gallerie e rifugi antiaerei per la protezione della popolazione civile durante i bombardamenti.';
 
   @override
   String get poi_san_rocco_name => 'Chiesa di San Rocco';
 
   @override
-  String get poi_san_rocco_desc => 'Chiesa situata in un quartiere popolare di Cesena, con edifici semplici e strade storicamente sterrate. Dedicata a San Rocco, patrono degli appestati, è da secoli un punto di riferimento spirituale per le classi lavoratrici. Durante la Seconda Guerra Mondiale il quartiere, abitato da famiglie operaie, fu direttamente esposto alle difficoltà dei bombardamenti e la chiesa rappresentò un possibile luogo di raccolta e transito verso i rifugi durante gli allarmi aerei.';
+  String get poi_san_rocco_desc =>
+      'Chiesa situata in un quartiere popolare di Cesena, con edifici semplici e strade storicamente sterrate. Dedicata a San Rocco, patrono degli appestati, è da secoli un punto di riferimento spirituale per le classi lavoratrici. Durante la Seconda Guerra Mondiale il quartiere, abitato da famiglie operaie, fu direttamente esposto alle difficoltà dei bombardamenti e la chiesa rappresentò un possibile luogo di raccolta e transito verso i rifugi durante gli allarmi aerei.';
 
   @override
   String get poi_abbazia_monte_name => 'Abbazia di Santa Maria del Monte';
 
   @override
-  String get poi_abbazia_monte_desc => 'Complesso monastico su un colle dominante la città, circondato da campagna coltivata; forte simbolo religioso e territoriale di Cesena da oltre mille anni. La sua posizione elevata la rese strategicamente significativa durante la Seconda Guerra Mondiale: fu usata come punto di osservazione o riferimento visivo per le operazioni militari. L\'area collinare offrì rifugio e isolamento rispetto ai bombardamenti del centro urbano.';
+  String get poi_abbazia_monte_desc =>
+      'Complesso monastico su un colle dominante la città, circondato da campagna coltivata; forte simbolo religioso e territoriale di Cesena da oltre mille anni. La sua posizione elevata la rese strategicamente significativa durante la Seconda Guerra Mondiale: fu usata come punto di osservazione o riferimento visivo per le operazioni militari. L\'area collinare offrì rifugio e isolamento rispetto ai bombardamenti del centro urbano.';
 
   @override
   String get poi_osservanza_name => 'Chiesa e Convento dell\'Osservanza';
 
   @override
-  String get poi_osservanza_desc => 'Complesso religioso francescano immerso nella campagna cesenate, storicamente separato dal centro urbano. La chiesa conserva pregevoli opere d\'arte del Quattrocento e Cinquecento. Durante la Seconda Guerra Mondiale l\'isolamento rispetto alla città lo rendeva meno esposto agli attacchi diretti, diventando un possibile luogo di rifugio e assistenza spirituale per sfollati e popolazione rurale in fuga dai bombardamenti.';
+  String get poi_osservanza_desc =>
+      'Complesso religioso francescano immerso nella campagna cesenate, storicamente separato dal centro urbano. La chiesa conserva pregevoli opere d\'arte del Quattrocento e Cinquecento. Durante la Seconda Guerra Mondiale l\'isolamento rispetto alla città lo rendeva meno esposto agli attacchi diretti, diventando un possibile luogo di rifugio e assistenza spirituale per sfollati e popolazione rurale in fuga dai bombardamenti.';
 
   @override
   String get poi_palazzo_ridotto_name => 'Palazzo del Ridotto';
 
   @override
-  String get poi_palazzo_ridotto_desc => 'Edificio storico con torre civica, simbolo del centro cittadino e della vita pubblica di Cesena. Affaccia sulla Piazza del Popolo, cuore della città fin dal Medioevo, dominata anche dalla fontana del Masini. Durante la Seconda Guerra Mondiale ospitava una sirena antiaerea fondamentale per segnalare l\'arrivo dei bombardamenti, costituendo un nodo vitale nel sistema di allarme e coordinamento della popolazione civile.';
+  String get poi_palazzo_ridotto_desc =>
+      'Edificio storico con torre civica, simbolo del centro cittadino e della vita pubblica di Cesena. Affaccia sulla Piazza del Popolo, cuore della città fin dal Medioevo, dominata anche dalla fontana del Masini. Durante la Seconda Guerra Mondiale ospitava una sirena antiaerea fondamentale per segnalare l\'arrivo dei bombardamenti, costituendo un nodo vitale nel sistema di allarme e coordinamento della popolazione civile.';
 
   @override
   String get poi_stazione_name => 'Stazione Ferroviaria di Cesena';
 
   @override
-  String get poi_stazione_desc => 'Importante nodo ferroviario per il trasporto merci e passeggeri tra l\'Ottocento e il Novecento, sulla linea adriatica Bologna–Rimini. Durante la Seconda Guerra Mondiale fu uno degli obiettivi strategici primari dei bombardamenti alleati, poiché interromperne i rifornimenti era essenziale per bloccare l\'avanzata tedesca. Subì gravi distruzioni, diventando uno dei punti più colpiti della città.';
+  String get poi_stazione_desc =>
+      'Importante nodo ferroviario per il trasporto merci e passeggeri tra l\'Ottocento e il Novecento, sulla linea adriatica Bologna–Rimini. Durante la Seconda Guerra Mondiale fu uno degli obiettivi strategici primari dei bombardamenti alleati, poiché interromperne i rifornimenti era essenziale per bloccare l\'avanzata tedesca. Subì gravi distruzioni, diventando uno dei punti più colpiti della città.';
 
   @override
   String get poi_arrigoni_name => 'Stabilimento Arrigoni';
 
   @override
-  String get poi_arrigoni_desc => 'Grande industria conserviera fondata nel 1880, cuore dell\'economia locale e del lavoro operaio cesenate per oltre un secolo. Specializzata in conserve ittiche, fu tra le più importanti aziende della Romagna. Durante la Seconda Guerra Mondiale la struttura produttiva era strategicamente rilevante per la logistica alimentare, e fu teatro di scioperi e forti tensioni sociali, soprattutto nel biennio 1943–1944.';
+  String get poi_arrigoni_desc =>
+      'Grande industria conserviera fondata nel 1880, cuore dell\'economia locale e del lavoro operaio cesenate per oltre un secolo. Specializzata in conserve ittiche, fu tra le più importanti aziende della Romagna. Durante la Seconda Guerra Mondiale la struttura produttiva era strategicamente rilevante per la logistica alimentare, e fu teatro di scioperi e forti tensioni sociali, soprattutto nel biennio 1943–1944.';
 
   @override
   String get poi_fantaguzzi_name => 'Palazzo Fantaguzzi';
 
   @override
-  String get poi_fantaguzzi_desc => 'Palazzo storico nel cuore di Cesena, sede del Partito Nazionale Fascista locale durante il regime mussoliniano. Rappresenta uno dei simboli del ventennio fascista in città. Durante la Seconda Guerra Mondiale fu il centro del potere politico e amministrativo fascista a livello cittadino, probabile luogo di repressione, controllo della popolazione e organizzazione delle attività belliche sul territorio.';
+  String get poi_fantaguzzi_desc =>
+      'Palazzo storico nel cuore di Cesena, sede del Partito Nazionale Fascista locale durante il regime mussoliniano. Rappresenta uno dei simboli del ventennio fascista in città. Durante la Seconda Guerra Mondiale fu il centro del potere politico e amministrativo fascista a livello cittadino, probabile luogo di repressione, controllo della popolazione e organizzazione delle attività belliche sul territorio.';
 
   @override
   String get poi_rifugi_antiaerei_name => 'Rifugi Antiaerei della Rocca';
 
   @override
-  String get poi_rifugi_antiaerei_desc => 'Sistema di tunnel sotterranei scavati sotto e intorno alla Rocca Malatestiana per proteggere la popolazione civile dai bombardamenti aerei. Durante la Seconda Guerra Mondiale furono fondamentali per la sopravvivenza di centinaia di cesenati: i rifugi accolsero famiglie intere, diventando veri e propri spazi di vita temporanea sotterranea durante gli attacchi alleati tra il 1943 e il 1944.';
+  String get poi_rifugi_antiaerei_desc =>
+      'Sistema di tunnel sotterranei scavati sotto e intorno alla Rocca Malatestiana per proteggere la popolazione civile dai bombardamenti aerei. Durante la Seconda Guerra Mondiale furono fondamentali per la sopravvivenza di centinaia di cesenati: i rifugi accolsero famiglie intere, diventando veri e propri spazi di vita temporanea sotterranea durante gli attacchi alleati tra il 1943 e il 1944.';
 
   @override
   String setupUsernameInvalid(int min, int max) {
@@ -751,7 +795,8 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get setupUsernameOffensive => 'Username contiene termini non consentiti. Scegline uno diverso.';
+  String get setupUsernameOffensive =>
+      'Username contiene termini non consentiti. Scegline uno diverso.';
 
   @override
   String get setupUsernameTaken => 'Username già in uso. Scegline un altro.';
@@ -762,16 +807,19 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get setupPermissionDenied => 'Permessi Firestore insufficienti per completare il profilo. Controlla le regole del progetto.';
+  String get setupPermissionDenied =>
+      'Permessi Firestore insufficienti per completare il profilo. Controlla le regole del progetto.';
 
   @override
-  String get setupGenericError => 'Impossibile salvare il profilo. Riprova tra qualche secondo.';
+  String get setupGenericError =>
+      'Impossibile salvare il profilo. Riprova tra qualche secondo.';
 
   @override
   String get setupTitle => 'Crea il tuo profilo';
 
   @override
-  String get setupSubtitle => 'Scegli username univoco (non modificabile), nome in app e avatar.';
+  String get setupSubtitle =>
+      'Scegli username univoco (non modificabile), nome in app e avatar.';
 
   @override
   String get setupNameLabel => 'Nome in app';
@@ -789,10 +837,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get setupSubmitButton => 'Conferma profilo';
 
   @override
-  String get creditRoleDiplo => 'Rappresentanze Diplomatiche Tedesche in Italia';
+  String get creditRoleDiplo =>
+      'Rappresentanze Diplomatiche Tedesche in Italia';
 
   @override
-  String get creditRoleDiploDesc => 'Sviluppato grazie al loro prezioso contributo';
+  String get creditRoleDiploDesc =>
+      'Sviluppato grazie al loro prezioso contributo';
 
   @override
   String get sectionSupport => 'Collaboratori e Supporto';
@@ -801,10 +851,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get quiz_fallback_name => 'Difficoltà standard (seed locale)';
 
   @override
-  String get quiz_fallback_desc => 'Per un errore del server le domande non sono personalizzate e usano una difficoltà locale specifica.';
+  String get quiz_fallback_desc =>
+      'Per un errore del server le domande non sono personalizzate e usano una difficoltà locale specifica.';
 
   @override
-  String get quiz_santa_cristina_q1 => 'Quale elemento architettonico caratterizza la chiesa?';
+  String get quiz_santa_cristina_q1 =>
+      'Quale elemento architettonico caratterizza la chiesa?';
 
   @override
   String get quiz_santa_cristina_q1_o1 => 'Un campanile gotico';
@@ -816,16 +868,19 @@ class AppLocalizationsIt extends AppLocalizations {
   String get quiz_santa_cristina_q1_o3 => 'Un rosone rinascimentale';
 
   @override
-  String get quiz_santa_cristina_q2 => 'Quale ruolo ebbe la chiesa durante la Seconda Guerra Mondiale?';
+  String get quiz_santa_cristina_q2 =>
+      'Quale ruolo ebbe la chiesa durante la Seconda Guerra Mondiale?';
 
   @override
   String get quiz_santa_cristina_q2_o1 => 'Fu usata come ospedale da campo';
 
   @override
-  String get quiz_santa_cristina_q2_o2 => 'Fu un riferimento visivo per orientarsi durante i bombardamenti';
+  String get quiz_santa_cristina_q2_o2 =>
+      'Fu un riferimento visivo per orientarsi durante i bombardamenti';
 
   @override
-  String get quiz_santa_cristina_q2_o3 => 'Fu sede del comando militare tedesco';
+  String get quiz_santa_cristina_q2_o3 =>
+      'Fu sede del comando militare tedesco';
 
   @override
   String get quiz_rocca_q1 => 'Chi ha fatto costruire la Rocca?';
@@ -840,7 +895,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get quiz_rocca_q1_o3 => 'Federico da Montefeltro';
 
   @override
-  String get quiz_rocca_q2 => 'In quale anno la Biblioteca Malatestiana è diventata patrimonio UNESCO?';
+  String get quiz_rocca_q2 =>
+      'In quale anno la Biblioteca Malatestiana è diventata patrimonio UNESCO?';
 
   @override
   String get quiz_rocca_q2_o1 => '1995';
@@ -852,7 +908,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get quiz_rocca_q2_o3 => '2015';
 
   @override
-  String get quiz_rocca_q3 => 'Come fu usata la Rocca durante la Seconda Guerra Mondiale?';
+  String get quiz_rocca_q3 =>
+      'Come fu usata la Rocca durante la Seconda Guerra Mondiale?';
 
   @override
   String get quiz_rocca_q3_o1 => 'Come prigione per i partigiani';
@@ -900,19 +957,23 @@ class AppLocalizationsIt extends AppLocalizations {
   String get quiz_abbazia_monte_q1_o3 => 'Nel centro storico';
 
   @override
-  String get quiz_abbazia_monte_q2 => 'Quale vantaggio offrì l\'abbazia durante la guerra?';
+  String get quiz_abbazia_monte_q2 =>
+      'Quale vantaggio offrì l\'abbazia durante la guerra?';
 
   @override
-  String get quiz_abbazia_monte_q2_o1 => 'Ospitava un deposito di viveri militari';
+  String get quiz_abbazia_monte_q2_o1 =>
+      'Ospitava un deposito di viveri militari';
 
   @override
-  String get quiz_abbazia_monte_q2_o2 => 'La posizione elevata la rendeva utile come punto di osservazione';
+  String get quiz_abbazia_monte_q2_o2 =>
+      'La posizione elevata la rendeva utile come punto di osservazione';
 
   @override
   String get quiz_abbazia_monte_q2_o3 => 'Era sede del governo provvisorio';
 
   @override
-  String get quiz_osservanza_q1 => 'A quale ordine religioso appartiene il convento?';
+  String get quiz_osservanza_q1 =>
+      'A quale ordine religioso appartiene il convento?';
 
   @override
   String get quiz_osservanza_q1_o1 => 'Domenicani';
@@ -924,7 +985,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get quiz_osservanza_q1_o3 => 'Benedettini';
 
   @override
-  String get quiz_osservanza_q2 => 'Perché il convento era meno esposto ai bombardamenti?';
+  String get quiz_osservanza_q2 =>
+      'Perché il convento era meno esposto ai bombardamenti?';
 
   @override
   String get quiz_osservanza_q2_o1 => 'Era protetto da bunker sotterranei';
@@ -936,7 +998,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get quiz_osservanza_q2_o3 => 'Era presidiato dall\'esercito alleato';
 
   @override
-  String get quiz_palazzo_ridotto_q1 => 'Come si chiama la fontana in Piazza del Popolo?';
+  String get quiz_palazzo_ridotto_q1 =>
+      'Come si chiama la fontana in Piazza del Popolo?';
 
   @override
   String get quiz_palazzo_ridotto_q1_o1 => 'Fontana di Nettuno';
@@ -948,7 +1011,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get quiz_palazzo_ridotto_q1_o3 => 'Fontana dei Delfini';
 
   @override
-  String get quiz_palazzo_ridotto_q2 => 'Quale dispositivo bellico era installato nel palazzo?';
+  String get quiz_palazzo_ridotto_q2 =>
+      'Quale dispositivo bellico era installato nel palazzo?';
 
   @override
   String get quiz_palazzo_ridotto_q2_o1 => 'Una mitragliatrice antiaerea';
@@ -960,19 +1024,22 @@ class AppLocalizationsIt extends AppLocalizations {
   String get quiz_palazzo_ridotto_q2_o3 => 'Un radar di avvistamento';
 
   @override
-  String get quiz_stazione_q1 => 'Perché la stazione era un obiettivo dei bombardamenti alleati?';
+  String get quiz_stazione_q1 =>
+      'Perché la stazione era un obiettivo dei bombardamenti alleati?';
 
   @override
   String get quiz_stazione_q1_o1 => 'Ospitava il quartier generale tedesco';
 
   @override
-  String get quiz_stazione_q1_o2 => 'Era un nodo strategico per i rifornimenti militari';
+  String get quiz_stazione_q1_o2 =>
+      'Era un nodo strategico per i rifornimenti militari';
 
   @override
   String get quiz_stazione_q1_o3 => 'Era l\'unico ospedale della città';
 
   @override
-  String get quiz_stazione_q2 => 'Su quale linea ferroviaria si trova la stazione di Cesena?';
+  String get quiz_stazione_q2 =>
+      'Su quale linea ferroviaria si trova la stazione di Cesena?';
 
   @override
   String get quiz_stazione_q2_o1 => 'Bologna–Firenze';
@@ -984,7 +1051,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get quiz_stazione_q2_o3 => 'Rimini–Roma';
 
   @override
-  String get quiz_arrigoni_q1 => 'In quale settore operava lo Stabilimento Arrigoni?';
+  String get quiz_arrigoni_q1 =>
+      'In quale settore operava lo Stabilimento Arrigoni?';
 
   @override
   String get quiz_arrigoni_q1_o1 => 'Industria tessile';
@@ -996,7 +1064,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get quiz_arrigoni_q1_o3 => 'Meccanica pesante';
 
   @override
-  String get quiz_arrigoni_q2 => 'Cosa accadde nello stabilimento nel 1943–1944?';
+  String get quiz_arrigoni_q2 =>
+      'Cosa accadde nello stabilimento nel 1943–1944?';
 
   @override
   String get quiz_arrigoni_q2_o1 => 'Fu convertito in ospedale militare';
@@ -1008,7 +1077,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get quiz_arrigoni_q2_o3 => 'Fu utilizzato come prigione dai tedeschi';
 
   @override
-  String get quiz_fantaguzzi_q1 => 'Quale organizzazione aveva sede nel Palazzo Fantaguzzi durante il regime?';
+  String get quiz_fantaguzzi_q1 =>
+      'Quale organizzazione aveva sede nel Palazzo Fantaguzzi durante il regime?';
 
   @override
   String get quiz_fantaguzzi_q1_o1 => 'Il Comune di Cesena';
@@ -1020,31 +1090,37 @@ class AppLocalizationsIt extends AppLocalizations {
   String get quiz_fantaguzzi_q1_o3 => 'La Croce Rossa';
 
   @override
-  String get quiz_fantaguzzi_q2 => 'Quale ruolo ebbe il palazzo durante la guerra?';
+  String get quiz_fantaguzzi_q2 =>
+      'Quale ruolo ebbe il palazzo durante la guerra?';
 
   @override
-  String get quiz_fantaguzzi_q2_o1 => 'Centro di coordinamento della resistenza partigiana';
+  String get quiz_fantaguzzi_q2_o1 =>
+      'Centro di coordinamento della resistenza partigiana';
 
   @override
-  String get quiz_fantaguzzi_q2_o2 => 'Centro del potere politico e amministrativo fascista';
+  String get quiz_fantaguzzi_q2_o2 =>
+      'Centro del potere politico e amministrativo fascista';
 
   @override
   String get quiz_fantaguzzi_q2_o3 => 'Sede del tribunale militare alleato';
 
   @override
-  String get quiz_rifugi_antiaerei_q1 => 'Dove erano scavati i rifugi antiaerei?';
+  String get quiz_rifugi_antiaerei_q1 =>
+      'Dove erano scavati i rifugi antiaerei?';
 
   @override
   String get quiz_rifugi_antiaerei_q1_o1 => 'Sotto il Palazzo del Ridotto';
 
   @override
-  String get quiz_rifugi_antiaerei_q1_o2 => 'Sotto e intorno alla Rocca Malatestiana';
+  String get quiz_rifugi_antiaerei_q1_o2 =>
+      'Sotto e intorno alla Rocca Malatestiana';
 
   @override
   String get quiz_rifugi_antiaerei_q1_o3 => 'Sotto la stazione ferroviaria';
 
   @override
-  String get quiz_rifugi_antiaerei_q2 => 'In quali anni furono principalmente utilizzati i rifugi?';
+  String get quiz_rifugi_antiaerei_q2 =>
+      'In quali anni furono principalmente utilizzati i rifugi?';
 
   @override
   String get quiz_rifugi_antiaerei_q2_o1 => '1940–1941';

@@ -180,6 +180,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navSettings => 'Settings';
 
   @override
+  String get navCommunity => 'Community';
+
+  @override
   String errorLoadPreferences(String error) {
     return 'Error loading preferences: $error';
   }
