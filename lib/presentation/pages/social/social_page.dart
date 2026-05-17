@@ -59,7 +59,7 @@ class _SocialPageState extends State<SocialPage> {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          'Community',
+          AppLocalizations.of(context)!.navCommunity,
           style: TextStyle(
             color: theme.colorScheme.onSurface,
             fontWeight: FontWeight.w800,

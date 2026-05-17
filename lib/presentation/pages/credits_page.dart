@@ -70,7 +70,6 @@ class CreditsPage extends StatelessWidget {
           ),
           const SizedBox(height: 48),
 
-          // 🔴 SEZIONE: FINANZIAMENTO
           _SectionLabel(AppLocalizations.of(context)!.sectionThanks),
           const SizedBox(height: 16),
           _CreditsCard(
@@ -249,7 +248,6 @@ class _CreditRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // 🔴 Logica aggiornata per "zoomare" le immagini
     Widget imageWidget;
     if (imageAsset != null) {
       imageWidget = Image.asset(
@@ -270,7 +268,6 @@ class _CreditRow extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            // 🔴 Ridotto il padding se c'è un'immagine, così sfrutta più spazio
             padding: EdgeInsets.all(imageAsset != null ? 6 : 10),
             decoration: BoxDecoration(
               color: accent.withValues(alpha: 0.12),

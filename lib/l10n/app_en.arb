@@ -56,6 +56,7 @@
   "buttonRetry": "Retry",
   "navMap": "Map",
   "navProfile": "Profile",
+  "navCommunity": "Community",
   "navSettings": "Settings",
   "errorLoadPreferences": "Error loading preferences: {error}",
   "@errorLoadPreferences": {

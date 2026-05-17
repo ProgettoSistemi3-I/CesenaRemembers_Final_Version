@@ -437,6 +437,12 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get navSettings;
 
+  /// No description provided for @navCommunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Community'**
+  String get navCommunity;
+
   /// No description provided for @errorLoadPreferences.
   ///
   /// In en, this message translates to:

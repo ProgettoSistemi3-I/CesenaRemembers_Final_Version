@@ -180,6 +180,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get navSettings => 'Impostazioni';
 
   @override
+  String get navCommunity => 'Comunità';
+
+  @override
   String errorLoadPreferences(String error) {
     return 'Errore nel caricamento preferenze: $error';
   }

@@ -66,7 +66,6 @@ class _SplashScreenState extends State<SplashScreen>
           opacity: _fadeAnimation,
           child: ScaleTransition(
             scale: _scaleAnimation,
-            // 🔴 Aggiunta la colonna per mettere il nome sotto al logo
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
