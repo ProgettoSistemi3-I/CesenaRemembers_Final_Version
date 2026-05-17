@@ -12,6 +12,7 @@ import '../../theme/app_palette.dart';
 import '../../theme/theme_controller.dart';
 import 'package:cesena_remembers/l10n/app_localizations.dart';
 import '../credits_page.dart';
+import 'settings_feedback.dart';
 
 // Dichiariamo che la parte visiva dei widget si trova in questo file separato
 part 'settings_page_sections.dart';
@@ -114,15 +115,9 @@ class _SettingsPageState extends State<SettingsPage>
 
   void _onControllerError() {
     if (_controller.errorMessage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(_getLocalizedError(context, _controller.errorMessage!)),
-          backgroundColor: AppPalette.danger,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
+      SettingsFeedback.showErrorSnackBar(
+        context,
+        _getLocalizedError(context, _controller.errorMessage!),
       );
       _controller.clearError();
     }
