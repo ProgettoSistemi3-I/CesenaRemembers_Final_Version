@@ -202,8 +202,6 @@ class UserProfileDataSource {
     bool? darkMode,
     bool? gps,
   }) async {
-    // Usiamo la dot-notation per aggiornare SOLO i sotto-campi richiesti
-    // senza sovrascrivere gli altri valori dentro "preferences".
     final Map<String, dynamic> updates = {
       'updatedAt': FieldValue.serverTimestamp(),
     };
@@ -233,9 +231,14 @@ class UserProfileDataSource {
     }
   }
 
+  // 🔴 AGGIUNTA LA FUNZIONE PER LE NOTIFICHE
   Future<void> saveFcmToken(String uid, String token) async {
-    await _users.doc(uid).update({
-      'fcmTokens': FieldValue.arrayUnion([token]),
-    });
+    try {
+      await _users.doc(uid).set({
+        'fcmTokens': FieldValue.arrayUnion([token]),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      throw Exception('Impossibile salvare il token FCM: $e');
+    }
   }
 }

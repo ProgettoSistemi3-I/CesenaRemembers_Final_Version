@@ -9,7 +9,7 @@ import '../domain/repositories/i_quiz_repository.dart';
 import 'seeds/historic_places_seed.dart';
 
 class QuizRepositoryImpl implements IQuizRepository {
-  static const String _baseUrl = 'https://sharika-matripotestal-ina.ngrok-free.dev';
+  static const String _baseUrl = 'https://saggy-film-raven.ngrok-free.dev';
   static const _fallbackDifficultyLabel = 'quiz_fallback_name';
 
   @override
@@ -39,7 +39,9 @@ class QuizRepositoryImpl implements IQuizRepository {
 
       final Map<String, dynamic> data = jsonDecode(response.body);
       final List<dynamic> questionsJson = data['questions'] ?? [];
-      final questions = questionsJson.map((q) => QuizQuestion.fromJson(q)).toList();
+      final questions = questionsJson
+          .map((q) => QuizQuestion.fromJson(q))
+          .toList();
 
       return QuizLoadResult(
         questions: questions,
@@ -56,8 +58,7 @@ class QuizRepositoryImpl implements IQuizRepository {
       return QuizLoadResult(
         questions: _fallbackQuestions(poiId),
         usesPersonalizedQuestions: false,
-        fallbackNotice:
-            'quiz_fallback_desc',
+        fallbackNotice: 'quiz_fallback_desc',
         fallbackDifficultyLabel: _fallbackDifficultyLabel,
       );
     }

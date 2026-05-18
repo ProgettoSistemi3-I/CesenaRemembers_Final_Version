@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:cesena_remembers/l10n/app_localizations.dart';
 import '../pages/map/map_page.dart';
 import '../pages/profile/profile_page.dart';
 import '../pages/settings/settings_page.dart';
 import 'shell_navigation_store.dart';
 import '../pages/social/social_page.dart';
+
+// 🔴 IMPORT AGGIUNTI PER LE NOTIFICHE E LA CLEAN ARCHITECTURE
+import 'push_notification_service.dart';
+import '../../domain/usecases/user_profile_use_cases.dart';
+import '../../injection_container.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -28,6 +32,17 @@ class _MainShellState extends State<MainShell> {
   void initState() {
     super.initState();
     ShellNavigationStore.tabIndex.addListener(_onTabIndexChanged);
+
+    // 🔴 AGGIUNTA LA LOGICA DELLE NOTIFICHE ALL'AVVIO
+    _initializeNotifications();
+  }
+
+  // 🔴 ESTRATTO IN UN METODO PER MANTENERE IL CODICE PULITO
+  void _initializeNotifications() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // 🔴 Passiamo il context al servizio così può gestire la UI
+      PushNotificationService.initializeAndSaveToken(context);
+    });
   }
 
   @override
@@ -54,26 +69,26 @@ class _MainShellState extends State<MainShell> {
         currentIndex: _currentIndex,
         onTap: _onTapBottomBar,
         type: BottomNavigationBarType.fixed,
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.map_outlined),
             activeIcon: Icon(Icons.map),
-            label: AppLocalizations.of(context)!.navMap,
+            label: 'Mappa',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.people_outline),
             activeIcon: Icon(Icons.people),
-            label: AppLocalizations.of(context)!.navCommunity,
+            label: 'Community',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.emoji_events_outlined),
             activeIcon: Icon(Icons.emoji_events),
-            label: AppLocalizations.of(context)!.navProfile,
+            label: 'Profilo',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings_outlined),
             activeIcon: Icon(Icons.settings),
-            label: AppLocalizations.of(context)!.navSettings,
+            label: 'Impostazioni',
           ),
         ],
       ),

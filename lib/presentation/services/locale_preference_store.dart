@@ -9,8 +9,8 @@ class LocalePreferenceStore {
   static Future<Locale> loadLocale() async {
     final prefs = await SharedPreferences.getInstance();
     final code = prefs.getString(_localeCodeKey);
-    if (code == 'en' || code == 'it') {
-      return Locale(code!);
+    if (code != null && (code == 'en' || code == 'it')) {
+      return Locale(code);
     }
     return const Locale('it');
   }

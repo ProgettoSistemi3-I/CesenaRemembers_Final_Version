@@ -23,15 +23,16 @@ class NotificationService {
 
     const DarwinInitializationSettings initializationSettingsIOS =
         DarwinInitializationSettings(
-      requestSoundPermission: true,
-      requestBadgePermission: true,
-      requestAlertPermission: true,
-    );
+          requestSoundPermission: true,
+          requestBadgePermission: true,
+          requestAlertPermission: true,
+        );
 
-    const InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
-    );
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsIOS,
+        );
 
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
@@ -82,25 +83,23 @@ class NotificationService {
     await Permission.notification.request();
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>()
-        ?.requestPermissions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
+          IOSFlutterLocalNotificationsPlugin
+        >()
+        ?.requestPermissions(alert: true, badge: true, sound: true);
   }
 
   Future<void> showLocalNotification(String title, String body) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'social_channel',
-      'Social Notifications',
-      channelDescription: 'Notifiche per le interazioni sociali come richieste di amicizia',
-      importance: Importance.high,
-      priority: Priority.high,
-      ticker: 'ticker',
-    );
-    
+          'social_channel',
+          'Social Notifications',
+          channelDescription:
+              'Notifiche per le interazioni sociali come richieste di amicizia',
+          importance: Importance.high,
+          priority: Priority.high,
+          ticker: 'ticker',
+        );
+
     const DarwinNotificationDetails iOSPlatformChannelSpecifics =
         DarwinNotificationDetails();
 
@@ -110,7 +109,7 @@ class NotificationService {
     );
 
     await flutterLocalNotificationsPlugin.show(
-      0,
+      DateTime.now().millisecondsSinceEpoch ~/ 1000,
       title,
       body,
       platformChannelSpecifics,
