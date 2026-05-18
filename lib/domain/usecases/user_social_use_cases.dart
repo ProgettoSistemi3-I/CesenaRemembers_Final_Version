@@ -26,4 +26,7 @@ class UserSocialUseCases {
 
   Future<List<UserProfile>> getUsersByIds(List<String> uids) =>
       _repository.getUsersByIds(uids);
+
+  Future<bool> checkAreFriends(String currentUid, String targetUid) =>
+      _repository.checkAreFriends(currentUid, targetUid);
 }

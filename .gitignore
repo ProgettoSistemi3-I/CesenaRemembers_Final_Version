@@ -39,6 +39,10 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 
+# Ignora TUTTI i file JSON delle chiavi segrete nella cartella notifier_service
+notifier_service/*.json
+notifier_service/*serviceAccountKey*.json
+
 # Android Studio will place build artifacts here
 /android/app/debug
 /android/app/profile

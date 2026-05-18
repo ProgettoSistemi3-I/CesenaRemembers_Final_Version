@@ -45,6 +45,9 @@ class UserProfileUseCases {
   Future<bool> isUsernameAvailable(String username) =>
       _repository.isUsernameAvailable(username);
 
+  Future<void> saveFcmToken(String uid, String token) =>
+      _repository.saveFcmToken(uid, token);
+
   Future<void> deleteUserData({required String uid}) =>
       _repository.deleteUserData(uid: uid);
 }

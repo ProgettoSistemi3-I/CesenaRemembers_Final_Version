@@ -1630,189 +1630,319 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
 
 
 
-            _SectionLabel(AppLocalizations.of(context)!.publicStatDetailed),
+            if (isFriend || myUid == profile.uid) ...[
+
+              _SectionLabel(AppLocalizations.of(context)!.publicStatDetailed),
 
 
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
 
 
-            // Grid Statistiche
+              // Grid Statistiche
 
-            GridView.count(
+              GridView.count(
 
-              crossAxisCount: 2,
-
-
-
-              shrinkWrap: true,
+                crossAxisCount: 2,
 
 
 
-              physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
 
 
 
-              crossAxisSpacing: 16,
+                physics: const NeverScrollableScrollPhysics(),
 
 
 
-              mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
 
 
 
-              childAspectRatio: 1.25,
+                mainAxisSpacing: 16,
 
 
 
-              children: [
-
-                _buildStatCard(
-
-                  AppLocalizations.of(context)!.publicStatAchievements,
+                childAspectRatio: 1.25,
 
 
 
-                  '${profile.achievementsCount}',
+                children: [
+
+                  _buildStatCard(
+
+                    AppLocalizations.of(context)!.publicStatAchievements,
 
 
 
-                  Icons.emoji_events_rounded,
+                    '${profile.achievementsCount}',
 
 
 
-                  AppPalette.olive,
+                    Icons.emoji_events_rounded,
 
 
 
-                  theme,
+                    AppPalette.olive,
+
+
+
+                    theme,
+
+                  ),
+
+
+
+                  _buildStatCard(
+
+                    AppLocalizations.of(context)!.publicStatBestScore,
+
+
+
+                    '${profile.maxQuizScore}%',
+
+
+
+                    Icons.bolt_rounded,
+
+
+
+                    Colors.orange.shade400,
+
+
+
+                    theme,
+
+                  ),
+
+
+
+                  _buildStatCard(
+
+                    AppLocalizations.of(context)!.publicStatSites,
+
+
+
+                    '${profile.visitedCount}',
+
+
+
+                    Icons.map_rounded,
+
+
+
+                    AppPalette.moss,
+
+
+
+                    theme,
+
+                  ),
+
+
+
+                  _buildStatCard(
+
+                    AppLocalizations.of(context)!.publicStatQuiz,
+
+
+
+                    '${profile.totalQuizCompleted}',
+
+
+
+                    Icons.fact_check_rounded,
+
+
+
+                    AppPalette.tan,
+
+
+
+                    theme,
+
+                  ),
+
+
+
+                  _buildStatCard(
+
+                    AppLocalizations.of(context)!.publicStatBestTime,
+
+
+
+                    bestTourTimeLabel,
+
+
+
+                    Icons.timer_rounded,
+
+
+
+                    Colors.blue.shade400,
+
+
+
+                    theme,
+
+                  ),
+
+
+
+                  _buildStatCard(
+
+                    AppLocalizations.of(context)!.publicStatCorrectAnswers,
+
+
+
+                    '${profile.totalCorrectAnswers}',
+
+
+
+                    Icons.check_circle_rounded,
+
+
+
+                    AppPalette.moss,
+
+
+
+                    theme,
+
+                  ),
+
+                ],
+
+              ),
+
+            ] else ...[
+
+              Container(
+
+                width: double.infinity,
+
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+
+                decoration: BoxDecoration(
+
+                  gradient: LinearGradient(
+
+                    colors: [
+
+                      theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+
+                      theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
+
+                    ],
+
+                    begin: Alignment.topLeft,
+
+                    end: Alignment.bottomRight,
+
+                  ),
+
+                  borderRadius: BorderRadius.circular(28),
+
+                  border: Border.all(
+
+                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+
+                    width: 1,
+
+                  ),
 
                 ),
 
+                child: Column(
 
+                  children: [
 
-                _buildStatCard(
+                    Container(
 
-                  AppLocalizations.of(context)!.publicStatBestScore,
+                      padding: const EdgeInsets.all(16),
 
+                      decoration: BoxDecoration(
 
+                        color: theme.colorScheme.surface,
 
-                  '${profile.maxQuizScore}%',
+                        shape: BoxShape.circle,
 
+                        boxShadow: [
 
+                          BoxShadow(
 
-                  Icons.bolt_rounded,
+                            color: Colors.black.withValues(alpha: 0.05),
 
+                            blurRadius: 10,
 
+                            offset: const Offset(0, 4),
 
-                  Colors.orange.shade400,
+                          ),
 
+                        ],
 
+                      ),
 
-                  theme,
+                      child: Icon(
+
+                        Icons.lock_rounded,
+
+                        size: 32,
+
+                        color: theme.colorScheme.onSurfaceVariant,
+
+                      ),
+
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    Text(
+
+                      'Statistiche Private',
+
+                      style: TextStyle(
+
+                        fontSize: 20,
+
+                        fontWeight: FontWeight.w800,
+
+                        color: theme.colorScheme.onSurface,
+
+                        letterSpacing: -0.5,
+
+                      ),
+
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    Text(
+
+                      'Diventa amico per vedere le statistiche dettagliate, i traguardi sbloccati e molto altro.',
+
+                      textAlign: TextAlign.center,
+
+                      style: TextStyle(
+
+                        fontSize: 15,
+
+                        height: 1.4,
+
+                        color: theme.colorScheme.onSurfaceVariant,
+
+                      ),
+
+                    ),
+
+                  ],
 
                 ),
 
+              ),
 
-
-                _buildStatCard(
-
-                  AppLocalizations.of(context)!.publicStatSites,
-
-
-
-                  '${profile.visitedCount}',
-
-
-
-                  Icons.map_rounded,
-
-
-
-                  AppPalette.moss,
-
-
-
-                  theme,
-
-                ),
-
-
-
-                _buildStatCard(
-
-                  AppLocalizations.of(context)!.publicStatQuiz,
-
-
-
-                  '${profile.totalQuizCompleted}',
-
-
-
-                  Icons.fact_check_rounded,
-
-
-
-                  AppPalette.tan,
-
-
-
-                  theme,
-
-                ),
-
-
-
-                _buildStatCard(
-
-                  AppLocalizations.of(context)!.publicStatBestTime,
-
-
-
-                  bestTourTimeLabel,
-
-
-
-                  Icons.timer_rounded,
-
-
-
-                  Colors.blue.shade400,
-
-
-
-                  theme,
-
-                ),
-
-
-
-                _buildStatCard(
-
-                  AppLocalizations.of(context)!.publicStatCorrectAnswers,
-
-
-
-                  '${profile.totalCorrectAnswers}',
-
-
-
-                  Icons.check_circle_rounded,
-
-
-
-                  AppPalette.moss,
-
-
-
-                  theme,
-
-                ),
-
-              ],
-
-            ),
+            ],
 
           ],
 

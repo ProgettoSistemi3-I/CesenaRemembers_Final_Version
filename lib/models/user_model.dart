@@ -23,6 +23,7 @@ class UserModel extends UserProfile {
     super.friends,
     super.receivedFriendRequests,
     super.sentFriendRequests,
+    super.fcmTokens,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json, String documentId) {
@@ -55,6 +56,7 @@ class UserModel extends UserProfile {
       receivedFriendRequests: List<String>.from(
         json['receivedFriendRequests'] ?? [],
       ),
+      fcmTokens: List<String>.from(json['fcmTokens'] ?? []),
     );
   }
 
@@ -76,6 +78,7 @@ class UserModel extends UserProfile {
       'totalCorrectAnswers': totalCorrectAnswers,
       'bestTourTimeSeconds': bestTourTimeSeconds,
       'maxSingleTourXp': maxSingleTourXp,
+      'fcmTokens': fcmTokens,
       'preferences': {
         'notifiche': notificheEnabled,
         'modalitaNotte': darkModeEnabled,

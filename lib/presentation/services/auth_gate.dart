@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../domain/entities/app_user.dart';
@@ -10,6 +11,7 @@ import '../pages/profile/profile_setup_page.dart';
 import '../theme/theme_controller.dart';
 import 'package:cesena_remembers/l10n/app_localizations.dart';
 import 'main_shell.dart';
+import 'notification_service.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -50,6 +52,8 @@ class _AuthenticatedGate extends StatefulWidget {
 class _AuthenticatedGateState extends State<_AuthenticatedGate> {
   late final UserProfileUseCases _profileUseCases;
   late final Future<void> _ensureFuture;
+  StreamSubscription<UserProfile?>? _profileSubscription;
+  int _previousReceivedRequestsCount = -1;
 
   @override
   void initState() {
@@ -60,7 +64,35 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
       uid: widget.appUser.id,
       email: widget.appUser.email,
     )
-        .then((_) => sl<ThemeController>().refreshFromProfile());
+        .then((_) {
+      sl<ThemeController>().refreshFromProfile();
+      _initNotifications();
+    });
+  }
+
+  void _initNotifications() async {
+    final notificationService = NotificationService();
+    await notificationService.init(_profileUseCases, widget.appUser.id);
+
+    _profileSubscription = _profileUseCases
+        .getUserProfileStream(widget.appUser.id)
+        .listen((profile) {
+      if (profile == null) return;
+      final currentRequestsCount = profile.receivedFriendRequests.length;
+      
+      // If initialized and count increased, show notification
+      if (_previousReceivedRequestsCount != -1 && currentRequestsCount > _previousReceivedRequestsCount) {
+        final newRequestsCount = currentRequestsCount - _previousReceivedRequestsCount;
+        notificationService.showFriendRequestNotification(newRequestsCount);
+      }
+      _previousReceivedRequestsCount = currentRequestsCount;
+    });
+  }
+
+  @override
+  void dispose() {
+    _profileSubscription?.cancel();
+    super.dispose();
   }
 
   @override

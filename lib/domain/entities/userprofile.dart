@@ -20,6 +20,7 @@ class UserProfile {
   final List<String> friends;
   final List<String> sentFriendRequests;
   final List<String> receivedFriendRequests;
+  final List<String> fcmTokens;
 
   UserProfile({
     required this.uid,
@@ -43,6 +44,7 @@ class UserProfile {
     this.friends = const [],
     this.sentFriendRequests = const [],
     this.receivedFriendRequests = const [],
+    this.fcmTokens = const [],
   });
 
   // Getter comodi per la UI
@@ -72,6 +74,7 @@ class UserProfile {
     List<String>? friends,
     List<String>? sentFriendRequests,
     List<String>? receivedFriendRequests,
+    List<String>? fcmTokens,
   }) {
     return UserProfile(
       uid: uid ?? this.uid,
@@ -96,6 +99,7 @@ class UserProfile {
       sentFriendRequests: sentFriendRequests ?? this.sentFriendRequests,
       receivedFriendRequests:
           receivedFriendRequests ?? this.receivedFriendRequests,
+      fcmTokens: fcmTokens ?? this.fcmTokens,
     );
   }
 }

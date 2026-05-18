@@ -130,4 +130,12 @@ class UserRepositoryImpl implements IUserRepository {
   @override
   Future<List<UserProfile>> getUsersByIds(List<String> uids) =>
       _social.getUsersByIds(uids);
+
+  @override
+  Future<bool> checkAreFriends(String currentUid, String targetUid) =>
+      _social.checkAreFriends(currentUid, targetUid);
+
+  @override
+  Future<void> saveFcmToken(String uid, String token) =>
+      _profile.saveFcmToken(uid, token);
 }

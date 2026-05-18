@@ -232,4 +232,10 @@ class UserProfileDataSource {
       throw Exception('Errore durante la ricerca utenti: $e');
     }
   }
+
+  Future<void> saveFcmToken(String uid, String token) async {
+    await _users.doc(uid).update({
+      'fcmTokens': FieldValue.arrayUnion([token]),
+    });
+  }
 }

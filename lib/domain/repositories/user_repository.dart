@@ -67,4 +67,6 @@ abstract class IUserRepository {
   Future<void> rejectFriendRequest(String currentUid, String requesterUid);
   Future<void> removeFriend(String currentUid, String friendUid);
   Future<List<UserProfile>> getUsersByIds(List<String> uids);
+  Future<bool> checkAreFriends(String currentUid, String targetUid);
+  Future<void> saveFcmToken(String uid, String token);
 }

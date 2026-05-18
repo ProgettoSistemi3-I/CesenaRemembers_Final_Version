@@ -6,8 +6,12 @@
     Background location
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
 
-     Per Android 14+
+    <!-- Per Android 14+ -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+    
+    <!-- Per Notifiche Locali (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
     <application
         android:label="Cesena Remembers"
         android:name="${applicationName}"

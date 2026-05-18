@@ -129,4 +129,11 @@ class UserSocialDataSource {
     }
     return result;
   }
+
+  Future<bool> checkAreFriends(String currentUid, String targetUid) async {
+    final doc = await _users.doc(targetUid).get();
+    if (!doc.exists) return false;
+    final friends = List<String>.from(doc.data()?['friends'] ?? []);
+    return friends.contains(currentUid);
+  }
 }
