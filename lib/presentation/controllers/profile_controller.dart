@@ -81,7 +81,8 @@ class ProfileController extends ChangeNotifier {
   Future<void> updateProfileBasics({
     String? displayName,
     String? avatarId,
-  }) async {    final uid = _profileUseCases.getCurrentUserUid();
+  }) async {
+    final uid = _profileUseCases.getCurrentUserUid();
     if (uid == null) return;
 
     try {
@@ -99,9 +100,13 @@ class ProfileController extends ChangeNotifier {
       errorMessage = null;
       _safeNotifyListeners();
     } catch (e) {
-      errorMessage = e.toString();
+      errorMessage = 'errorSaveProfile';
       _safeNotifyListeners();
     }
+  }
+
+  void clearError() {
+    errorMessage = null;
   }
 
   @override

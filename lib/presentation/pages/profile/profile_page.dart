@@ -94,20 +94,30 @@ class _ProfilePageState extends State<ProfilePage>
     if (!mounted) return;
     final err = _profileController.errorMessage;
     if (err != null) {
+      final l10n = AppLocalizations.of(context)!;
+      final localizedError = switch (err) {
+        'errorNotLoggedIn' => l10n.errorNotLoggedIn,
+        'errorSyncProfile' => l10n.errorSyncProfile,
+        'errorLoadProfile' => l10n.errorLoadProfile,
+        'errorSaveProfile' => l10n.errorSaveProfile,
+        _ => err,
+      };
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Errore: $err'),
+          content: Text(localizedError),
           backgroundColor: AppPalette.danger,
           duration: const Duration(seconds: 5),
         ),
       );
-      _profileController.errorMessage = null;
+      _profileController.clearError();
     }
   }
 
   Future<void> _showAvatarPicker(UserProfile profile) async {
     final theme = Theme.of(context);
-    final initialIndex = avatarOptions.indexWhere((opt) => opt.id == profile.avatarId);
+    final initialIndex = avatarOptions.indexWhere(
+      (opt) => opt.id == profile.avatarId,
+    );
     if (initialIndex != -1) {
       setState(() {
         _selectedAvatarIndex = initialIndex;
@@ -140,7 +150,10 @@ class _ProfilePageState extends State<ProfilePage>
     setState(() => _isEditingName = !_isEditingName);
   }
 
-  Future<void> _saveProfileBasics(UserProfile profile, {int? selectedAvatarIndex}) async {
+  Future<void> _saveProfileBasics(
+    UserProfile profile, {
+    int? selectedAvatarIndex,
+  }) async {
     final updatedName = _nameController.text.trim();
 
     final activeIndex = selectedAvatarIndex ?? _selectedAvatarIndex;
@@ -224,7 +237,11 @@ class _ProfilePageState extends State<ProfilePage>
       builder: (_) => FractionallySizedBox(
         heightFactor: 0.8,
 
-        child: _buildUserListSheet(AppLocalizations.of(context)!.profileYourFriends, users, theme),
+        child: _buildUserListSheet(
+          AppLocalizations.of(context)!.profileYourFriends,
+          users,
+          theme,
+        ),
       ),
     );
   }
@@ -250,7 +267,11 @@ class _ProfilePageState extends State<ProfilePage>
       builder: (_) => FractionallySizedBox(
         heightFactor: 0.8,
 
-        child: _buildUserListSheet(AppLocalizations.of(context)!.profileFriendRequests, users, theme),
+        child: _buildUserListSheet(
+          AppLocalizations.of(context)!.profileFriendRequests,
+          users,
+          theme,
+        ),
       ),
     );
   }
@@ -391,9 +412,9 @@ class _ProfilePageState extends State<ProfilePage>
                         child: CircleAvatar(
                           backgroundColor: AppPalette.tan,
                           radius: 22,
-                          backgroundImage: AssetImage(avatarById(u.avatarId).assetPath),
-
-                          
+                          backgroundImage: AssetImage(
+                            avatarById(u.avatarId).assetPath,
+                          ),
                         ),
                       ),
 
@@ -659,7 +680,9 @@ class _ProfilePageState extends State<ProfilePage>
 
                           const SizedBox(height: 32),
 
-                          _SectionLabel(AppLocalizations.of(context)!.sectionStatistics),
+                          _SectionLabel(
+                            AppLocalizations.of(context)!.sectionStatistics,
+                          ),
 
                           const SizedBox(height: 16),
 
@@ -679,14 +702,18 @@ class _ProfilePageState extends State<ProfilePage>
                             children: [
                               _StatCard(
                                 icon: Icons.bolt_rounded,
-                                label: AppLocalizations.of(context)!.statTotalXp,
+                                label: AppLocalizations.of(
+                                  context,
+                                )!.statTotalXp,
                                 value: '${profile.xp}',
                                 color: AppPalette.olive,
                               ),
 
                               _StatCard(
                                 icon: Icons.emoji_events_outlined,
-                                label: AppLocalizations.of(context)!.statBestTour,
+                                label: AppLocalizations.of(
+                                  context,
+                                )!.statBestTour,
                                 value: profile.maxSingleTourXp > 0
                                     ? '${profile.maxSingleTourXp}'
                                     : '--',
@@ -695,21 +722,27 @@ class _ProfilePageState extends State<ProfilePage>
 
                               _StatCard(
                                 icon: Icons.map_outlined,
-                                label: AppLocalizations.of(context)!.statVisitedSites,
+                                label: AppLocalizations.of(
+                                  context,
+                                )!.statVisitedSites,
                                 value: '${profile.visitedCount}',
                                 color: AppPalette.moss,
                               ),
 
                               _StatCard(
                                 icon: Icons.route_rounded,
-                                label: AppLocalizations.of(context)!.toursCompleted,
+                                label: AppLocalizations.of(
+                                  context,
+                                )!.toursCompleted,
                                 value: '${profile.totalToursCompleted}',
                                 color: AppPalette.tan,
                               ),
 
                               _StatCard(
                                 icon: Icons.timer_outlined,
-                                label: AppLocalizations.of(context)!.statBestTime,
+                                label: AppLocalizations.of(
+                                  context,
+                                )!.statBestTime,
                                 value: profile.bestTourTimeSeconds > 0
                                     ? _formatTime(profile.bestTourTimeSeconds)
                                     : '--',
@@ -718,7 +751,9 @@ class _ProfilePageState extends State<ProfilePage>
 
                               _StatCard(
                                 icon: Icons.military_tech_rounded,
-                                label: AppLocalizations.of(context)!.statAchievements,
+                                label: AppLocalizations.of(
+                                  context,
+                                )!.statAchievements,
                                 value: '${profile.achievementsCount}',
                                 color: AppPalette.moss,
                               ),
@@ -727,7 +762,9 @@ class _ProfilePageState extends State<ProfilePage>
 
                           const SizedBox(height: 36),
 
-                          _SectionLabel(AppLocalizations.of(context)!.sectionAchievements),
+                          _SectionLabel(
+                            AppLocalizations.of(context)!.sectionAchievements,
+                          ),
 
                           const SizedBox(height: 16),
 

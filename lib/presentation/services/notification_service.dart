@@ -54,8 +54,8 @@ class NotificationService {
       FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
         profileUseCases.saveFcmToken(uid, newToken);
       });
-    } catch (e) {
-      print("Errore FCM: $e");
+    } catch (_) {
+      // Evitiamo log rumorosi o sensibili in produzione.
     }
 
     // Gestione notifiche Push ricevute mentre l'app è in FOREGROUND

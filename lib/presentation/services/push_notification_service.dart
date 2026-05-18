@@ -5,9 +5,12 @@ import '../../injection_container.dart';
 import 'shell_navigation_store.dart';
 
 class PushNotificationService {
+  static bool _isInitialized = false;
+
   static Future<void> initializeAndSaveToken(BuildContext context) async {
+    if (_isInitialized) return;
     try {
-      FirebaseMessaging messaging = FirebaseMessaging.instance;
+      final messaging = FirebaseMessaging.instance;
 
       // 1. Richiedi i permessi all'utente
       NotificationSettings settings = await messaging.requestPermission(
@@ -25,17 +28,15 @@ class PushNotificationService {
           String? token = await messaging.getToken();
           if (token != null) {
             await profileUseCases.saveFcmToken(uid, token);
-            print('✅ Token FCM salvato con successo: $token');
           }
         }
 
         // 3. Configura i Listener per gestire le notifiche in tempo reale
         _setupNotificationListeners(context);
-      } else {
-        print('⚠️ L\'utente ha negato i permessi per le notifiche.');
+        _isInitialized = true;
       }
-    } catch (e) {
-      print('❌ Errore durante l\'inizializzazione delle notifiche: $e');
+    } catch (_) {
+      // Evitiamo log rumorosi o sensibili in produzione.
     }
   }
 
@@ -44,10 +45,6 @@ class PushNotificationService {
     // 1. APP APERTA (Foreground): Mostra un dialog o uno SnackBar custom
     // ------------------------------------------------------------------
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print(
-        '🔔 Notifica ricevuta in Foreground: ${message.notification?.title}',
-      );
-
       if (message.notification != null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -89,7 +86,6 @@ class PushNotificationService {
     // 2. APP IN BACKGROUND: L'utente clicca sulla notifica nel sistema
     // ------------------------------------------------------------------
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('📩 Notifica cliccata da Background!');
       _handleNotificationClick(message.data);
     });
 
@@ -100,21 +96,17 @@ class PushNotificationService {
       RemoteMessage? message,
     ) {
       if (message != null) {
-        print('🚀 App avviata da notifica spenta!');
         _handleNotificationClick(message.data);
       }
     });
   }
 
-  // 🔴 LOGICA DI REINDERIZZAMENTO AUTOMATICO AL CLICK
   static void _handleNotificationClick(Map<String, dynamic> data) {
     final notificationType = data['type'];
 
-    // Sfruttiamo lo ShellNavigationStore esistente per spostare l'utente sulla Community
     if (notificationType == 'friend_request' ||
         notificationType == 'friend_accepted') {
-      print('➔ Sposto l\'utente alla scheda Community (Index 1)');
-      ShellNavigationStore.goToTab(1); // Sposta l'indice sul tab SocialPage
+      ShellNavigationStore.goToTab(1);
     }
   }
 }

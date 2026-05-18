@@ -12,19 +12,19 @@ class PoiMarkerFactory {
   Marker fromPoi(Poi poi, {double counterRotationDegrees = 0}) {
     return Marker(
       point: LatLng(poi.latitude, poi.longitude),
-      width: 160,
-      height: 110,
+      width: 180,
+      height: 100,
       child: Transform.rotate(
         angle: _degreesToRadians(-counterRotationDegrees),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            _LiquidGlassPin(
-              accentColor: _colorFromType(poi.type),
+            _ThemedPoiPin(
+              color: _colorFromType(poi.type),
               icon: _iconFromType(poi.type),
             ),
-            const SizedBox(height: 6),
-            _LiquidGlassLabel(text: poi.name),
+            const SizedBox(height: 4),
+            _PoiLabel(text: poi.name),
           ],
         ),
       ),
@@ -36,8 +36,8 @@ class PoiMarkerFactory {
   Color _colorFromType(String type) {
     switch (type.toLowerCase()) {
       case 'church':
-        // ANTI-LILA BAN: Sostituito il viola con un Tan architettonico più sobrio
-        return AppPalette.tan;
+        return const Color(0xFF7B6AA5);
+
       case 'monument':
         return AppPalette.olive;
       case 'square':
@@ -49,13 +49,12 @@ class PoiMarkerFactory {
       case 'library':
         return AppPalette.moss;
       default:
-        // Neutro elegante di fallback (Zinc-400)
-        return const Color(0xFFA1A1AA);
+        // Sostituito textMid con olive come fallback di sistema
+        return AppPalette.olive;
     }
   }
 
   IconData _iconFromType(String type) {
-    // ENFORCEMENT: Utilizzo esclusivo di varianti 'outlined' o a tratto fine
     switch (type.toLowerCase()) {
       case 'church':
         return Icons.church_outlined;
@@ -64,129 +63,135 @@ class PoiMarkerFactory {
       case 'square':
         return Icons.location_city_outlined;
       case 'school':
-        return Icons.school_outlined;
+        return Icons.school;
       case 'bridge':
         return Icons.architecture;
       case 'library':
-        return Icons.local_library_outlined;
+        return Icons.local_library;
       default:
-        return Icons.place_outlined;
+        return Icons.castle;
     }
   }
 }
 
-/// [MOTION_INTENSITY: 6] - Genera un micro-movimento continuo (breathing)
-/// per mantenere la mappa viva, utilizzando solo trasformazioni scalari
-/// per sfruttare l'accelerazione hardware senza ricalcoli onerosi del layout.
-class _LiquidGlassPin extends StatefulWidget {
-  final Color accentColor;
+class _ThemedPoiPin extends StatelessWidget {
+  const _ThemedPoiPin({required this.color, required this.icon});
+
+  final Color color;
+
   final IconData icon;
-
-  const _LiquidGlassPin({required this.accentColor, required this.icon});
-
-  @override
-  State<_LiquidGlassPin> createState() => _LiquidGlassPinState();
-}
-
-class _LiquidGlassPinState extends State<_LiquidGlassPin>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    // Perpetual Loop: breathing effect dolce e organico
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 3200),
-    )..repeat(reverse: true);
-
-    _scaleAnimation = Tween<double>(begin: 0.96, end: 1.04).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _scaleAnimation,
-      child: ClipOval(
-        child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-          child: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              // Base: Zinc-950 traslucido (NO nero assoluto)
-              color: const Color(0xFF09090B).withValues(alpha: 0.65),
-              border: Border.all(
-                // Rifrazione fisica sui bordi
-                color: Colors.white.withValues(alpha: 0.15),
-                width: 1.2,
+    const double pinWidth = 40;
+    const double pinHeight = 52;
+
+    return SizedBox(
+      width: pinWidth,
+      height: pinHeight,
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          CustomPaint(
+            size: const Size(pinWidth, pinHeight),
+            painter: _DropPinPainter(color: color),
+          ),
+          Positioned(
+            top: 5,
+            child: Container(
+              width: 30,
+              height: 30,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
               ),
-              boxShadow: [
-                // Bagliore di profondità legato all'accent color
-                BoxShadow(
-                  color: widget.accentColor.withValues(alpha: 0.15),
-                  blurRadius: 12,
-                  spreadRadius: -2,
-                ),
-              ],
-            ),
-            child: Center(
-              child: Icon(widget.icon, color: widget.accentColor, size: 20),
+              child: Icon(icon, color: color, size: 18),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
 }
 
-/// [VISUAL_DENSITY: 4] - Etichetta minimalista, font incisivo e contenimento elegante
-class _LiquidGlassLabel extends StatelessWidget {
-  final String text;
+class _DropPinPainter extends CustomPainter {
+  const _DropPinPainter({required this.color});
+  final Color color;
 
-  const _LiquidGlassLabel({required this.text});
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final shadowPaint = Paint()
+      ..color = Colors.black.withValues(alpha: 0.25)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+
+    final double w = size.width;
+    final double h = size.height;
+    final double r = w / 2;
+    final double cx = w / 2;
+    final double cy = r;
+
+    final path = ui.Path();
+    path.addArc(
+      Rect.fromCircle(center: Offset(cx, cy), radius: r),
+      math.pi * 0.75,
+      math.pi * 1.5,
+    );
+    path.lineTo(cx, h);
+    path.close();
+
+    canvas.drawPath(path, shadowPaint);
+    canvas.drawPath(path, paint);
+
+    final borderPaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+    canvas.drawPath(path, borderPaint);
+  }
+
+  @override
+  bool shouldRepaint(_DropPinPainter oldDelegate) => oldDelegate.color != color;
+}
+
+class _PoiLabel extends StatelessWidget {
+  const _PoiLabel({required this.text});
+  final String text;
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 140),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: const Color(0xFF09090B).withValues(alpha: 0.75), // Deep Zinc
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.12),
-              width: 1,
-            ),
+    final theme = Theme.of(context);
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 170),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface.withValues(alpha: 0.94),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: theme.colorScheme.surfaceContainerHighest,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.18),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
-          child: Text(
-            text,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFFFAFAFA), // Zinc-50
-              letterSpacing: -0.3, // Typography determinism: tighter tracking
-              height: 1.2,
-            ),
-          ),
+        ],
+      ),
+      child: Text(
+        text,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w800,
+          color: theme.colorScheme.onSurface,
+          letterSpacing: 0.1,
         ),
       ),
     );
