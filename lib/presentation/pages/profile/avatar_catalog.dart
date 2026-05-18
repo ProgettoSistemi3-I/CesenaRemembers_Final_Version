@@ -3,51 +3,29 @@ import 'package:flutter/material.dart';
 class AvatarOption {
   const AvatarOption({
     required this.id,
-    required this.icon,
+    required this.assetPath,
     required this.background,
   });
 
   final String id;
-  final IconData icon;
+  final String assetPath;
   final Color background;
 }
 
 const List<AvatarOption> avatarOptions = [
-  AvatarOption(id: 'person', icon: Icons.person, background: Color(0xFFEEEEEE)),
-  AvatarOption(
-    id: 'military_tech',
-    icon: Icons.military_tech,
-    background: Color(0xFFFFECB3),
-  ),
-  AvatarOption(
-    id: 'local_fire_department',
-    icon: Icons.local_fire_department,
-    background: Color(0xFFFFCDD2),
-  ),
-  AvatarOption(id: 'bolt', icon: Icons.bolt, background: Color(0xFFFFF9C4)),
-  AvatarOption(id: 'shield', icon: Icons.shield, background: Color(0xFFBBDEFB)),
-  AvatarOption(id: 'star', icon: Icons.star, background: Color(0xFFC8E6C9)),
-  AvatarOption(
-    id: 'emoji_events',
-    icon: Icons.emoji_events,
-    background: Color(0xFFE1BEE7),
-  ),
-  AvatarOption(id: 'public', icon: Icons.public, background: Color(0xFFB2EBF2)),
-  AvatarOption(
-    id: 'psychology',
-    icon: Icons.psychology,
-    background: Color(0xFFD7CCC8),
-  ),
-  AvatarOption(
-    id: 'auto_awesome',
-    icon: Icons.auto_awesome,
-    background: Color(0xFFF8BBD0),
-  ),
+  AvatarOption(id: 'partisan',  assetPath: 'assets/avatars/partisan.png',  background: Color(0xFFE0E0E0)),
+  AvatarOption(id: 'soldier',   assetPath: 'assets/avatars/soldier.png',   background: Color(0xFFD7CCC8)),
+  AvatarOption(id: 'nurse',     assetPath: 'assets/avatars/nurse.png',     background: Color(0xFFFFCDD2)),
+  AvatarOption(id: 'explorer',  assetPath: 'assets/avatars/explorer.png',  background: Color(0xFFFFF9C4)),
+  AvatarOption(id: 'staffetta', assetPath: 'assets/avatars/staffetta.png', background: Color(0xFFF8E8D0)),
+  AvatarOption(id: 'mayor',     assetPath: 'assets/avatars/mayor.png',     background: Color(0xFFE8EAF6)),
+  AvatarOption(id: 'priest',    assetPath: 'assets/avatars/priest.png',    background: Color(0xFFECEFF1)),
+  AvatarOption(id: 'worker',    assetPath: 'assets/avatars/worker.png',    background: Color(0xFFE0F2F1)),
 ];
 
 AvatarOption avatarById(String avatarId) {
   return avatarOptions.firstWhere(
     (option) => option.id == avatarId,
-    orElse: () => avatarOptions[1],
+    orElse: () => avatarOptions[1], // default: soldier
   );
 }

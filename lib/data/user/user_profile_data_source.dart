@@ -187,7 +187,7 @@ class UserProfileDataSource {
       updates['avatarId'] = avatarId.trim();
     }
 
-    await _users.doc(uid).set(updates, SetOptions(merge: true));
+    await _users.doc(uid).update(updates);
   }
 
   Future<bool> isUsernameAvailable(String username) async {

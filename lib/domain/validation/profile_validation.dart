@@ -23,11 +23,11 @@ class ProfileValidation {
   }
 
   static bool hasOffensiveDisplayName(String value) {
-    return OffensiveLanguageFilter.containsOffensiveLanguage(value.trim());
+    return OffensiveLanguageFilter.isOffensiveDisplayName(value.trim());
   }
 
   static bool hasOffensiveUsername(String value) {
-    return OffensiveLanguageFilter.containsOffensiveLanguage(
+    return OffensiveLanguageFilter.isOffensiveUsername(
       normalizeUsername(value),
     );
   }

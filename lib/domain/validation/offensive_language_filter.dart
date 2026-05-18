@@ -1,178 +1,166 @@
 class OffensiveLanguageFilter {
   const OffensiveLanguageFilter._();
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // LISTA TERMINI BLOCCATI
+  //
+  // IMPORTANTE – logica di matching:
+  //   • I termini vengono confrontati SOLO come parole intere (word-boundary).
+  //   • "bazzocchi" NON viene bloccato perché "cazzo" non è una parola intera
+  //     all'interno di "bazzocchi"; il confronto avviene token per token.
+  //   • Per i display name (con spazi) ogni parola viene testata separatamente.
+  //   • Per gli username (singolo token) si controlla il token normalizzato
+  //     nella sua interezza E se inizia/termina con un termine bloccato.
+  // ─────────────────────────────────────────────────────────────────────────
+
   static const Set<String> _blockedTerms = {
-    // 🇮🇹 Italiano - Parolacce generali (esteso)
-    'merda', 'merd', 'merdaccia', 'cagata', 'cacata', 'cacca', 'cagare', 'cag',
-    'cazzo',
-    'cazz',
-    'cazzone',
-    'cazzata',
-    'cazzate',
-    'testadicazzo',
-    'testacazzo',
-    'minchia', 'minch', 'minchiata', 'minchiate', 'minchione',
-    'stronzo', 'stronz', 'stronza', 'stronzata', 'stronzate',
-    'coglione', 'coglion', 'coglioni', 'rompicoglioni', 'rompicoglion',
+    // 🇮🇹 Italiano – parolacce
+    'merda', 'merdaccia', 'cagata', 'cacata', 'cagare',
+    'cazzo', 'cazzone', 'cazzata', 'cazzate', 'testadicazzo', 'testacazzo',
+    'minchia', 'minchiata', 'minchiate', 'minchione',
+    'stronzo', 'stronza', 'stronzata', 'stronzate',
+    'coglione', 'coglioni', 'rompicoglioni',
     'figa', 'fica', 'fregna', 'passera', 'topa', 'fessa', 'fighetta',
-    'culo', 'cul', 'culattone', 'bucaiolo', 'busone',
-    'palle', 'pall', 'chepalle', 'rompiballe', 'rompiball',
-    'puttana', 'puttan', 'putt', 'puttanella',
+    'culo', 'culattone', 'bucaiolo', 'busone',
+    'palle', 'chepalle', 'rompiballe',
+    'puttana', 'puttanella',
     'troia',
-    'troi',
     'zoccola',
-    'zocc',
     'mignotta',
-    'mignott',
     'baldracca',
     'bagascia',
     'battona',
     'sgualdrina',
-    'bastardo', 'bastard', 'figliodiputtana', 'figlioditroia', 'figlioditroi',
-    'vaffanculo',
-    'vaffan',
-    'fanculo',
-    'fanc',
-    'vaff',
-    'fottiti',
-    'fott',
-    'fottuto',
-    'succhia',
-    'suca',
-    'pompa',
-    'pompino',
-    'bocchino',
-    'segaiolo',
-    'sega',
-    'mezzasega',
-    'cornuto', 'cornut', 'cuck',
-    'sfigato', 'sfigat', 'sfig',
+    'bastardo', 'figliodiputtana', 'figlioditroia',
+    'vaffanculo', 'fanculo', 'fottiti', 'fottuto',
+    'succhia', 'suca', 'pompino', 'bocchino',
+    'segaiolo', 'mezzasega',
+    'cornuto',
+    'sfigato',
+    'incazzato',
 
-    // Bestemmie e varianti blasfeme (la parte più estesa)
-    'porcodio', 'porco dio', 'porcoddio', 'porcadio', 'pordio', 'pordd',
-    'dio porco', 'dioporco',
-    'porcamadonna', 'porca madonna', 'porcamadonn',
-    'madonna puttana', 'madonnputtana', 'madonnatroia', 'madonnatroi',
-    'madonna troia', 'madonna zoccola', 'madonna lurida',
-    'diocane', 'dio cane', 'dio merda', 'diomerda',
-    'dio stronzo', 'diostronzo',
-    'dio bastardo', 'diobastardo',
-    'dio ladro', 'dioladro',
-    'dio boia', 'dioboia',
-    'dio maiale', 'diomaiale',
-    'dio bestia', 'diobestia',
-    'dio vigliacco', 'diovigliacco',
-    'gesucristo', 'gesù cane', 'gesucane', 'porcogesù', 'porco gesù',
-    'porco cristo', 'porcocristo',
-    'mannaggia madonna',
-    'mannaggia alla madonna',
-    'mannaggia cristo',
-    'mannaggia a cristo',
-    'mannaggia dio', 'mannaggia',
-    'porco iddio', 'porcoiddio', 'porchiddio',
-    'porcaccio dio', 'porcacciodio',
-    'diocane porco', 'madonna impestata', 'dio schifoso', 'dio lurido',
-    'cristo boia', 'cristoboia', 'madonna vacca', 'madonnvacca',
+    // 🇮🇹 Bestemmie
+    'porcodio', 'porcoddio', 'porcadio',
+    'dioporco', 'diocane', 'diomerda', 'diostronzo', 'diobastardo',
+    'dioladro', 'dioboia', 'diomaiale', 'diobestia',
+    'porcamadonna', 'porcamadonn',
+    'madonnputtana', 'madonnatroia', 'madonnvacca',
+    'gesucane', 'porcocristo', 'cristoboia',
+    'porcoiddio', 'porchiddio', 'porcacciodio',
 
-    // Inglese (hai già una buona base, ho aggiunto qualche variante comune)
-    'fuck', 'fck', 'fuk', 'fucking', 'fuker',
-    'shit', 'sht', 'bullshit',
-    'bitch', 'btch', 'sonofabitch',
-    'asshole', 'ashole',
-    'cunt',
-    'dick', 'dickhead',
-    'cock',
-    'pussy',
-    'whore', 'slut',
-    'nigger', 'nigga',
-    'faggot', 'fag',
-    'retard', 'retarded',
-    'moron',
-    'idiot',
-    'stupid',
-    'dumbass',
-    'jackass',
-    'motherfucker',
-    'motherfukr',
+    // 🇬🇧 Inglese
+    'fuck', 'fucking', 'shit', 'bullshit',
+    'bitch', 'sonofabitch',
+    'asshole', 'cunt', 'dick', 'dickhead', 'cock', 'pussy',
+    'whore', 'slut', 'nigger', 'nigga', 'faggot',
+    'retard', 'retarded', 'motherfucker',
 
-    'cretino', 'cretin',
-    'imbecille', 'imbecil',
-    'deficiente', 'defic',
-    'ritardato', 'ritard',
-    'mongoloide', 'mongol',
-    'negro',
-    'duce',
-    'ebrei',
-    'immigrati',
-    'finocchio',
-    'magrebino',
-    'magrebini',
-    'frocio',
-    'froc',
-    'ricchione',
-    'ricchion',
-    'lesbica',
-    'incazzato', 'incazz', 'incaz',
-    'testa di minchia', 'testadiminchia',
-    'testa di merda', 'testadimerda',
-    'pezzo di merda', 'pezzodimerda',
+    // Insulti generici
+    'cretino', 'imbecille', 'deficiente', 'ritardato',
+    'mongoloide', 'negro', 'frocio', 'ricchione', 'finocchio',
   };
 
-  static bool containsOffensiveLanguage(String value) {
-    if (value.trim().isEmpty) return false;
+  // Frasi multi-parola (controllate come substring sull'input completo)
+  static const Set<String> _blockedPhrases = {
+    'porco dio', 'dio porco', 'dio cane', 'dio merda', 'dio stronzo',
+    'dio bastardo', 'dio ladro', 'dio boia', 'dio maiale', 'dio bestia',
+    'porca madonna', 'madonna puttana', 'madonna troia',
+    'madonna zoccola', 'madonna lurida', 'madonna vacca',
+    'gesù cane', 'porco gesù', 'porco cristo', 'porco iddio',
+    'mannaggia madonna', 'mannaggia cristo', 'mannaggia dio',
+    'testa di minchia', 'testa di merda', 'pezzo di merda',
+  };
 
-    final words = value.toLowerCase().trim().split(RegExp(r'\s+'));
-    for (final word in words) {
-      final cleaned = word.replaceAll(RegExp(r'[^\w]'), '');
-      if (cleaned.isNotEmpty && _blockedTerms.contains(cleaned)) {
-        return true;
-      }
+  // ─────────────────────────────────────────────────────────────────────────
+  // API PUBBLICA
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Controlla un **display name** (può avere spazi).
+  /// Ogni parola viene confrontata individualmente – i cognomi/nomi
+  /// che contengono sequenze simili a parolacce NON vengono bloccati
+  /// perché il confronto è word-boundary.
+  static bool isOffensiveDisplayName(String value) {
+    final clean = value.trim().toLowerCase();
+    if (clean.isEmpty) return false;
+
+    // 1. Frasi multi-parola
+    if (_containsBlockedPhrase(clean)) return true;
+
+    // 2. Ogni token individuale
+    final tokens = clean.split(RegExp(r'[^a-zàáâãäåèéêëìíîïòóôõöùúûüýñç]+'));
+    for (final token in tokens) {
+      if (token.length < 3) continue;
+      final norm = _normalize(token);
+      if (norm.isNotEmpty && _blockedTerms.contains(norm)) return true;
+      // Controlla anche il token non normalizzato per catturare varianti dirette
+      if (_blockedTerms.contains(token)) return true;
     }
+    return false;
+  }
 
-    final normalized = _normalize(value);
-    if (normalized.isEmpty) return false;
+  /// Controlla uno **username** (singolo token, già normalizzato a-z0-9._).
+  /// Blocca solo se:
+  ///   (a) l'username coincide esattamente con un termine bloccato, OPPURE
+  ///   (b) l'username inizia O termina con un termine bloccato
+  ///       (es. "cazzomio" o "miocazzo" → bloccati; "bazzocchi" → OK).
+  static bool isOffensiveUsername(String value) {
+    final norm = _normalize(value.toLowerCase().trim());
+    if (norm.isEmpty) return false;
 
     for (final term in _blockedTerms) {
-      if (normalized.contains(term)) return true;
-    }
+      if (term.length < 4) continue; // ignora abbreviazioni di 1-3 lettere
 
+      // (a) match esatto
+      if (norm == term) return true;
+
+      // (b) inizia o finisce con il termine (es. "cazzoXYZ" o "XYZcazzo")
+      if (norm.startsWith(term) || norm.endsWith(term)) return true;
+    }
+    return false;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Retrocompatibilità – usata internamente da ProfileValidation
+  // ─────────────────────────────────────────────────────────────────────────
+  static bool containsOffensiveLanguage(String value) =>
+      isOffensiveDisplayName(value);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // HELPERS PRIVATI
+  // ─────────────────────────────────────────────────────────────────────────
+
+  static bool _containsBlockedPhrase(String normalized) {
+    for (final phrase in _blockedPhrases) {
+      if (normalized.contains(phrase)) return true;
+    }
     return false;
   }
 
   static String _normalize(String value) {
-    var result = value.toLowerCase();
-
-    // Rimuovi diacritici (è → e, à → a, ecc.)
-    result = _removeDiacritics(result);
-
-    // Leetspeak e sostituzioni comuni
-    result = result
-        .replaceAll(RegExp(r'[4@à]'), 'a')
-        .replaceAll(RegExp(r'[3€è]'), 'e')
-        .replaceAll(RegExp(r'[1!|ì]'), 'i')
-        .replaceAll(RegExp(r'[0òó]'), 'o')
+    var r = value.toLowerCase();
+    r = _removeDiacritics(r);
+    r = r
+        .replaceAll(RegExp(r'[4@]'), 'a')
+        .replaceAll(RegExp(r'[3€]'), 'e')
+        .replaceAll(RegExp(r'[1!|]'), 'i')
+        .replaceAll(RegExp(r'[0]'), 'o')
         .replaceAll(RegExp(r'[5\$]'), 's')
-        .replaceAll(RegExp(r'[7]'), 't')
-        .replaceAll(RegExp(r'[ùú]'), 'u')
-        .replaceAll(RegExp(r'[ç]'), 'c')
-        .replaceAll(RegExp(r'[ñ]'), 'n')
-        .replaceAll('ph', 'f') // "phuck" → "fuck"
-        .replaceAll('ck', 'k'); // opzionale, riduce falsi negativi
+        .replaceAll('7', 't')
+        .replaceAll('ph', 'f');
 
-    // Rimuovi caratteri ripetuti (fuuuck → fuk, merdaaa → merda)
-    result = result.replaceAllMapped(RegExp(r'(.)\1{2,}'), (m) => m.group(1)!);
+    // Rimuovi caratteri tripli ripetuti (fuuuck → fuk)
+    r = r.replaceAllMapped(RegExp(r'(.)\1{2,}'), (m) => m.group(1)!);
 
-    // Rimuovi tutto tranne lettere e numeri
-    result = result.replaceAll(RegExp(r'[^a-z0-9]'), '');
-
-    return result;
+    // Tieni solo lettere
+    r = r.replaceAll(RegExp(r'[^a-z]'), '');
+    return r;
   }
 
   static String _removeDiacritics(String input) {
-    const diacritics = 'ÀÁÂÃÄÅàáâãäåÈÉÊËèéêëÌÍÎÏìíîïÒÓÔÕÖØòóôõöøÙÚÛÜùúûüÝýÑñÇç';
+    const diacritics =
+        'ÀÁÂÃÄÅàáâãäåÈÉÊËèéêëÌÍÎÏìíîïÒÓÔÕÖØòóôõöøÙÚÛÜùúûüÝýÑñÇç';
     const replacement =
         'AAAAAAaaaaaaEEEEeeeeIIIIiiiiOOOOOOooooooUUUUuuuuYyNnCc';
-
     var result = input;
     for (var i = 0; i < diacritics.length; i++) {
       result = result.replaceAll(diacritics[i], replacement[i]);

@@ -301,11 +301,8 @@ class _SocialPageState extends State<SocialPage> {
                   child: CircleAvatar(
                     radius: 20,
                     backgroundColor: avatar.background,
-                    child: Icon(
-                      avatar.icon,
-                      size: 20,
-                      color: Colors.black.withValues(alpha: 0.6),
-                    ),
+                    backgroundImage: AssetImage(avatar.assetPath),
+                    
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -462,11 +459,8 @@ class _SocialPageState extends State<SocialPage> {
                       child: CircleAvatar(
                         radius: 22,
                         backgroundColor: avatar.background,
-                        child: Icon(
-                          avatar.icon,
-                          size: 22,
-                          color: Colors.black.withValues(alpha: 0.6),
-                        ),
+                    backgroundImage: AssetImage(avatar.assetPath),
+                        
                       ),
                     ),
                     const SizedBox(width: 16),

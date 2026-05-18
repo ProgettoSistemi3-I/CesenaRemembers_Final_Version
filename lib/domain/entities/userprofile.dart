@@ -27,7 +27,7 @@ class UserProfile {
     required this.email,
     required this.displayName,
     this.username = '',
-    this.avatarId = 'military_tech',
+    this.avatarId = 'soldier',
     this.profileCompleted = false,
     this.xp = 0,
     this.visitedPoiIds = const [],

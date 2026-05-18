@@ -108,14 +108,9 @@ class _HeroCard extends StatelessWidget {
                       radius: 56,
 
                       backgroundColor: option.background,
+                      backgroundImage: AssetImage(option.assetPath),
 
-                      child: Icon(
-                        option.icon,
-
-                        size: 60,
-
-                        color: Colors.black.withValues(alpha: 0.6),
-                      ),
+                      
                     ),
                   ),
                 ),
@@ -780,6 +775,7 @@ class _AvatarPickerSheet extends StatelessWidget {
                     shape: BoxShape.circle,
 
                     color: opt.background,
+                    image: DecorationImage(image: AssetImage(opt.assetPath), fit: BoxFit.cover),
 
                     boxShadow: isSelected
                         ? [
@@ -804,13 +800,7 @@ class _AvatarPickerSheet extends StatelessWidget {
                     alignment: Alignment.center,
 
                     children: [
-                      Icon(
-                        opt.icon,
 
-                        size: isSelected ? 38 : 34,
-
-                        color: Colors.black.withValues(alpha: 0.6),
-                      ),
 
                       if (isSelected)
                         Positioned(

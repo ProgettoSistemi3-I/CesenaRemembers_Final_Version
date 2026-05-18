@@ -90,9 +90,16 @@ class ProfileController extends ChangeNotifier {
         displayName: displayName,
         avatarId: avatarId,
       );
+      if (profile != null) {
+        profile = profile!.copyWith(
+          displayName: displayName ?? profile!.displayName,
+          avatarId: avatarId ?? profile!.avatarId,
+        );
+      }
       errorMessage = null;
+      _safeNotifyListeners();
     } catch (e) {
-      errorMessage = 'errorSaveProfile';
+      errorMessage = e.toString();
       _safeNotifyListeners();
     }
   }

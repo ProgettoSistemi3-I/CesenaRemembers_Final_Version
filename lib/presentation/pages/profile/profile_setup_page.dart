@@ -219,7 +219,8 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                       child: CircleAvatar(
                         radius: 28,
                         backgroundColor: option.background,
-                        child: Icon(option.icon, color: Colors.black54),
+                        backgroundImage: AssetImage(option.assetPath),
+                        
                       ),
                     ),
                   );

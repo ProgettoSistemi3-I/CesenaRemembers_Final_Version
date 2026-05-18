@@ -74,6 +74,7 @@ class _ProfilePageState extends State<ProfilePage>
     _animCtrl.forward();
 
     _profileController = ProfileController(profileUseCases: sl());
+    _profileController.addListener(_onProfileError);
 
     _socialController = sl<SocialController>();
   }
@@ -81,7 +82,7 @@ class _ProfilePageState extends State<ProfilePage>
   @override
   void dispose() {
     _animCtrl.dispose();
-
+    _profileController.removeListener(_onProfileError);
     _profileController.dispose();
 
     _nameController.dispose();
@@ -89,8 +90,29 @@ class _ProfilePageState extends State<ProfilePage>
     super.dispose();
   }
 
-  Future<void> _showAvatarPicker() async {
+  void _onProfileError() {
+    if (!mounted) return;
+    final err = _profileController.errorMessage;
+    if (err != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Errore: $err'),
+          backgroundColor: AppPalette.danger,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+      _profileController.errorMessage = null;
+    }
+  }
+
+  Future<void> _showAvatarPicker(UserProfile profile) async {
     final theme = Theme.of(context);
+    final initialIndex = avatarOptions.indexWhere((opt) => opt.id == profile.avatarId);
+    if (initialIndex != -1) {
+      setState(() {
+        _selectedAvatarIndex = initialIndex;
+      });
+    }
 
     await showModalBottomSheet<void>(
       context: context,
@@ -104,7 +126,10 @@ class _ProfilePageState extends State<ProfilePage>
       builder: (_) => _AvatarPickerSheet(
         selected: _selectedAvatarIndex,
 
-        onSelect: (i) => setState(() => _selectedAvatarIndex = i),
+        onSelect: (i) {
+          setState(() => _selectedAvatarIndex = i);
+          _saveProfileBasics(profile, selectedAvatarIndex: i);
+        },
       ),
     );
   }
@@ -115,10 +140,11 @@ class _ProfilePageState extends State<ProfilePage>
     setState(() => _isEditingName = !_isEditingName);
   }
 
-  Future<void> _saveProfileBasics(UserProfile profile) async {
+  Future<void> _saveProfileBasics(UserProfile profile, {int? selectedAvatarIndex}) async {
     final updatedName = _nameController.text.trim();
 
-    final selectedAvatarId = avatarOptions[_selectedAvatarIndex].id;
+    final activeIndex = selectedAvatarIndex ?? _selectedAvatarIndex;
+    final selectedAvatarId = avatarOptions[activeIndex].id;
 
     if (updatedName.isEmpty) {
       setState(() => _nameController.text = profile.displayName);
@@ -364,16 +390,10 @@ class _ProfilePageState extends State<ProfilePage>
 
                         child: CircleAvatar(
                           backgroundColor: AppPalette.tan,
-
                           radius: 22,
+                          backgroundImage: AssetImage(avatarById(u.avatarId).assetPath),
 
-                          child: Icon(
-                            avatarById(u.avatarId).icon,
-
-                            size: 22,
-
-                            color: Colors.black87,
-                          ),
+                          
                         ),
                       ),
 
@@ -613,9 +633,7 @@ class _ProfilePageState extends State<ProfilePage>
                             toursCount: profile.totalToursCompleted.toString(),
 
                             onAvatarTap: () async {
-                              await _showAvatarPicker();
-
-                              await _saveProfileBasics(profile);
+                              await _showAvatarPicker(profile);
                             },
 
                             onEditToggle: () => _toggleNameEdit(profile),

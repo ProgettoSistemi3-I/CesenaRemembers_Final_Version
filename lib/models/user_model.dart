@@ -32,7 +32,7 @@ class UserModel extends UserProfile {
       email: json['email'] ?? '',
       displayName: json['displayName'] ?? 'Utente',
       username: json['username'] ?? '',
-      avatarId: json['avatarId'] ?? 'military_tech',
+      avatarId: json['avatarId'] ?? 'soldier',
       profileCompleted: json['profileCompleted'] ?? false,
       xp: json['xp'] ?? 0,
       visitedPoiIds: List<String>.from(json['visitedPoiIds'] ?? []),

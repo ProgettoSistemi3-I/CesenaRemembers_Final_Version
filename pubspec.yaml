@@ -84,6 +84,7 @@ flutter:
     - assets/icon/diplo_logo.png
     - assets/icon/logoScuola.png
     - assets/loginView.png
+    - assets/avatars/
 
 flutter_launcher_icons:
   android: "launcher_icon"

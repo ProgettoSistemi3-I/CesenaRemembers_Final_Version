@@ -523,22 +523,11 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
 
 
                         backgroundColor: AppPalette.tan.withValues(alpha: 0.2),
+                        backgroundImage: AssetImage(avatarById(u.avatarId).assetPath),
 
 
 
-                        child: Icon(
-
-                          avatarById(u.avatarId).icon,
-
-
-
-                          size: 24,
-
-
-
-                          color: AppPalette.olive,
-
-                        ),
+                        
 
                       ),
 
@@ -1041,22 +1030,11 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
 
 
                       backgroundColor: avatar.background,
+                      backgroundImage: AssetImage(avatar.assetPath),
 
 
 
-                      child: Icon(
-
-                        avatar.icon,
-
-
-
-                        size: 64,
-
-
-
-                        color: Colors.black.withValues(alpha: 0.6),
-
-                      ),
+                      
 
                     ),
 
