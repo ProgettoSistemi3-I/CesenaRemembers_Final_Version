@@ -7,6 +7,7 @@ import 'injection_container.dart' as di;
 import 'presentation/theme/app_palette.dart';
 import 'presentation/theme/theme_controller.dart';
 import 'presentation/pages/splash_screen.dart';
+import 'presentation/services/push_notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -101,6 +102,8 @@ class CesenaRemembersApp extends StatelessWidget {
       builder: (context, _) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
+          navigatorKey: PushNotificationService.navigatorKey,
+          scaffoldMessengerKey: PushNotificationService.scaffoldMessengerKey,
           title: 'Cesena Remembers 1945',
           themeMode: themeCtrl.themeMode,
           theme: AppPalette.lightTheme,

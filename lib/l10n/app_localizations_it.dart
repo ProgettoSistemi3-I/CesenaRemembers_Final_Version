@@ -176,6 +176,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get buttonRetry => 'Riprova';
 
   @override
+  String get notificationOpenAction => 'APRI';
+
+  @override
   String get navMap => 'Mappa';
 
   @override

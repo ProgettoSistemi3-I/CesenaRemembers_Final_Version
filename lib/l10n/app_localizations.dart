@@ -419,6 +419,12 @@ abstract class AppLocalizations {
   /// **'Retry'**
   String get buttonRetry;
 
+  /// No description provided for @notificationOpenAction.
+  ///
+  /// In en, this message translates to:
+  /// **'OPEN'**
+  String get notificationOpenAction;
+
   /// No description provided for @navMap.
   ///
   /// In en, this message translates to:

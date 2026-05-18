@@ -4,11 +4,7 @@ import '../pages/profile/profile_page.dart';
 import '../pages/settings/settings_page.dart';
 import 'shell_navigation_store.dart';
 import '../pages/social/social_page.dart';
-
-// 🔴 IMPORT AGGIUNTI PER LE NOTIFICHE E LA CLEAN ARCHITECTURE
 import 'push_notification_service.dart';
-import '../../domain/usecases/user_profile_use_cases.dart';
-import '../../injection_container.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -20,7 +16,6 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
 
-  // Le pagine vengono mantenute in vita (non ricostruite ad ogni switch)
   final List<Widget> _pages = const [
     MapPage(),
     SocialPage(),
@@ -32,16 +27,12 @@ class _MainShellState extends State<MainShell> {
   void initState() {
     super.initState();
     ShellNavigationStore.tabIndex.addListener(_onTabIndexChanged);
-
-    // 🔴 AGGIUNTA LA LOGICA DELLE NOTIFICHE ALL'AVVIO
     _initializeNotifications();
   }
 
-  // 🔴 ESTRATTO IN UN METODO PER MANTENERE IL CODICE PULITO
   void _initializeNotifications() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // 🔴 Passiamo il context al servizio così può gestire la UI
-      PushNotificationService.initializeAndSaveToken(context);
+      PushNotificationService.initializeAndSaveToken();
     });
   }
 
