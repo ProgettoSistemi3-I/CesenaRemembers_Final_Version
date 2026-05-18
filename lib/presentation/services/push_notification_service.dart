@@ -1,13 +1,18 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:cesena_remembers/l10n/app_localizations.dart';
 import '../../domain/usecases/user_profile_use_cases.dart';
 import '../../injection_container.dart';
 import 'shell_navigation_store.dart';
 
 class PushNotificationService {
   static bool _isInitialized = false;
+  static final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
 
-  static Future<void> initializeAndSaveToken(BuildContext context) async {
+  static Future<void> initializeAndSaveToken() async {
     if (_isInitialized) return;
     try {
       final messaging = FirebaseMessaging.instance;
@@ -32,7 +37,7 @@ class PushNotificationService {
         }
 
         // 3. Configura i Listener per gestire le notifiche in tempo reale
-        _setupNotificationListeners(context);
+        _setupNotificationListeners();
         _isInitialized = true;
       }
     } catch (_) {
@@ -40,13 +45,14 @@ class PushNotificationService {
     }
   }
 
-  static void _setupNotificationListeners(BuildContext context) {
+  static void _setupNotificationListeners() {
     // ------------------------------------------------------------------
     // 1. APP APERTA (Foreground): Mostra un dialog o uno SnackBar custom
     // ------------------------------------------------------------------
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      if (message.notification != null && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+      final context = navigatorKey.currentContext;
+      if (message.notification != null && context != null) {
+        scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
             content: Row(
               children: [
@@ -73,7 +79,7 @@ class PushNotificationService {
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 4),
             action: SnackBarAction(
-              label: 'VAI',
+              label: AppLocalizations.of(context)!.notificationOpenAction,
               textColor: Colors.white,
               onPressed: () => _handleNotificationClick(message.data),
             ),

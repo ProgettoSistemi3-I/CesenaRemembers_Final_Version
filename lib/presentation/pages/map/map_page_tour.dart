@@ -120,20 +120,20 @@ extension _MapPageTourActions on _MapPageState {
     });
   }
 
-  void _openPoiPopup() {
+  Future<void> _openPoiPopup() async {
     final currentStop = _tourController.currentStop;
     if (currentStop == null) return;
     final visual = _tourStopVisuals.forStop(currentStop);
-    // Usiamo l'XP già noto al genitore per evitare una lettura Firestore extra
-    // ogni volta che l'utente apre il tab Quiz.
+
     int userXp = 0;
     try {
-      // Lettura sincrona: se il profilo è già in cache il repository lo restituisce
-      // senza fare una round-trip. In caso di errore si usa 0.
+      final uid = _profileUseCases.getCurrentUserUid();
+      if (uid != null) {
+        final profile = await _profileUseCases.getUserProfile(uid);
+        userXp = profile.xp;
+      }
     } catch (_) {}
 
-    // ← FIX: calcola se questa è l'ultima tappa PRIMA di aprire il bottom sheet,
-    // così onQuizCompleted può passare il valore corretto a _registerQuizCompletion.
     final isLastStop =
         _tourController.currentStopIndex ==
         _tourController.orderedStops.length - 1;
@@ -174,7 +174,6 @@ extension _MapPageTourActions on _MapPageState {
           }
         },
         onQuizCompleted: (result) {
-          // ← FIX: passa isLastStop così registerQuizCompletion sa che il tour è finito
           _registerQuizCompletion(
             currentStop.id,
             result,
@@ -188,7 +187,7 @@ extension _MapPageTourActions on _MapPageState {
   Future<void> _registerQuizCompletion(
     String poiId,
     QuizCompletionData result, {
-    bool isLastStop = false, // ← FIX: nuovo parametro
+    bool isLastStop = false,
   }) async {
     if (_isSavingQuizResult) return;
 
@@ -210,7 +209,7 @@ extension _MapPageTourActions on _MapPageState {
         correctAnswers: result.score,
         totalQuestions: result.totalQuestions,
         tourElapsedSeconds: _tourController.totalElapsedSeconds,
-        isTourComplete: isLastStop, // ← FIX: ora viene passato correttamente
+        isTourComplete: isLastStop,
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

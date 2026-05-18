@@ -54,6 +54,7 @@
   "buttonDelete": "Delete",
   "buttonOk": "Got it",
   "buttonRetry": "Retry",
+  "notificationOpenAction": "OPEN",
   "navMap": "Map",
   "navProfile": "Profile",
   "navCommunity": "Community",

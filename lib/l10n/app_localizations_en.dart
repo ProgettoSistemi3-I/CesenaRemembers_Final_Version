@@ -171,6 +171,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get buttonRetry => 'Retry';
 
   @override
+  String get notificationOpenAction => 'OPEN';
+
+  @override
   String get navMap => 'Map';
 
   @override
