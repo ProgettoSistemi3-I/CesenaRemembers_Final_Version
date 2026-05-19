@@ -49,7 +49,10 @@ class UserProfileUseCases {
   Future<void> deleteUserData({required String uid}) =>
       _repository.deleteUserData(uid: uid);
 
-  // 🔴 AGGIUNTA LA FUNZIONE PER LE NOTIFICHE
   Future<void> saveFcmToken(String uid, String token) =>
       _repository.saveFcmToken(uid, token);
+
+  // --- BAN ---
+  /// Ritorna true se l'utente è presente nella collection banned_users.
+  Future<bool> isUserBanned(String uid) => _repository.isUserBanned(uid);
 }

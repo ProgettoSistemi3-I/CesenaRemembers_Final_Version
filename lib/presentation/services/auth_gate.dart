@@ -51,6 +51,7 @@ class _AuthenticatedGate extends StatefulWidget {
 
 class _AuthenticatedGateState extends State<_AuthenticatedGate> {
   late final UserProfileUseCases _profileUseCases;
+  late final AuthRepository _authRepository;
   late final Future<void> _ensureFuture;
   StreamSubscription<UserProfile?>? _profileSubscription;
   int _previousReceivedRequestsCount = -1;
@@ -59,15 +60,33 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
   void initState() {
     super.initState();
     _profileUseCases = sl<UserProfileUseCases>();
-    _ensureFuture = _profileUseCases
-        .ensureUserDocument(
+    _authRepository = sl<AuthRepository>();
+    _ensureFuture = _checkBanAndInit();
+  }
+
+  Future<void> _checkBanAndInit() async {
+    final isBanned = await _profileUseCases.isUserBanned(widget.appUser.id);
+    if (isBanned) {
+      // Prima fa signOut, poi lancia l'eccezione.
+      // Il signOut aggiorna userStream → AuthGate torna a LoginPage.
+      // L'eccezione ACCOUNT_BANNED viene catturata da LoginPage via _handleSignIn,
+      // oppure viene mostrata nell'errore del FutureBuilder qui sotto
+      // (ma lo stream si aggiorna quasi contemporaneamente, quindi
+      // la LoginPage riceve il segnale di ban tramite l'eccezione
+      // rilanciata da firebase_auth_repository in signInWithGoogle).
+      //
+      // Soluzione: passiamo il flag di ban a LoginPage tramite un meccanismo
+      // separato dallo stream: usiamo Navigator.pushReplacement con argomento.
+      await _authRepository.signOut();
+      throw const _BannedFromFirestoreException();
+    }
+
+    await _profileUseCases.ensureUserDocument(
       uid: widget.appUser.id,
       email: widget.appUser.email,
-    )
-        .then((_) {
-      sl<ThemeController>().refreshFromProfile();
-      _initNotifications();
-    });
+    );
+    sl<ThemeController>().refreshFromProfile();
+    _initNotifications();
   }
 
   void _initNotifications() async {
@@ -79,10 +98,10 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
         .listen((profile) {
       if (profile == null) return;
       final currentRequestsCount = profile.receivedFriendRequests.length;
-      
-      // If initialized and count increased, show notification
-      if (_previousReceivedRequestsCount != -1 && currentRequestsCount > _previousReceivedRequestsCount) {
-        final newRequestsCount = currentRequestsCount - _previousReceivedRequestsCount;
+      if (_previousReceivedRequestsCount != -1 &&
+          currentRequestsCount > _previousReceivedRequestsCount) {
+        final newRequestsCount =
+            currentRequestsCount - _previousReceivedRequestsCount;
         notificationService.showFriendRequestNotification(newRequestsCount);
       }
       _previousReceivedRequestsCount = currentRequestsCount;
@@ -100,6 +119,22 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
     return FutureBuilder<void>(
       future: _ensureFuture,
       builder: (context, ensureSnapshot) {
+        // Caso ban: il signOut ha già triggerato lo stream,
+        // AuthGate tornerà a LoginPage. Mostriamo uno schermo di caricamento
+        // neutro per evitare qualsiasi flash della _BannedScreen
+        // che poi scompare subito.
+        if (ensureSnapshot.hasError &&
+            ensureSnapshot.error is _BannedFromFirestoreException) {
+          // Mostriamo loading: tra pochi ms lo stream aggiorna e
+          // AuthGate mostra LoginPage (che gestisce il ban via isBanned flag
+          // settato dal FirebaseAuthException 'user-disabled', oppure
+          // semplicemente l'utente torna alla login normale se l'account
+          // non è disabilitato su Auth ma solo su Firestore).
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
         if (ensureSnapshot.connectionState != ConnectionState.done) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
@@ -128,7 +163,8 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
                 body: Center(child: CircularProgressIndicator()),
               );
             }
-            final profileCompleted = profileSnapshot.data?.profileCompleted == true;
+            final profileCompleted =
+                profileSnapshot.data?.profileCompleted == true;
 
             if (!profileCompleted) {
               return ProfileSetupPage(
@@ -144,4 +180,9 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
       },
     );
   }
+}
+
+/// Eccezione interna usata solo per segnalare il ban da Firestore.
+class _BannedFromFirestoreException implements Exception {
+  const _BannedFromFirestoreException();
 }

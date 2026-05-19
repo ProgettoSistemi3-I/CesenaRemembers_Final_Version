@@ -101,7 +101,8 @@ class UserRepositoryImpl implements IUserRepository {
       _cleanup.deleteUserData(uid: uid);
 
   @override
-  Future<List<UserProfile>> searchUsers(String query) => _profile.searchUsers(query);
+  Future<List<UserProfile>> searchUsers(String query) =>
+      _profile.searchUsers(query);
 
   @override
   Stream<List<Map<String, dynamic>>> getLeaderboardStream({int limit = 50}) =>
@@ -138,4 +139,11 @@ class UserRepositoryImpl implements IUserRepository {
   @override
   Future<void> saveFcmToken(String uid, String token) =>
       _profile.saveFcmToken(uid, token);
+
+  // --- BAN ---
+  @override
+  Future<bool> isUserBanned(String uid) async {
+    final doc = await firestore.collection('banned_users').doc(uid).get();
+    return doc.exists;
+  }
 }

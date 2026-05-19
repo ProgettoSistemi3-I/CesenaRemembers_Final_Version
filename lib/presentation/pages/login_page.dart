@@ -17,17 +17,11 @@ const String _googleLogoSvg = '''
 </svg>
 ''';
 
-// ─────────────────────────────────────────────
-//  Palette coerente con il resto dell'capp
-// ─────────────────────────────────────────────
 const _cream = Color(0xFFF7F3EE);
-const _warmWhite = Color(0xFFFFFFFF);
 const _olive = Color(0xFF5C6B3A);
-const _moss = Color(0xFF8A9E5B);
 const _tan = Color(0xFFB5885A);
 const _tanLight = Color(0xFFE8D4BE);
 const _textDark = Color(0xFF2C2C2C);
-const _textMid = Color(0xFF7A7A7A);
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -42,6 +36,7 @@ class _LoginPageState extends State<LoginPage>
 
   bool _isLoading = false;
   String? _error;
+  bool _isBanned = false; // nuovo: traccia se l'errore è un ban
 
   late AnimationController _animController;
   late Animation<double> _fadeAnimation;
@@ -79,18 +74,32 @@ class _LoginPageState extends State<LoginPage>
     setState(() {
       _isLoading = true;
       _error = null;
+      _isBanned = false;
     });
     try {
       await _signInWithGoogle();
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
-      setState(() => _error = _mapAuthErrorMessage(e));
-    } catch (_) {
+      if (e.code == 'user-disabled') {
+        setState(() {
+          _isBanned = true;
+          _error = 'Questo account è stato sospeso.';
+        });
+      } else {
+        setState(() => _error = _mapAuthErrorMessage(e));
+      }
+    } catch (e) {
       if (!mounted) return;
-      setState(
-        () => _error =
-            AppLocalizations.of(context)!.errorLoginFailed,
-      );
+      // Gestisce anche ACCOUNT_BANNED lanciato da auth_gate via signOut
+      final msg = e.toString();
+      if (msg.contains('ACCOUNT_BANNED')) {
+        setState(() {
+          _isBanned = true;
+          _error = 'Questo account è stato sospeso.';
+        });
+      } else {
+        setState(() => _error = AppLocalizations.of(context)!.errorLoginGeneric);
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -130,7 +139,6 @@ class _LoginPageState extends State<LoginPage>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Sfondo mappa locale
           Image.asset(
             'assets/loginView.png',
             fit: BoxFit.cover,
@@ -146,8 +154,6 @@ class _LoginPageState extends State<LoginPage>
               ),
             ),
           ),
-
-          // Vignettatura
           Container(
             decoration: BoxDecoration(
               gradient: RadialGradient(
@@ -160,107 +166,103 @@ class _LoginPageState extends State<LoginPage>
             ),
           ),
 
-          // Contenuto centrato
-          SafeArea(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: hPadding),
-              child: FadeTransition(
-                opacity: _fadeAnimation,
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Emblema militare
-                      Container(
-                        padding: EdgeInsets.all(iconPad),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: _olive, width: 2),
-                          color: Colors.black.withValues(alpha: 0.45),
+          // Se l'utente è bannato mostra schermata dedicata,
+          // altrimenti mostra il normale form di login
+          if (_isBanned)
+            _BannedOverlay(scale: scale, hPadding: hPadding)
+          else
+            SafeArea(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: hPadding),
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(iconPad),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: _olive, width: 2),
+                            color: Colors.black.withValues(alpha: 0.45),
+                          ),
+                          child: Icon(
+                            Icons.military_tech,
+                            size: iconSize,
+                            color: _olive,
+                          ),
                         ),
-                        child: Icon(
-                          Icons.military_tech,
-                          size: iconSize,
-                          color: _olive,
+                        SizedBox(height: spacingMd),
+                        Text(
+                          "CESENA",
+                          style: TextStyle(
+                            fontSize: titleSize,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 4.0,
+                            color: Colors.white,
+                            height: 1.0,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                      ),
-                      SizedBox(height: spacingMd),
-
-                      // Titolo
-                      Text(
-                        "CESENA",
-                        style: TextStyle(
-                          fontSize: titleSize,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 4.0,
-                          color: Colors.white,
-                          height: 1.0,
+                        Text(
+                          "1945",
+                          style: TextStyle(
+                            fontSize: titleSize,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 4.0,
+                            color: _tan,
+                            height: 1.0,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      Text(
-                        "1945",
-                        style: TextStyle(
-                          fontSize: titleSize,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 4.0,
-                          color: _tan,
-                          height: 1.0,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-
-                      SizedBox(height: spacingLg),
-
-                      // Bottone / loader
-                      if (_isLoading)
-                        const CircularProgressIndicator(color: _olive)
-                      else
-                        _buildGoogleButton(
-                          btnVertPad: btnVertPad,
-                          btnFontSize: btnFontSize,
-                          logoSize: logoSize,
-                        ),
-
-                      // Errore
-                      if (_error != null) ...[
-                        SizedBox(height: spacingSm),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: spacingSm,
-                                vertical: spacingSm * 0.75,
-                              ),
-                              decoration: BoxDecoration(
-                                color: _tan.withValues(alpha: 0.16),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: _tan.withValues(alpha: 0.35),
+                        SizedBox(height: spacingLg),
+                        if (_isLoading)
+                          const CircularProgressIndicator(color: _olive)
+                        else
+                          _buildGoogleButton(
+                            btnVertPad: btnVertPad,
+                            btnFontSize: btnFontSize,
+                            logoSize: logoSize,
+                          ),
+                        if (_error != null) ...[
+                          SizedBox(height: spacingSm),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: spacingSm,
+                                  vertical: spacingSm * 0.75,
                                 ),
-                              ),
-                              child: Text(
-                                _error!,
-                                style: TextStyle(
-                                  color: const Color(0xFFB84F4F),
-                                  fontSize: 13 * scale,
+                                decoration: BoxDecoration(
+                                  color: _tan.withValues(alpha: 0.16),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: _tan.withValues(alpha: 0.35),
+                                  ),
                                 ),
-                                textAlign: TextAlign.center,
+                                child: Text(
+                                  _error!,
+                                  style: TextStyle(
+                                    color: const Color(0xFFB84F4F),
+                                    fontSize: 13 * scale,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -312,6 +314,51 @@ class _LoginPageState extends State<LoginPage>
                 letterSpacing: 1.0,
                 color: _textDark,
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Schermata sovrapposta quando l'account è bannato (dentro LoginPage,
+/// così non c'è nessun flash di transizione).
+class _BannedOverlay extends StatelessWidget {
+  const _BannedOverlay({required this.scale, required this.hPadding});
+
+  final double scale;
+  final double hPadding;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: hPadding),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.block, size: 72 * scale, color: const Color(0xFFB84F4F)),
+            SizedBox(height: 24 * scale),
+            Text(
+              'Account sospeso',
+              style: TextStyle(
+                fontSize: 26 * scale,
+                fontWeight: FontWeight.w900,
+                color: Colors.white,
+                letterSpacing: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 12 * scale),
+            Text(
+              'Il tuo account è stato sospeso per violazione\ndei termini di servizio.',
+              style: TextStyle(
+                fontSize: 14 * scale,
+                color: Colors.white70,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),

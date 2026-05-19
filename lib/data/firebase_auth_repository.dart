@@ -35,6 +35,10 @@ class FirebaseAuthRepository implements AuthRepository {
 
   @override
   Future<AppUser?> signInWithGoogle() async {
+    // Forza sempre il selettore account Google, anche se c'è un account in cache.
+    // Questo evita che un account bannato/disabilitato venga riloggato silenziosamente.
+    await _googleSignIn.signOut();
+
     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
     final GoogleSignInAuthentication? googleAuth =
         await googleUser?.authentication;
@@ -46,16 +50,26 @@ class FirebaseAuthRepository implements AuthRepository {
       idToken: googleAuth.idToken,
     );
 
-    final UserCredential userCredential = await _firebaseAuth
-        .signInWithCredential(credential);
-    final User? user = userCredential.user;
-
-    if (user == null) return null;
-    return AppUser(
-      id: user.uid,
-      email: user.email ?? '',
-      displayName: user.displayName,
-    );
+    try {
+      final UserCredential userCredential = await _firebaseAuth
+          .signInWithCredential(credential);
+      final User? user = userCredential.user;
+      if (user == null) return null;
+      return AppUser(
+        id: user.uid,
+        email: user.email ?? '',
+        displayName: user.displayName,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-disabled') {
+        // Rilancia con codice riconoscibile dalla LoginPage
+        throw FirebaseAuthException(
+          code: 'user-disabled',
+          message: 'user-disabled',
+        );
+      }
+      rethrow;
+    }
   }
 
   @override
@@ -72,19 +86,15 @@ class FirebaseAuthRepository implements AuthRepository {
     }
 
     try {
-      // Tenta l'eliminazione diretta
       await user.delete();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'requires-recent-login') {
-        // Ri-autenticazione silenziosa (o esplicita) se Firebase la richiede per sicurezza
         final googleUser =
             await _googleSignIn.signInSilently() ??
             await _googleSignIn.signIn();
 
         if (googleUser == null) {
-          throw Exception(
-            'Re-authentication required but cancelled by user.',
-          );
+          throw Exception('Re-authentication required but cancelled by user.');
         }
 
         final googleAuth = await googleUser.authentication;
@@ -100,14 +110,11 @@ class FirebaseAuthRepository implements AuthRepository {
       }
     }
 
-    // PULIZIA PROFONDA DELLA SESSIONE GOOGLE (Risolve il bug del ri-login automatico)
     try {
       if (await _googleSignIn.isSignedIn()) {
-        // Usare DISCONNECT, non signOut!
         await _googleSignIn.disconnect();
       }
     } catch (_) {
-      // Fallback: se disconnect fallisce per qualche strana ragione, proviamo signOut
       try {
         await _googleSignIn.signOut();
       } catch (_) {}
