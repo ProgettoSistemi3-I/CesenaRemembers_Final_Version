@@ -23,67 +23,91 @@ console.log("🚀 Notifier Service avviato. In ascolto su modifiche alla collect
 // Ascolta tutte le modifiche ai documenti nella collection 'users'
 db.collection('users').onSnapshot(snapshot => {
   snapshot.docChanges().forEach(async (change) => {
-    // Ci interessa solo quando un documento viene modificato (non creato o cancellato)
+    
     if (change.type === 'modified') {
       const newData = change.doc.data();
       
       // Estrarre dati necessari
       const receivedRequests = newData.receivedFriendRequests || [];
+      const sentRequests = newData.sentFriendRequests || []; // 🔴 NUOVO: Tracciamo le inviate
+      const friends = newData.friends || []; 
       const fcmTokens = newData.fcmTokens || [];
       const userId = change.doc.id;
 
-      // Recuperiamo i dati prima della modifica per fare un confronto
-      // Attenzione: onSnapshot in tempo reale non fornisce direttamente il "before", 
-      // in un ambiente server puro a volte bisogna mantenere una cache o strutturare il DB 
-      // con subcollection di eventi. Per semplicità in questo microservizio, useremo
-      // un trucco: cerchiamo di ricordare l'ultimo stato noto.
-
       const previousState = global.usersCache ? global.usersCache[userId] : null;
       
-      // Aggiorniamo la cache
+      // Aggiorniamo la cache includendo anche i sentRequests
       if (!global.usersCache) global.usersCache = {};
-      global.usersCache[userId] = receivedRequests;
+      global.usersCache[userId] = {
+        requestsCount: receivedRequests.length,
+        friendsCount: friends.length,
+        sentCount: sentRequests.length // 🔴 NUOVO
+      };
 
       // Se non avevamo lo stato precedente, lo saltiamo per evitare falsi positivi all'avvio
       if (!previousState) return;
 
-      // Se le richieste ricevute sono aumentate
-      if (receivedRequests.length > previousState.length) {
-        console.log(`🔔 Nuova richiesta di amicizia per l'utente ${userId}! Invio notifica...`);
-
-        if (fcmTokens.length === 0) {
-          console.log(`⚠️ Impossibile inviare notifica: Nessun token FCM registrato per ${userId}.`);
-          return;
-        }
-
-        const message = {
-          notification: {
-            title: 'Nuova richiesta di amicizia',
-            body: 'Qualcuno vuole stringere amicizia con te su Cesena Remembers!'
-          },
-          data: {
-            type: 'friend_request'
-          },
-          tokens: fcmTokens // Invia a tutti i dispositivi registrati per questo utente
-        };
-
-        try {
-          const response = await admin.messaging().sendEachForMulticast(message);
-          console.log(`✅ Notifiche inviate a ${response.successCount} dispositivi.`);
-          if (response.failureCount > 0) {
-            console.log(`❌ Invio fallito per ${response.failureCount} dispositivi.`);
-            // Potresti voler ripulire i token falliti dal DB
-          }
-        } catch (error) {
-          console.error("Errore durante l'invio della notifica:", error);
-        }
+      // ------------------------------------------------------------------
+      // CASO 1: NUOVA RICHIESTA RICEVUTA
+      // ------------------------------------------------------------------
+      if (receivedRequests.length > previousState.requestsCount) {
+        console.log(`🔔 Nuova richiesta di amicizia per l'utente ${userId}!`);
+        await inviaNotifica(fcmTokens, {
+          title: 'Nuova richiesta di amicizia',
+          body: 'Qualcuno vuole stringere amicizia con te su Cesena Remembers!',
+          type: 'friend_request'
+        });
       }
+
+      // ------------------------------------------------------------------
+      // CASO 2: RICHIESTA ACCETTATA (Nuovo amico aggiunto)
+      // ------------------------------------------------------------------
+      // 🔴 IL FIX: Inviamo la notifica SOLO a chi ha visto diminuire le sue richieste INVIATE
+      if (friends.length > previousState.friendsCount && sentRequests.length < previousState.sentCount) {
+        console.log(`🤝 L'utente ${userId} ha un nuovo amico (aveva inviato lui la richiesta)!`);
+        await inviaNotifica(fcmTokens, {
+          title: 'Nuova Amicizia!',
+          body: 'La tua richiesta di amicizia è stata accettata.',
+          type: 'friend_accepted'
+        });
+      }
+
     } else if (change.type === 'added') {
-      // Memorizziamo lo stato iniziale per i documenti esistenti quando il server parte
+      // Inizializza la cache all'avvio del server per i documenti già esistenti
       if (!global.usersCache) global.usersCache = {};
-      global.usersCache[change.doc.id] = change.doc.data().receivedFriendRequests || [];
+      global.usersCache[change.doc.id] = {
+        requestsCount: (change.doc.data().receivedFriendRequests || []).length,
+        friendsCount: (change.doc.data().friends || []).length,
+        sentCount: (change.doc.data().sentFriendRequests || []).length // 🔴 NUOVO
+      };
     }
   });
 }, err => {
   console.error("Errore durante l'ascolto di Firestore:", err);
 });
+
+// Funzione helper per inviare la notifica pulendo il codice principale
+async function inviaNotifica(tokens, payload) {
+  if (tokens.length === 0) {
+    console.log(`⚠️ Impossibile inviare notifica: Nessun token FCM registrato.`);
+    return;
+  }
+
+  const message = {
+    notification: {
+      title: payload.title,
+      body: payload.body
+    },
+    data: {
+      type: payload.type
+    },
+    tokens: tokens 
+  };
+
+  try {
+    const response = await admin.messaging().sendEachForMulticast(message);
+    console.log(`✅ Notifica "${payload.title}" inviata a ${response.successCount} dispositivi.`);
+  } catch (error) {
+    console.error("Errore durante l'invio della notifica:", error);
+  }
+}
