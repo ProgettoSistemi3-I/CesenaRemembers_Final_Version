@@ -70,26 +70,6 @@ class CreditsPage extends StatelessWidget {
           ),
           const SizedBox(height: 48),
 
-          _SectionLabel(AppLocalizations.of(context)!.sectionThanks),
-          const SizedBox(height: 16),
-          _CreditsCard(
-            children: [
-              _CreditRow(
-                imageAsset:
-                    'assets/icon/diplo_logo.png', // Assicurati di avere l'immagine qui
-                fallbackIcon: Icons.public,
-                title: AppLocalizations.of(context)!.creditRoleDiplo,
-                subtitle: AppLocalizations.of(context)!.creditRoleDiploDesc,
-                accent: AppPalette.tan,
-                onTap: () => launchUrl(
-                  Uri.parse('https://italien.diplo.de/it-it'),
-                  mode: LaunchMode.externalApplication,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 32),
-
           // SEZIONE: IL TEAM
           _SectionLabel(AppLocalizations.of(context)!.sectionTeam),
           const SizedBox(height: 16),
@@ -149,6 +129,25 @@ class CreditsPage extends StatelessWidget {
                 accent: AppPalette.olive,
                 onTap: () => launchUrl(
                   Uri.parse('https://www.ispascalcomandini.it/'),
+                  mode: LaunchMode.externalApplication,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 32),
+
+          _SectionLabel(AppLocalizations.of(context)!.sectionThanks),
+          const SizedBox(height: 16),
+          _CreditsCard(
+            children: [
+              _CreditRow(
+                imageAsset: 'assets/icon/diplo_logo.png',
+                fallbackIcon: Icons.public,
+                title: AppLocalizations.of(context)!.creditRoleDiplo,
+                subtitle: AppLocalizations.of(context)!.creditRoleDiploDesc,
+                accent: AppPalette.tan,
+                onTap: () => launchUrl(
+                  Uri.parse('https://italien.diplo.de/it-it'),
                   mode: LaunchMode.externalApplication,
                 ),
               ),
