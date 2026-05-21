@@ -79,38 +79,11 @@ class _HeroCard extends StatelessWidget {
               alignment: Alignment.bottomRight,
 
               children: [
-                // Modern gradient ring around the avatar
-                Container(
-                  padding: const EdgeInsets.all(4),
+                CircleAvatar(
+                  radius: 56,
 
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-
-                    gradient: LinearGradient(
-                      colors: [AppPalette.olive, AppPalette.tan],
-
-                      begin: Alignment.topLeft,
-
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-
-                      color: theme.colorScheme.surface,
-                    ),
-
-                    child: CircleAvatar(
-                      radius: 56,
-
-                      backgroundColor: option.background,
-                      backgroundImage: AssetImage(option.assetPath),
-                    ),
-                  ),
+                  backgroundColor: option.background,
+                  backgroundImage: AssetImage(option.assetPath),
                 ),
 
                 // Modern Edit Badge

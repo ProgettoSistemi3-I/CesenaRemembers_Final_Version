@@ -98,7 +98,9 @@ class _LoginPageState extends State<LoginPage>
           _error = 'Questo account è stato sospeso.';
         });
       } else {
-        setState(() => _error = AppLocalizations.of(context)!.errorLoginGeneric);
+        setState(
+          () => _error = AppLocalizations.of(context)!.errorLoginGeneric,
+        );
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -352,7 +354,7 @@ class _BannedOverlay extends StatelessWidget {
             ),
             SizedBox(height: 12 * scale),
             Text(
-              'Il tuo account è stato sospeso per violazione\ndei termini di servizio.',
+              'Il tuo account è stato sospeso per violazione\ndei termini di servizio. \nContatta l\'assistenza per maggiori informazioni. \nEmail: cesenaremembers@gmail.com',
               style: TextStyle(
                 fontSize: 14 * scale,
                 color: Colors.white70,

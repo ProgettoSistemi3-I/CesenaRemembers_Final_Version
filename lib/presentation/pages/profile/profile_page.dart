@@ -394,27 +394,11 @@ class _ProfilePageState extends State<ProfilePage>
                         vertical: 8,
                       ),
 
-                      leading: Container(
-                        padding: const EdgeInsets.all(2),
-
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-
-                          border: Border.all(
-                            color: theme.colorScheme.primary.withValues(
-                              alpha: 0.2,
-                            ),
-
-                            width: 2,
-                          ),
-                        ),
-
-                        child: CircleAvatar(
-                          backgroundColor: AppPalette.tan,
-                          radius: 22,
-                          backgroundImage: AssetImage(
-                            avatarById(u.avatarId).assetPath,
-                          ),
+                      leading: CircleAvatar(
+                        backgroundColor: AppPalette.tan,
+                        radius: 22,
+                        backgroundImage: AssetImage(
+                          avatarById(u.avatarId).assetPath,
                         ),
                       ),
 
