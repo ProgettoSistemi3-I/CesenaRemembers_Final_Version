@@ -56,30 +56,32 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
 
     if (!ProfileValidation.isValidDisplayName(displayName)) {
       setState(
-        () => _error =
-            AppLocalizations.of(context)!.profileNameTooShort(ProfileValidation.minDisplayNameLength, ProfileValidation.maxDisplayNameLength),
+        () => _error = AppLocalizations.of(context)!.profileNameTooShort(
+          ProfileValidation.minDisplayNameLength,
+          ProfileValidation.maxDisplayNameLength,
+        ),
       );
       return;
     }
     if (ProfileValidation.hasOffensiveDisplayName(displayName)) {
       setState(
-        () => _error =
-            AppLocalizations.of(context)!.profileNameOffensive,
+        () => _error = AppLocalizations.of(context)!.profileNameOffensive,
       );
       return;
     }
 
     if (!ProfileValidation.isValidUsername(normalizedUsername)) {
       setState(
-        () => _error =
-            AppLocalizations.of(context)!.setupUsernameInvalid(ProfileValidation.minUsernameLength, ProfileValidation.maxUsernameLength),
+        () => _error = AppLocalizations.of(context)!.setupUsernameInvalid(
+          ProfileValidation.minUsernameLength,
+          ProfileValidation.maxUsernameLength,
+        ),
       );
       return;
     }
     if (ProfileValidation.hasOffensiveUsername(normalizedUsername)) {
       setState(
-        () => _error =
-            AppLocalizations.of(context)!.setupUsernameOffensive,
+        () => _error = AppLocalizations.of(context)!.setupUsernameOffensive,
       );
       return;
     }
@@ -123,22 +125,25 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
         if (message.contains('USERNAME_NOT_AVAILABLE')) {
           _error = AppLocalizations.of(context)!.setupUsernameTaken;
         } else if (message.contains('USERNAME_INDEX_PERMISSION_DENIED')) {
-          _error =
-              AppLocalizations.of(context)!.setupFirestoreError(normalizedUsername);
+          _error = AppLocalizations.of(
+            context,
+          )!.setupFirestoreError(normalizedUsername);
         } else if (message.contains('INVALID_DISPLAY_NAME')) {
-          _error =
-              AppLocalizations.of(context)!.profileNameTooShort(ProfileValidation.minDisplayNameLength, ProfileValidation.maxDisplayNameLength);
+          _error = AppLocalizations.of(context)!.profileNameTooShort(
+            ProfileValidation.minDisplayNameLength,
+            ProfileValidation.maxDisplayNameLength,
+          );
         } else if (message.contains('INVALID_USERNAME')) {
-          _error =
-              AppLocalizations.of(context)!.setupUsernameInvalid(ProfileValidation.minUsernameLength, ProfileValidation.maxUsernameLength);
+          _error = AppLocalizations.of(context)!.setupUsernameInvalid(
+            ProfileValidation.minUsernameLength,
+            ProfileValidation.maxUsernameLength,
+          );
         } else if (message.contains('OFFENSIVE_DISPLAY_NAME')) {
-          _error =
-              AppLocalizations.of(context)!.profileNameOffensive;
+          _error = AppLocalizations.of(context)!.profileNameOffensive;
         } else if (message.contains('OFFENSIVE_USERNAME')) {
           _error = AppLocalizations.of(context)!.setupUsernameOffensive;
         } else if (e is FirebaseException && e.code == 'permission-denied') {
-          _error =
-              AppLocalizations.of(context)!.setupPermissionDenied;
+          _error = AppLocalizations.of(context)!.setupPermissionDenied;
         } else {
           _error = AppLocalizations.of(context)!.setupGenericError;
         }
@@ -207,20 +212,20 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                   final selected = _selectedAvatarIndex == index;
                   return GestureDetector(
                     onTap: () => setState(() => _selectedAvatarIndex = index),
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      curve: Curves.easeOut,
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: selected ? AppPalette.olive : Colors.transparent,
-                          width: 2,
-                        ),
+                        color: selected
+                            ? AppPalette.olive.withValues(alpha: 0.22)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       child: CircleAvatar(
                         radius: 28,
                         backgroundColor: option.background,
                         backgroundImage: AssetImage(option.assetPath),
-                        
                       ),
                     ),
                   );
@@ -228,10 +233,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
               ),
               if (_error != null) ...[
                 const SizedBox(height: 14),
-                Text(
-                  _error!,
-                  style: const TextStyle(color: AppPalette.danger),
-                ),
+                Text(_error!, style: const TextStyle(color: AppPalette.danger)),
               ],
               const SizedBox(height: 24),
               SizedBox(
