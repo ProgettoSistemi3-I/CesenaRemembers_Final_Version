@@ -1,8 +1,5 @@
-import 'dart:math' as math;
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
-
 import '../../../theme/app_palette.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -12,115 +9,63 @@ class TourCompletionAnimation extends StatefulWidget {
   const TourCompletionAnimation({super.key, required this.onDismiss});
 
   @override
-  State<TourCompletionAnimation> createState() =>
-      _TourCompletionAnimationState();
+  State<TourCompletionAnimation> createState() => _TourCompletionAnimationState();
 }
 
 class _TourCompletionAnimationState extends State<TourCompletionAnimation>
     with TickerProviderStateMixin {
   late final AnimationController _mainController;
-
-  late final Animation<double> _glassOpacity;
-  late final Animation<double> _chestScale;
-  late final Animation<double> _chestShake;
-  late final Animation<double> _explosionScale;
-  late final Animation<double> _particlesOpacity;
-  late final Animation<double> _textOpacity;
-  late final Animation<Offset> _textOffset;
-
-  final List<_Particle> _particles = [];
-  final math.Random _random = math.Random();
+  late final Animation<double> _backdropOpacity;
+  late final Animation<double> _cardScale;
+  late final Animation<double> _iconScale;
+  late final Animation<double> _contentOpacity;
+  late final Animation<Offset> _contentSlide;
 
   @override
   void initState() {
     super.initState();
-    _generateParticles();
-
     _mainController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 3200),
+      duration: const Duration(milliseconds: 2400),
     );
 
-    // 1. Fade in glass (0.0 to 0.1)
-    _glassOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _mainController, curve: const Interval(0.0, 0.1)),
+    // 1. Fluid Backdrop Blur Fade-in
+    _backdropOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _mainController, curve: const Interval(0.0, 0.2)),
     );
 
-    // 2. Chest drops in with spring (0.1 to 0.35)
-    _chestScale = Tween<double>(begin: 0.0, end: 1.0).animate(
+    // 2. Main Card Spring Reveal
+    _cardScale = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(
         parent: _mainController,
-        curve: const Interval(0.1, 0.35, curve: Curves.elasticOut),
+        curve: const Interval(0.1, 0.4, curve: Curves.elasticOut),
       ),
     );
 
-    // 3. Chest shakes/anticipates (0.35 to 0.6)
-    _chestShake =
-        TweenSequence<double>([
-          TweenSequenceItem(tween: Tween(begin: 0.0, end: -0.05), weight: 1),
-          TweenSequenceItem(tween: Tween(begin: -0.05, end: 0.05), weight: 2),
-          TweenSequenceItem(tween: Tween(begin: 0.05, end: -0.05), weight: 2),
-          TweenSequenceItem(tween: Tween(begin: -0.05, end: 0.05), weight: 2),
-          TweenSequenceItem(tween: Tween(begin: 0.05, end: 0.0), weight: 1),
-        ]).animate(
-          CurvedAnimation(
-            parent: _mainController,
-            curve: const Interval(0.35, 0.6),
-          ),
-        );
-
-    // 4. Explosion/Burst (0.6 to 0.8)
-    _explosionScale = Tween<double>(begin: 0.0, end: 1.0).animate(
+    // 3. Icon Overshoot Spring
+    _iconScale = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _mainController,
-        curve: const Interval(0.6, 0.8, curve: Curves.easeOutCirc),
+        curve: const Interval(0.2, 0.5, curve: Curves.elasticOut),
       ),
     );
-    _particlesOpacity =
-        TweenSequence<double>([
-          TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.0), weight: 70),
-          TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 30),
-        ]).animate(
-          CurvedAnimation(
-            parent: _mainController,
-            curve: const Interval(0.6, 1.0),
-          ),
-        );
 
-    // 5. Final text reveal (0.7 to 0.9)
-    _textOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _mainController, curve: const Interval(0.7, 0.9)),
+    // 4. Staggered Content Slide-up
+    _contentOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _mainController,
+        curve: const Interval(0.3, 0.6, curve: Curves.easeOutCubic),
+      ),
     );
-    _textOffset = Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero)
+    _contentSlide = Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero)
         .animate(
-          CurvedAnimation(
-            parent: _mainController,
-            curve: const Interval(0.7, 0.9, curve: Curves.easeOutCubic),
-          ),
-        );
+      CurvedAnimation(
+        parent: _mainController,
+        curve: const Interval(0.3, 0.6, curve: Curves.easeOutCubic),
+      ),
+    );
 
     _mainController.forward();
-  }
-
-  void _generateParticles() {
-    final colors = [
-      AppPalette.olive,
-      AppPalette.tan,
-      AppPalette.moss,
-      Colors.white,
-    ];
-    for (int i = 0; i < 40; i++) {
-      final angle = _random.nextDouble() * 2 * math.pi;
-      final distance = 100.0 + _random.nextDouble() * 150.0;
-      _particles.add(
-        _Particle(
-          color: colors[_random.nextInt(colors.length)],
-          angle: angle,
-          distance: distance,
-          size: 6.0 + _random.nextDouble() * 12.0,
-        ),
-      );
-    }
   }
 
   @override
@@ -142,180 +87,139 @@ class _TourCompletionAnimationState extends State<TourCompletionAnimation>
           return Stack(
             fit: StackFit.expand,
             children: [
-              // 1. Liquid Glass Backdrop
+              // ── 1. LIQUID GLASS BACKDROP ──
               Opacity(
-                opacity: _glassOpacity.value,
+                opacity: _backdropOpacity.value,
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 16.0, sigmaY: 16.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surface.withOpacity(0.6),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.15),
-                        width: 1,
-                      ),
+                      color: theme.colorScheme.surface.withOpacity(0.55),
                     ),
                   ),
                 ),
               ),
 
-              // 2. Main Content
+              // ── 2. CENTERED CARD ──
               Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      height: 300,
-                      width: 300,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        clipBehavior: Clip.none,
-                        children: [
-                          // Particles explosion
-                          ..._particles.map((p) {
-                            final currentDistance =
-                                p.distance * _explosionScale.value;
-                            return Transform.translate(
-                              offset: Offset(
-                                math.cos(p.angle) * currentDistance,
-                                math.sin(p.angle) * currentDistance,
+                child: Opacity(
+                  opacity: _backdropOpacity.value, // fade with backdrop
+                  child: Transform.scale(
+                    scale: _cardScale.value,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(32),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 30.0, sigmaY: 30.0),
+                        child: Container(
+                          width: 320,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 48,
+                          ),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surface.withOpacity(0.65),
+                            borderRadius: BorderRadius.circular(32),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.15),
+                              width: 1.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppPalette.olive.withOpacity(0.15),
+                                blurRadius: 40,
+                                spreadRadius: -10,
+                                offset: const Offset(0, 20),
                               ),
-                              child: Opacity(
-                                opacity: _particlesOpacity.value,
-                                child: Transform.rotate(
-                                  angle: _explosionScale.value * math.pi * 2,
-                                  child: Container(
-                                    width: p.size,
-                                    height: p.size,
-                                    decoration: BoxDecoration(
-                                      color: p.color,
-                                      shape: p.angle > math.pi
-                                          ? BoxShape.circle
-                                          : BoxShape.rectangle,
-                                      borderRadius: p.angle > math.pi
-                                          ? null
-                                          : BorderRadius.circular(2),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: p.color.withOpacity(0.5),
-                                          blurRadius: 8,
-                                        ),
-                                      ],
-                                    ),
+                              BoxShadow(
+                                color: Colors.white.withOpacity(0.1),
+                                blurRadius: 10,
+                                spreadRadius: 1,
+                                offset: const Offset(0, -1), // Inner top light
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // ── 3. GLOWING ICON ──
+                              Transform.scale(
+                                scale: _iconScale.value,
+                                child: Container(
+                                  padding: const EdgeInsets.all(24),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: theme.colorScheme.surface,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppPalette.olive.withOpacity(0.3),
+                                        blurRadius: 30,
+                                        spreadRadius: 5,
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(
+                                    Icons.military_tech_rounded,
+                                    size: 64,
+                                    color: AppPalette.olive,
                                   ),
                                 ),
                               ),
-                            );
-                          }),
+                              const SizedBox(height: 32),
 
-                          // The Chest
-                          Transform.scale(
-                            scale: _chestScale.value,
-                            child: Transform.rotate(
-                              angle: _chestShake.value,
-                              child: Transform.scale(
-                                // After explosion, scale down slightly or hide if desired.
-                                // We'll make it pop bigger during explosion then settle.
-                                scale: 1.0 + (_explosionScale.value * 0.2),
-                                child: Container(
-                                  padding: const EdgeInsets.all(32),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: RadialGradient(
-                                      colors: [
-                                        AppPalette.tan.withOpacity(0.4),
-                                        Colors.transparent,
-                                      ],
-                                      stops: const [0.2, 1.0],
-                                    ),
-                                  ),
-                                  child: Icon(
-                                    Icons.redeem_rounded,
-                                    size: 120,
-                                    color: theme.colorScheme.onSurface,
-                                    shadows: [
-                                      BoxShadow(
-                                        color: AppPalette.olive.withOpacity(
-                                          0.5,
+                              // ── 4. STAGGERED TEXT & BUTTON ──
+                              SlideTransition(
+                                position: _contentSlide,
+                                child: Opacity(
+                                  opacity: _contentOpacity.value,
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        l10n?.tourCompleted ?? 'Tour Completato',
+                                        style: theme.textTheme.headlineMedium?.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: -1.0,
+                                          height: 1.1,
+                                          color: theme.colorScheme.onSurface,
                                         ),
-                                        blurRadius: 24,
-                                        spreadRadius: 4,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppPalette.olive.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(99),
+                                          border: Border.all(
+                                            color: AppPalette.olive.withOpacity(0.2),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '+ XP Ottenuti',
+                                          style: theme.textTheme.titleSmall?.copyWith(
+                                            fontWeight: FontWeight.w700,
+                                            color: AppPalette.olive,
+                                            letterSpacing: 0.5,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 40),
+                                      _MagneticButton(
+                                        text: l10n?.buttonClose ?? 'Continua',
+                                        onTap: widget.onDismiss,
                                       ),
                                     ],
                                   ),
                                 ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-
-                    // 3. Text Reveal (Asymmetric & High-End Typography)
-                    const SizedBox(height: 32),
-                    SlideTransition(
-                      position: _textOffset,
-                      child: Opacity(
-                        opacity: _textOpacity.value,
-                        child: Column(
-                          children: [
-                            Text(
-                              l10n?.tourCompleted ?? 'Tour Completed!',
-                              style: theme.textTheme.displayMedium?.copyWith(
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: -1.5,
-                                color: theme.colorScheme.onSurface,
-                                shadows: [
-                                  Shadow(
-                                    color: theme.colorScheme.surface,
-                                    blurRadius: 8,
-                                  ),
-                                ],
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              '+ XP Gained!',
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: AppPalette.tan,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            const SizedBox(height: 48),
-                            // Magnetic-feel button (Scale effect on tap)
-                            AnimatedScale(
-                              scale:
-                                  1.0, // Can add hover/active state here if needed
-                              duration: const Duration(milliseconds: 150),
-                              child: FilledButton.tonal(
-                                style: FilledButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 48,
-                                    vertical: 16,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(24),
-                                  ),
-                                  backgroundColor: theme.colorScheme.onSurface,
-                                  foregroundColor: theme.colorScheme.surface,
-                                ),
-                                onPressed: widget.onDismiss,
-                                child: Text(
-                                  l10n?.buttonClose ?? 'Close',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
                         ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             ],
@@ -326,16 +230,68 @@ class _TourCompletionAnimationState extends State<TourCompletionAnimation>
   }
 }
 
-class _Particle {
-  final Color color;
-  final double angle;
-  final double distance;
-  final double size;
+class _MagneticButton extends StatefulWidget {
+  final String text;
+  final VoidCallback onTap;
 
-  _Particle({
-    required this.color,
-    required this.angle,
-    required this.distance,
-    required this.size,
-  });
+  const _MagneticButton({required this.text, required this.onTap});
+
+  @override
+  State<_MagneticButton> createState() => _MagneticButtonState();
+}
+
+class _MagneticButtonState extends State<_MagneticButton> {
+  bool _isHovered = false;
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scale = _isPressed ? 0.96 : (_isHovered ? 1.02 : 1.0);
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapUp: (_) {
+          setState(() => _isPressed = false);
+          widget.onTap();
+        },
+        onTapCancel: () => setState(() => _isPressed = false),
+        child: AnimatedScale(
+          scale: scale,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOutQuart,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.onSurface,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: _isHovered
+                  ? [
+                      BoxShadow(
+                        color: theme.colorScheme.onSurface.withOpacity(0.2),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      )
+                    ]
+                  : [],
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              widget.text,
+              style: TextStyle(
+                color: theme.colorScheme.surface,
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
