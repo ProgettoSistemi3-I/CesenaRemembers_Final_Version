@@ -751,7 +751,7 @@ class _ProfilePageState extends State<ProfilePage>
                             AppLocalizations.of(context)!.sectionAchievements,
                           ),
 
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 12),
 
                           _AchievementsGrid(
                             unlockedIds: profile.unlockedAchievements,
