@@ -9,19 +9,17 @@ import '../../../../l10n/app_localizations.dart';
 class TourCompletionAnimation extends StatefulWidget {
   final VoidCallback onDismiss;
 
-  const TourCompletionAnimation({
-    super.key,
-    required this.onDismiss,
-  });
+  const TourCompletionAnimation({super.key, required this.onDismiss});
 
   @override
-  State<TourCompletionAnimation> createState() => _TourCompletionAnimationState();
+  State<TourCompletionAnimation> createState() =>
+      _TourCompletionAnimationState();
 }
 
 class _TourCompletionAnimationState extends State<TourCompletionAnimation>
     with TickerProviderStateMixin {
   late final AnimationController _mainController;
-  
+
   late final Animation<double> _glassOpacity;
   late final Animation<double> _chestScale;
   late final Animation<double> _chestShake;
@@ -57,15 +55,19 @@ class _TourCompletionAnimationState extends State<TourCompletionAnimation>
     );
 
     // 3. Chest shakes/anticipates (0.35 to 0.6)
-    _chestShake = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: -0.05), weight: 1),
-      TweenSequenceItem(tween: Tween(begin: -0.05, end: 0.05), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: 0.05, end: -0.05), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: -0.05, end: 0.05), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: 0.05, end: 0.0), weight: 1),
-    ]).animate(
-      CurvedAnimation(parent: _mainController, curve: const Interval(0.35, 0.6)),
-    );
+    _chestShake =
+        TweenSequence<double>([
+          TweenSequenceItem(tween: Tween(begin: 0.0, end: -0.05), weight: 1),
+          TweenSequenceItem(tween: Tween(begin: -0.05, end: 0.05), weight: 2),
+          TweenSequenceItem(tween: Tween(begin: 0.05, end: -0.05), weight: 2),
+          TweenSequenceItem(tween: Tween(begin: -0.05, end: 0.05), weight: 2),
+          TweenSequenceItem(tween: Tween(begin: 0.05, end: 0.0), weight: 1),
+        ]).animate(
+          CurvedAnimation(
+            parent: _mainController,
+            curve: const Interval(0.35, 0.6),
+          ),
+        );
 
     // 4. Explosion/Burst (0.6 to 0.8)
     _explosionScale = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -74,23 +76,28 @@ class _TourCompletionAnimationState extends State<TourCompletionAnimation>
         curve: const Interval(0.6, 0.8, curve: Curves.easeOutCirc),
       ),
     );
-    _particlesOpacity = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.0), weight: 70),
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 30),
-    ]).animate(
-      CurvedAnimation(parent: _mainController, curve: const Interval(0.6, 1.0)),
-    );
+    _particlesOpacity =
+        TweenSequence<double>([
+          TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.0), weight: 70),
+          TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 30),
+        ]).animate(
+          CurvedAnimation(
+            parent: _mainController,
+            curve: const Interval(0.6, 1.0),
+          ),
+        );
 
     // 5. Final text reveal (0.7 to 0.9)
     _textOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _mainController, curve: const Interval(0.7, 0.9)),
     );
-    _textOffset = Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(
-      CurvedAnimation(
-        parent: _mainController,
-        curve: const Interval(0.7, 0.9, curve: Curves.easeOutCubic),
-      ),
-    );
+    _textOffset = Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: _mainController,
+            curve: const Interval(0.7, 0.9, curve: Curves.easeOutCubic),
+          ),
+        );
 
     _mainController.forward();
   }
@@ -105,12 +112,14 @@ class _TourCompletionAnimationState extends State<TourCompletionAnimation>
     for (int i = 0; i < 40; i++) {
       final angle = _random.nextDouble() * 2 * math.pi;
       final distance = 100.0 + _random.nextDouble() * 150.0;
-      _particles.add(_Particle(
-        color: colors[_random.nextInt(colors.length)],
-        angle: angle,
-        distance: distance,
-        size: 6.0 + _random.nextDouble() * 12.0,
-      ));
+      _particles.add(
+        _Particle(
+          color: colors[_random.nextInt(colors.length)],
+          angle: angle,
+          distance: distance,
+          size: 6.0 + _random.nextDouble() * 12.0,
+        ),
+      );
     }
   }
 
@@ -164,7 +173,8 @@ class _TourCompletionAnimationState extends State<TourCompletionAnimation>
                         children: [
                           // Particles explosion
                           ..._particles.map((p) {
-                            final currentDistance = p.distance * _explosionScale.value;
+                            final currentDistance =
+                                p.distance * _explosionScale.value;
                             return Transform.translate(
                               offset: Offset(
                                 math.cos(p.angle) * currentDistance,
@@ -179,12 +189,12 @@ class _TourCompletionAnimationState extends State<TourCompletionAnimation>
                                     height: p.size,
                                     decoration: BoxDecoration(
                                       color: p.color,
-                                      shape: _random.nextBool()
+                                      shape: p.angle > math.pi
                                           ? BoxShape.circle
                                           : BoxShape.rectangle,
-                                      borderRadius: _random.nextBool()
-                                          ? BorderRadius.circular(2)
-                                          : null,
+                                      borderRadius: p.angle > math.pi
+                                          ? null
+                                          : BorderRadius.circular(2),
                                       boxShadow: [
                                         BoxShadow(
                                           color: p.color.withOpacity(0.5),
@@ -225,10 +235,12 @@ class _TourCompletionAnimationState extends State<TourCompletionAnimation>
                                     color: theme.colorScheme.onSurface,
                                     shadows: [
                                       BoxShadow(
-                                        color: AppPalette.olive.withOpacity(0.5),
+                                        color: AppPalette.olive.withOpacity(
+                                          0.5,
+                                        ),
                                         blurRadius: 24,
                                         spreadRadius: 4,
-                                      )
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -274,7 +286,8 @@ class _TourCompletionAnimationState extends State<TourCompletionAnimation>
                             const SizedBox(height: 48),
                             // Magnetic-feel button (Scale effect on tap)
                             AnimatedScale(
-                              scale: 1.0, // Can add hover/active state here if needed
+                              scale:
+                                  1.0, // Can add hover/active state here if needed
                               duration: const Duration(milliseconds: 150),
                               child: FilledButton.tonal(
                                 style: FilledButton.styleFrom(
