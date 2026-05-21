@@ -170,6 +170,7 @@ extension _MapPageTourActions on _MapPageState {
                   opacity: animation,
                   child: TourCompletionAnimation(
                     onDismiss: () => Navigator.of(context).pop(),
+                    xpGained: _lastTourXpGained,
                   ),
                 );
               },
@@ -205,6 +206,8 @@ extension _MapPageTourActions on _MapPageState {
     );
 
     try {
+      _lastTourXpGained = score.totalXp;
+
       await _progressUseCases.registerQuizCompletion(
         uid: uid,
         poiId: poiId,

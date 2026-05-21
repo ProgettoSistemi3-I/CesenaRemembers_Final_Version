@@ -80,6 +80,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   bool _isCheckingLocation = true;
   bool _isCenteringOnUser = false;
   bool _isSavingQuizResult = false;
+  int _lastTourXpGained = 0;
   Locale? _lastLocale;
   late VoidCallback _onLocaleChanged;
 
