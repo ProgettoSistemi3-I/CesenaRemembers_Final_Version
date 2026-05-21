@@ -85,6 +85,7 @@ flutter:
     - assets/icon/logoScuola.png
     - assets/loginView.png
     - assets/avatars/
+    - assets/achievements/
 
 flutter_launcher_icons:
   android: "launcher_icon"
