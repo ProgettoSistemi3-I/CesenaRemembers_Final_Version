@@ -109,8 +109,6 @@ class _HeroCard extends StatelessWidget {
 
                       backgroundColor: option.background,
                       backgroundImage: AssetImage(option.assetPath),
-
-                      
                     ),
                   ),
                 ),
@@ -516,6 +514,7 @@ class _AchievementsGrid extends StatelessWidget {
     final achievements = AchievementService.all;
 
     return GridView.builder(
+      padding: EdgeInsets.zero,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -541,10 +540,7 @@ class _AchievementTile extends StatelessWidget {
   final AchievementDefinition achievement;
   final bool isUnlocked;
 
-  const _AchievementTile({
-    required this.achievement,
-    required this.isUnlocked,
-  });
+  const _AchievementTile({required this.achievement, required this.isUnlocked});
 
   @override
   Widget build(BuildContext context) {
@@ -571,28 +567,54 @@ class _AchievementTile extends StatelessWidget {
                         ? Image.asset(achievement.assetPath, fit: BoxFit.cover)
                         : ColorFiltered(
                             colorFilter: const ColorFilter.matrix([
-                              0.2126, 0.7152, 0.0722, 0, 0,
-                              0.2126, 0.7152, 0.0722, 0, 0,
-                              0.2126, 0.7152, 0.0722, 0, 0,
-                              0,      0,      0,      0.3, 0,
+                              0.2126,
+                              0.7152,
+                              0.0722,
+                              0,
+                              0,
+                              0.2126,
+                              0.7152,
+                              0.0722,
+                              0,
+                              0,
+                              0.2126,
+                              0.7152,
+                              0.0722,
+                              0,
+                              0,
+                              0,
+                              0,
+                              0,
+                              0.3,
+                              0,
                             ]),
-                            child: Image.asset(achievement.assetPath, fit: BoxFit.cover),
+                            child: Image.asset(
+                              achievement.assetPath,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   isUnlocked
-                      ? AppLocalizations.of(context)!.achievementTitle(achievement.id)
+                      ? AppLocalizations.of(
+                          context,
+                        )!.achievementTitle(achievement.id)
                       : '???',
-                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 17,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ],
             ),
             content: Text(
               isUnlocked
-                  ? AppLocalizations.of(context)!.achievementDescription(achievement.id)
+                  ? AppLocalizations.of(
+                      context,
+                    )!.achievementDescription(achievement.id)
                   : '\u{1F512}  ${AppLocalizations.of(context)!.achievementDescription(achievement.id)}',
               style: TextStyle(
                 color: isUnlocked
@@ -611,7 +633,7 @@ class _AchievementTile extends StatelessWidget {
         );
       },
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           // Badge image — clipped to circle, grayscale if locked
           AnimatedOpacity(
@@ -627,10 +649,26 @@ class _AchievementTile extends StatelessWidget {
                     )
                   : ColorFiltered(
                       colorFilter: const ColorFilter.matrix([
-                        0.2126, 0.7152, 0.0722, 0, 0,
-                        0.2126, 0.7152, 0.0722, 0, 0,
-                        0.2126, 0.7152, 0.0722, 0, 0,
-                        0,      0,      0,      1, 0,
+                        0.2126,
+                        0.7152,
+                        0.0722,
+                        0,
+                        0,
+                        0.2126,
+                        0.7152,
+                        0.0722,
+                        0,
+                        0,
+                        0.2126,
+                        0.7152,
+                        0.0722,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        1,
+                        0,
                       ]),
                       child: Image.asset(
                         achievement.assetPath,
@@ -806,7 +844,10 @@ class _AvatarPickerSheet extends StatelessWidget {
                     shape: BoxShape.circle,
 
                     color: opt.background,
-                    image: DecorationImage(image: AssetImage(opt.assetPath), fit: BoxFit.cover),
+                    image: DecorationImage(
+                      image: AssetImage(opt.assetPath),
+                      fit: BoxFit.cover,
+                    ),
 
                     boxShadow: isSelected
                         ? [
@@ -831,8 +872,6 @@ class _AvatarPickerSheet extends StatelessWidget {
                     alignment: Alignment.center,
 
                     children: [
-
-
                       if (isSelected)
                         Positioned(
                           right: 0,

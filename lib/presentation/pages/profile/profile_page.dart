@@ -684,9 +684,10 @@ class _ProfilePageState extends State<ProfilePage>
                             AppLocalizations.of(context)!.sectionStatistics,
                           ),
 
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 14),
 
                           GridView.count(
+                            padding: EdgeInsets.zero,
                             crossAxisCount: 2,
 
                             shrinkWrap: true,
@@ -766,7 +767,7 @@ class _ProfilePageState extends State<ProfilePage>
                             AppLocalizations.of(context)!.sectionAchievements,
                           ),
 
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 10),
 
                           _AchievementsGrid(
                             unlockedIds: profile.unlockedAchievements,
