@@ -599,7 +599,7 @@ class _AchievementTile extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
+                child: Text(AppLocalizations.of(context)!.buttonOk),
               ),
             ],
           ),

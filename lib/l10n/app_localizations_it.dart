@@ -179,6 +179,19 @@ class AppLocalizationsIt extends AppLocalizations {
   String get notificationOpenAction => 'APRI';
 
   @override
+  String get notificationFallbackTitle => 'Notifica';
+
+  @override
+  String get bannedAccountError => 'Questo account è stato sospeso.';
+
+  @override
+  String get bannedOverlayTitle => 'Account sospeso';
+
+  @override
+  String get bannedOverlayMessage =>
+      'Il tuo account è stato sospeso per violazione\ndei termini di servizio.\nContatta l'assistenza per maggiori informazioni.\nEmail: cesenaremembers@gmail.com';
+
+  @override
   String get navMap => 'Mappa';
 
   @override
@@ -277,13 +290,22 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tourOrderButton => 'Ordina tappe';
 
   @override
+  String get mapTestAnimation => 'Test animazione';
+
+  @override
+  String get mapStyleStandard => 'Standard';
+
+  @override
+  String get mapStyleSatellite => 'Satellite';
+
+  @override
   String get profileTitle => 'Il mio profilo';
 
   @override
   String get sectionStatistics => 'Statistiche';
 
   @override
-  String get sectionAchievements => 'Achievement';
+  String get sectionAchievements => 'Trofei';
 
   @override
   String get statTotalXp => 'XP Totali';
@@ -298,7 +320,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get statBestTime => 'Miglior tempo';
 
   @override
-  String get statAchievements => 'Achievement';
+  String get statAchievements => 'Trofei';
 
   @override
   String get profileFriends => 'Amici';

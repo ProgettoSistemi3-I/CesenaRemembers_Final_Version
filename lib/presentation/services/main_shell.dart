@@ -5,6 +5,7 @@ import '../pages/settings/settings_page.dart';
 import 'shell_navigation_store.dart';
 import '../pages/social/social_page.dart';
 import 'push_notification_service.dart';
+import '../../l10n/app_localizations.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -60,26 +61,26 @@ class _MainShellState extends State<MainShell> {
         currentIndex: _currentIndex,
         onTap: _onTapBottomBar,
         type: BottomNavigationBarType.fixed,
-        items: const [
+        items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.map_outlined),
             activeIcon: Icon(Icons.map),
-            label: 'Mappa',
+            label: AppLocalizations.of(context)!.navMap,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.people_outline),
             activeIcon: Icon(Icons.people),
-            label: 'Community',
+            label: AppLocalizations.of(context)!.navCommunity,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.emoji_events_outlined),
             activeIcon: Icon(Icons.emoji_events),
-            label: 'Profilo',
+            label: AppLocalizations.of(context)!.navProfile,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings_outlined),
             activeIcon: Icon(Icons.settings),
-            label: 'Impostazioni',
+            label: AppLocalizations.of(context)!.navSettings,
           ),
         ],
       ),

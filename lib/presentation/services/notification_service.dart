@@ -62,7 +62,7 @@ class NotificationService {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (message.notification != null) {
         showLocalNotification(
-          message.notification!.title ?? 'Notifica',
+          message.notification!.title ?? AppLocalizations.of(context)!.notificationFallbackTitle,
           message.notification!.body ?? '',
         );
       }

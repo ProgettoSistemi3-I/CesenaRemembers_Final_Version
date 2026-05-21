@@ -1024,7 +1024,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context),
-                              child: const Text('OK'),
+                              child: Text(AppLocalizations.of(context)!.buttonOk),
                             ),
                           ],
                         ),
