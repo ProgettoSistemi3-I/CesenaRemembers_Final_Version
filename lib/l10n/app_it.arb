@@ -444,5 +444,14 @@
   "quiz_rifugi_antiaerei_q2": "In quali anni furono principalmente utilizzati i rifugi?",
   "quiz_rifugi_antiaerei_q2_o1": "1940–1941",
   "quiz_rifugi_antiaerei_q2_o2": "1943–1944",
-  "quiz_rifugi_antiaerei_q2_o3": "1945–1946"
+  "quiz_rifugi_antiaerei_q2_o3": "1945–1946",
+  "tourCompletionXpGained": "+{xp} XP ottenuti",
+  "@tourCompletionXpGained": {
+    "description": "XP gained badge shown in the tour completion animation",
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  }
 }

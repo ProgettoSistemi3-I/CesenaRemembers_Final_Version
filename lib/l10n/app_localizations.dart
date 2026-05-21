@@ -611,6 +611,12 @@ abstract class AppLocalizations {
   /// **'🎉 Tour completed! Great job.'**
   String get tourCompleted;
 
+  /// XP gained badge shown in the tour completion animation
+  ///
+  /// In en, this message translates to:
+  /// **'+{xp} XP earned'**
+  String tourCompletionXpGained(int xp);
+
   /// No description provided for @tourStopButton.
   ///
   /// In en, this message translates to:

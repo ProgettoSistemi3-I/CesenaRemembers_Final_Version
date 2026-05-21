@@ -5,8 +5,13 @@ import '../../../../l10n/app_localizations.dart';
 
 class TourCompletionAnimation extends StatefulWidget {
   final VoidCallback onDismiss;
+  final int xpGained;
 
-  const TourCompletionAnimation({super.key, required this.onDismiss});
+  const TourCompletionAnimation({
+    super.key,
+    required this.onDismiss,
+    required this.xpGained,
+  });
 
   @override
   State<TourCompletionAnimation> createState() => _TourCompletionAnimationState();
@@ -197,7 +202,8 @@ class _TourCompletionAnimationState extends State<TourCompletionAnimation>
                                           ),
                                         ),
                                         child: Text(
-                                          '+ XP Ottenuti',
+                                          l10n?.tourCompletionXpGained(widget.xpGained) ??
+                                              '+${widget.xpGained} XP',
                                           style: theme.textTheme.titleSmall?.copyWith(
                                             fontWeight: FontWeight.w700,
                                             color: AppPalette.olive,

@@ -284,6 +284,11 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tourCompleted => '🎉 Tour completato! Ottimo lavoro.';
 
   @override
+  String tourCompletionXpGained(int xp) {
+    return '+$xp XP ottenuti';
+  }
+
+  @override
   String get tourStopButton => 'Interrompi tour';
 
   @override
