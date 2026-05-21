@@ -519,10 +519,10 @@ class _AchievementsGrid extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 16,
-        childAspectRatio: 0.75,
+        crossAxisCount: 3,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 20,
+        childAspectRatio: 0.78,
       ),
       itemCount: achievements.length,
       itemBuilder: (context, i) {
@@ -558,30 +558,48 @@ class _AchievementTile extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(24),
             ),
-            title: Row(
+            contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+            title: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  achievement.icon,
-                  color: isUnlocked ? AppPalette.olive : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    AppLocalizations.of(context)!.achievementTitle(achievement.id),
-                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
+                // Badge preview in dialog
+                ClipOval(
+                  child: SizedBox(
+                    width: 80,
+                    height: 80,
+                    child: isUnlocked
+                        ? Image.asset(achievement.assetPath, fit: BoxFit.cover)
+                        : ColorFiltered(
+                            colorFilter: const ColorFilter.matrix([
+                              0.2126, 0.7152, 0.0722, 0, 0,
+                              0.2126, 0.7152, 0.0722, 0, 0,
+                              0.2126, 0.7152, 0.0722, 0, 0,
+                              0,      0,      0,      0.3, 0,
+                            ]),
+                            child: Image.asset(achievement.assetPath, fit: BoxFit.cover),
+                          ),
                   ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  isUnlocked
+                      ? AppLocalizations.of(context)!.achievementTitle(achievement.id)
+                      : '???',
+                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
             content: Text(
               isUnlocked
                   ? AppLocalizations.of(context)!.achievementDescription(achievement.id)
-                  : '🔒  ${AppLocalizations.of(context)!.achievementDescription(achievement.id)}',
+                  : '\u{1F512}  ${AppLocalizations.of(context)!.achievementDescription(achievement.id)}',
               style: TextStyle(
                 color: isUnlocked
                     ? theme.colorScheme.onSurface
                     : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
               ),
+              textAlign: TextAlign.center,
             ),
             actions: [
               TextButton(
@@ -595,35 +613,48 @@ class _AchievementTile extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isUnlocked
-                  ? AppPalette.olive.withValues(alpha: 0.12)
-                  : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-            ),
-            child: Icon(
-              isUnlocked ? achievement.icon : Icons.lock_outline_rounded,
-              color: isUnlocked
-                  ? AppPalette.olive
-                  : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-              size: 22,
+          // Badge image — clipped to circle, grayscale if locked
+          AnimatedOpacity(
+            duration: const Duration(milliseconds: 250),
+            opacity: isUnlocked ? 1.0 : 0.55,
+            child: ClipOval(
+              child: isUnlocked
+                  ? Image.asset(
+                      achievement.assetPath,
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    )
+                  : ColorFiltered(
+                      colorFilter: const ColorFilter.matrix([
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0,      0,      0,      1, 0,
+                      ]),
+                      child: Image.asset(
+                        achievement.assetPath,
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
-            isUnlocked ? AppLocalizations.of(context)!.achievementTitle(achievement.id) : '???',
+            isUnlocked
+                ? AppLocalizations.of(context)!.achievementTitle(achievement.id)
+                : '???',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: isUnlocked ? FontWeight.w700 : FontWeight.w500,
               color: isUnlocked
                   ? theme.colorScheme.onSurface
-                  : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                  : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.45),
             ),
           ),
         ],

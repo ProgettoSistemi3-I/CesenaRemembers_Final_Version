@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 
-/// Definizione statica di tutti gli achievement disponibili nell'app.
+/// Definizione statica di un achievement con asset image.
 class AchievementDefinition {
   const AchievementDefinition({
     required this.id,
-    required this.title,
-    required this.description,
-    required this.icon,
+    required this.assetPath,
   });
 
   final String id;
-  final String title;
-  final String description;
-  final IconData icon;
+
+  /// Path asset immagine badge (es. 'assets/achievements/first_visit.png')
+  final String assetPath;
 }
 
 class AchievementService {
@@ -23,63 +21,43 @@ class AchievementService {
   static const List<AchievementDefinition> all = [
     AchievementDefinition(
       id: 'first_visit',
-      title: 'achievement_first_visit_title',
-      description: 'achievement_first_visit_desc',
-      icon: Icons.place_rounded,
+      assetPath: 'assets/achievements/first_visit.png',
     ),
     AchievementDefinition(
       id: 'first_quiz',
-      title: 'achievement_first_quiz_title',
-      description: 'achievement_first_quiz_desc',
-      icon: Icons.quiz_rounded,
+      assetPath: 'assets/achievements/first_quiz.png',
     ),
     AchievementDefinition(
       id: 'first_tour',
-      title: 'achievement_first_tour_title',
-      description: 'achievement_first_tour_desc',
-      icon: Icons.flag_rounded,
+      assetPath: 'assets/achievements/first_tour.png',
     ),
     AchievementDefinition(
       id: 'quiz_15',
-      title: 'achievement_quiz_15_title',
-      description: 'achievement_quiz_15_desc',
-      icon: Icons.workspace_premium_rounded,
+      assetPath: 'assets/achievements/quiz_15.png',
     ),
     AchievementDefinition(
       id: 'perfect_tour',
-      title: 'achievement_perfect_tour_title',
-      description: 'achievement_perfect_tour_desc',
-      icon: Icons.stars_rounded,
+      assetPath: 'assets/achievements/perfect_tour.png',
     ),
     AchievementDefinition(
       id: 'xp_500',
-      title: 'achievement_xp_500_title',
-      description: 'achievement_xp_500_desc',
-      icon: Icons.bolt_rounded,
+      assetPath: 'assets/achievements/xp_500.png',
     ),
     AchievementDefinition(
       id: 'tour_under_1h',
-      title: 'achievement_tour_under_1h_title',
-      description: 'achievement_tour_under_1h_desc',
-      icon: Icons.timer_outlined,
+      assetPath: 'assets/achievements/tour_under_1h.png',
     ),
     AchievementDefinition(
       id: 'tour_under_30m',
-      title: 'achievement_tour_under_30m_title',
-      description: 'achievement_tour_under_30m_desc',
-      icon: Icons.electric_bolt_rounded,
+      assetPath: 'assets/achievements/tour_under_30m.png',
     ),
     AchievementDefinition(
       id: 'friend_1',
-      title: 'achievement_friend_1_title',
-      description: 'achievement_friend_1_desc',
-      icon: Icons.person_add_rounded,
+      assetPath: 'assets/achievements/friend_1.png',
     ),
     AchievementDefinition(
       id: 'friend_5',
-      title: 'achievement_friend_5_title',
-      description: 'achievement_friend_5_desc',
-      icon: Icons.group_rounded,
+      assetPath: 'assets/achievements/friend_5.png',
     ),
   ];
 
@@ -93,9 +71,6 @@ class AchievementService {
 
   // ── Evaluation on quiz/tour completion ───────────────────────────────────
 
-  /// Chiamato dentro la transazione di registerQuizCompletion.
-  /// Riceve i valori DOPO l'aggiornamento e gli achievement già sbloccati.
-  /// Restituisce la lista degli id da aggiungere a unlockedAchievements.
   static List<String> evaluateOnQuizCompletion({
     required List<String> alreadyUnlocked,
     required List<String> visitedPoiIds,
@@ -110,37 +85,28 @@ class AchievementService {
     final newUnlocks = <String>[];
 
     void maybeUnlock(String id, bool condition) {
-      if (condition && !alreadyUnlocked.contains(id) && !newUnlocks.contains(id)) {
+      if (condition &&
+          !alreadyUnlocked.contains(id) &&
+          !newUnlocks.contains(id)) {
         newUnlocks.add(id);
       }
     }
 
-    // Visita 1 posto
     maybeUnlock('first_visit', visitedPoiIds.isNotEmpty);
-
-    // Completa 1 quiz
     maybeUnlock('first_quiz', totalQuizCompleted >= 1);
-
-    // Primo tour completo
     maybeUnlock('first_tour', totalToursCompleted >= 1);
-
-    // 15 quiz
     maybeUnlock('quiz_15', totalQuizCompleted >= 15);
 
-    // Tutte corrette in un tour intero
     if (isTourComplete && totalQuestions > 0) {
       maybeUnlock('perfect_tour', correctAnswers == totalQuestions);
     }
 
-    // 500 XP totali
     maybeUnlock('xp_500', totalXp >= 500);
 
-    // Tour < 1h (3600s)
     if (isTourComplete && tourElapsedSeconds > 0) {
       maybeUnlock('tour_under_1h', tourElapsedSeconds < 3600);
     }
 
-    // Tour < 30m (1800s)
     if (isTourComplete && tourElapsedSeconds > 0) {
       maybeUnlock('tour_under_30m', tourElapsedSeconds < 1800);
     }
@@ -150,8 +116,6 @@ class AchievementService {
 
   // ── Evaluation on social changes ─────────────────────────────────────────
 
-  /// Chiamato dopo acceptFriendRequest.
-  /// friendCount = numero di amici DOPO l'accettazione.
   static List<String> evaluateOnFriendAdded({
     required List<String> alreadyUnlocked,
     required int friendCount,
@@ -159,7 +123,9 @@ class AchievementService {
     final newUnlocks = <String>[];
 
     void maybeUnlock(String id, bool condition) {
-      if (condition && !alreadyUnlocked.contains(id) && !newUnlocks.contains(id)) {
+      if (condition &&
+          !alreadyUnlocked.contains(id) &&
+          !newUnlocks.contains(id)) {
         newUnlocks.add(id);
       }
     }

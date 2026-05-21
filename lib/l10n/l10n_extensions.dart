@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:cesena_remembers/l10n/app_localizations.dart';
 
 extension AppLocalizationsExtensions on AppLocalizations {

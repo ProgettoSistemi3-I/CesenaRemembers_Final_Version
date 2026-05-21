@@ -160,16 +160,19 @@ extension _MapPageTourActions on _MapPageState {
               _centerOnStop(_toLatLng(_tourController.currentStop!.position));
             }
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(AppLocalizations.of(context)!.tourCompleted),
-                backgroundColor: AppPalette.olive,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
-              ),
+            showGeneralDialog(
+              context: context,
+              barrierDismissible: false,
+              barrierColor: Colors.transparent,
+              transitionDuration: const Duration(milliseconds: 300),
+              pageBuilder: (context, animation, secondaryAnimation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: TourCompletionAnimation(
+                    onDismiss: () => Navigator.of(context).pop(),
+                  ),
+                );
+              },
             );
           }
         },

@@ -104,7 +104,7 @@ extension _MapPageView on _MapPageState {
           ),
           Positioned(
             right: 20,
-            bottom: data.isTourActive ? cardBottom + 66 : 90,
+            bottom: data.isTourActive ? cardBottom + 80 : 90,
             child: CircleFab(
               heroTag: 'lock',
               icon: _isMapLocked ? Icons.lock : Icons.lock_open,
@@ -162,6 +162,28 @@ extension _MapPageView on _MapPageState {
                     icon: Icons.format_list_bulleted_rounded,
                     color: AppPalette.olive,
                     onTap: _openTourPlanSheet,
+                  ),
+                  const SizedBox(height: 10),
+                  TourQuickActionButton(
+                    label: 'Test Animazione',
+                    icon: Icons.auto_awesome_rounded,
+                    color: AppPalette.moss,
+                    onTap: () {
+                      showGeneralDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        barrierColor: Colors.transparent,
+                        transitionDuration: const Duration(milliseconds: 300),
+                        pageBuilder: (context, animation, secondaryAnimation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: TourCompletionAnimation(
+                              onDismiss: () => Navigator.of(context).pop(),
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
                 ],
               ),
