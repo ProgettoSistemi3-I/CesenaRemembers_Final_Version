@@ -163,6 +163,28 @@ extension _MapPageView on _MapPageState {
                     color: AppPalette.olive,
                     onTap: _openTourPlanSheet,
                   ),
+                  const SizedBox(height: 10),
+                  TourQuickActionButton(
+                    label: 'Test Animazione',
+                    icon: Icons.auto_awesome_rounded,
+                    color: AppPalette.moss,
+                    onTap: () {
+                      showGeneralDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        barrierColor: Colors.transparent,
+                        transitionDuration: const Duration(milliseconds: 300),
+                        pageBuilder: (context, animation, secondaryAnimation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: TourCompletionAnimation(
+                              onDismiss: () => Navigator.of(context).pop(),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
