@@ -104,7 +104,7 @@ extension _MapPageView on _MapPageState {
           ),
           Positioned(
             right: 20,
-            bottom: data.isTourActive ? cardBottom + 66 : 90,
+            bottom: data.isTourActive ? cardBottom + 80 : 90,
             child: CircleFab(
               heroTag: 'lock',
               icon: _isMapLocked ? Icons.lock : Icons.lock_open,

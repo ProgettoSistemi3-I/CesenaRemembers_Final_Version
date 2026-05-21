@@ -678,7 +678,7 @@ class _ProfilePageState extends State<ProfilePage>
                               ),
                             ),
 
-                          const SizedBox(height: 32),
+                          const SizedBox(height: 24),
 
                           _SectionLabel(
                             AppLocalizations.of(context)!.sectionStatistics,
@@ -766,7 +766,7 @@ class _ProfilePageState extends State<ProfilePage>
                             AppLocalizations.of(context)!.sectionAchievements,
                           ),
 
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
 
                           _AchievementsGrid(
                             unlockedIds: profile.unlockedAchievements,

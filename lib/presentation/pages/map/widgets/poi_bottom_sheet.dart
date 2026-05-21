@@ -448,16 +448,6 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
           ),
         ),
         const SizedBox(height: 18),
-        if (!quizController.usesPersonalizedQuestions &&
-            quizController.fallbackNotice != null) ...[
-          _QuizFallbackBanner(
-            notice: AppLocalizations.of(context)!
-                .getQuizString(quizController.fallbackNotice!),
-            difficultyLabel: AppLocalizations.of(context)!
-                .getQuizString(quizController.fallbackDifficultyLabel!),
-          ),
-          const SizedBox(height: 14),
-        ],
         Text(
           AppLocalizations.of(context)!.getQuizString(question.question),
           style: TextStyle(
@@ -604,6 +594,17 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
             ),
           ),
         ],
+
+        if (!quizController.usesPersonalizedQuestions &&
+            quizController.fallbackNotice != null) ...[
+          const SizedBox(height: 14),
+          _QuizFallbackBanner(
+            notice: AppLocalizations.of(context)!
+                .getQuizString(quizController.fallbackNotice!),
+            difficultyLabel: AppLocalizations.of(context)!
+                .getQuizString(quizController.fallbackDifficultyLabel!),
+          ),
+        ],
       ],
     );
   }
@@ -619,30 +620,44 @@ class _QuizFallbackBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: AppPalette.tan.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppPalette.tan.withValues(alpha: 0.35)),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(
+          alpha: 0.35,
+        ),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.45),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             AppLocalizations.of(context)!.quizNotice,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: AppPalette.tan,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 4),
-          Text(notice, style: const TextStyle(fontSize: 12.5)),
+          const SizedBox(height: 3),
+          Text(
+            notice,
+            style: TextStyle(
+              fontSize: 12,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
           if (difficultyLabel != null) ...[
             const SizedBox(height: 4),
             Text(
               difficultyLabel!,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ],
