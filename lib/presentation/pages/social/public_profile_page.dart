@@ -507,26 +507,11 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
 
               child: Column(
                 children: [
-                  // Avatar con anello decorativo
-                  Container(
-                    padding: const EdgeInsets.all(4),
+                  CircleAvatar(
+                    radius: 56,
 
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-
-                      border: Border.all(
-                        color: AppPalette.olive.withValues(alpha: 0.3),
-
-                        width: 3,
-                      ),
-                    ),
-
-                    child: CircleAvatar(
-                      radius: 56,
-
-                      backgroundColor: avatar.background,
-                      backgroundImage: AssetImage(avatar.assetPath),
-                    ),
+                    backgroundColor: avatar.background,
+                    backgroundImage: AssetImage(avatar.assetPath),
                   ),
 
                   const SizedBox(height: 20),

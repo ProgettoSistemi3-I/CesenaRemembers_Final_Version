@@ -287,23 +287,10 @@ class _SocialPageState extends State<SocialPage> {
                 ),
                
                 // Avatar Premium
-                Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: isCurrentUser
-                          ? AppPalette.olive
-                          : theme.colorScheme.surfaceContainerHighest,
-                      width: 2,
-                    ),
-                  ),
-                  child: CircleAvatar(
-                    radius: 20,
-                    backgroundColor: avatar.background,
-                    backgroundImage: AssetImage(avatar.assetPath),
-                    
-                  ),
+                CircleAvatar(
+                  radius: 20,
+                  backgroundColor: avatar.background,
+                  backgroundImage: AssetImage(avatar.assetPath),
                 ),
                 const SizedBox(width: 14),
                
@@ -447,21 +434,10 @@ class _SocialPageState extends State<SocialPage> {
                 child: Row(
                   children: [
                     // Avatar Risultato Ricerca
-                    Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: theme.colorScheme.surfaceContainerHighest,
-                          width: 2,
-                        ),
-                      ),
-                      child: CircleAvatar(
-                        radius: 22,
-                        backgroundColor: avatar.background,
-                    backgroundImage: AssetImage(avatar.assetPath),
-                        
-                      ),
+                    CircleAvatar(
+                      radius: 22,
+                      backgroundColor: avatar.background,
+                      backgroundImage: AssetImage(avatar.assetPath),
                     ),
                     const SizedBox(width: 16),
                    
