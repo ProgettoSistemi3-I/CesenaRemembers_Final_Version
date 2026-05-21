@@ -1,4 +1,6 @@
+import 'package:cesena_remembers/l10n/app_localizations.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -14,7 +16,11 @@ class NotificationService {
 
   bool _initialized = false;
 
-  Future<void> init(UserProfileUseCases profileUseCases, String uid) async {
+  Future<void> init(
+    UserProfileUseCases profileUseCases,
+    String uid,
+    BuildContext context,
+  ) async {
     if (_initialized) return;
 
     // Initialization settings for Android local notifications (foreground)
@@ -62,7 +68,8 @@ class NotificationService {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (message.notification != null) {
         showLocalNotification(
-          message.notification!.title ?? AppLocalizations.of(context)!.notificationFallbackTitle,
+          message.notification!.title ??
+              AppLocalizations.of(context)!.notificationFallbackTitle,
           message.notification!.body ?? '',
         );
       }

@@ -189,7 +189,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get bannedOverlayMessage =>
-      'Il tuo account è stato sospeso per violazione\ndei termini di servizio.\nContatta l'assistenza per maggiori informazioni.\nEmail: cesenaremembers@gmail.com';
+      'Il tuo account è stato sospeso per violazione\ndei termini di servizio.\nContatta l\'assistenza per maggiori informazioni.\nEmail: cesenaremembers@gmail.com';
 
   @override
   String get navMap => 'Mappa';

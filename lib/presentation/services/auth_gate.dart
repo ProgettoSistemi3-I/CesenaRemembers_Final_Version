@@ -91,7 +91,11 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
 
   void _initNotifications() async {
     final notificationService = NotificationService();
-    await notificationService.init(_profileUseCases, widget.appUser.id);
+    await notificationService.init(
+      _profileUseCases,
+      widget.appUser.id,
+      context,
+    );
 
     _profileSubscription = _profileUseCases
         .getUserProfileStream(widget.appUser.id)

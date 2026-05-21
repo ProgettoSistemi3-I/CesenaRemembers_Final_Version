@@ -83,7 +83,7 @@ class _LoginPageState extends State<LoginPage>
       if (e.code == 'user-disabled') {
         setState(() {
           _isBanned = true;
-          _error = l10n.bannedAccountError;
+          _error = AppLocalizations.of(context)!.bannedAccountError;
         });
       } else {
         setState(() => _error = _mapAuthErrorMessage(e));
@@ -95,7 +95,7 @@ class _LoginPageState extends State<LoginPage>
       if (msg.contains('ACCOUNT_BANNED')) {
         setState(() {
           _isBanned = true;
-          _error = l10n.bannedAccountError;
+          _error = AppLocalizations.of(context)!.bannedAccountError;
         });
       } else {
         setState(
