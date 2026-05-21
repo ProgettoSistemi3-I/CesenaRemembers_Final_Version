@@ -425,6 +425,30 @@ abstract class AppLocalizations {
   /// **'OPEN'**
   String get notificationOpenAction;
 
+  /// No description provided for @notificationFallbackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification'**
+  String get notificationFallbackTitle;
+
+  /// No description provided for @bannedAccountError.
+  ///
+  /// In en, this message translates to:
+  /// **'This account has been suspended.'**
+  String get bannedAccountError;
+
+  /// No description provided for @bannedOverlayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspended account'**
+  String get bannedOverlayTitle;
+
+  /// No description provided for @bannedOverlayMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been suspended for violating\nterms of service.\nContact support for more information.\nEmail: cesenaremembers@gmail.com'**
+  String get bannedOverlayMessage;
+
   /// No description provided for @navMap.
   ///
   /// In en, this message translates to:
@@ -598,6 +622,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Order stops'**
   String get tourOrderButton;
+
+  /// No description provided for @mapTestAnimation.
+  ///
+  /// In en, this message translates to:
+  /// **'Animation test'**
+  String get mapTestAnimation;
+
+  /// No description provided for @mapStyleStandard.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get mapStyleStandard;
+
+  /// No description provided for @mapStyleSatellite.
+  ///
+  /// In en, this message translates to:
+  /// **'Satellite'**
+  String get mapStyleSatellite;
 
   /// No description provided for @profileTitle.
   ///

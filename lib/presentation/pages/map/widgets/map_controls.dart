@@ -112,7 +112,7 @@ class MapTypeButton extends StatelessWidget {
           Row(
             children: [
               square(
-                title: 'Standard',
+                title: AppLocalizations.of(context)!.mapStyleStandard,
                 icon: Icons.map,
                 isSelected: selectedMapStyle == MapStyle.standard,
                 bgColor: theme.brightness == Brightness.dark
@@ -122,7 +122,7 @@ class MapTypeButton extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               square(
-                title: 'Satellite',
+                title: AppLocalizations.of(context)!.mapStyleSatellite,
                 icon: Icons.satellite_alt,
                 isSelected: selectedMapStyle == MapStyle.satellite,
                 bgColor: theme.brightness == Brightness.dark

@@ -165,7 +165,7 @@ extension _MapPageView on _MapPageState {
                   ),
                   const SizedBox(height: 10),
                   TourQuickActionButton(
-                    label: 'Test Animazione',
+                    label: AppLocalizations.of(context)!.mapTestAnimation,
                     icon: Icons.auto_awesome_rounded,
                     color: AppPalette.moss,
                     onTap: () {

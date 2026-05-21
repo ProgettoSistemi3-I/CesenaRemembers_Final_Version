@@ -174,6 +174,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationOpenAction => 'OPEN';
 
   @override
+  String get notificationFallbackTitle => 'Notification';
+
+  @override
+  String get bannedAccountError => 'This account has been suspended.';
+
+  @override
+  String get bannedOverlayTitle => 'Suspended account';
+
+  @override
+  String get bannedOverlayMessage =>
+      'Your account has been suspended for violating\nterms of service.\nContact support for more information.\nEmail: cesenaremembers@gmail.com';
+
+  @override
   String get navMap => 'Map';
 
   @override
@@ -265,6 +278,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tourOrderButton => 'Order stops';
+
+  @override
+  String get mapTestAnimation => 'Animation test';
+
+  @override
+  String get mapStyleStandard => 'Standard';
+
+  @override
+  String get mapStyleSatellite => 'Satellite';
 
   @override
   String get profileTitle => 'My Profile';

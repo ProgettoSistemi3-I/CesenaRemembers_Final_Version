@@ -83,7 +83,7 @@ class _LoginPageState extends State<LoginPage>
       if (e.code == 'user-disabled') {
         setState(() {
           _isBanned = true;
-          _error = 'Questo account è stato sospeso.';
+          _error = l10n.bannedAccountError;
         });
       } else {
         setState(() => _error = _mapAuthErrorMessage(e));
@@ -95,7 +95,7 @@ class _LoginPageState extends State<LoginPage>
       if (msg.contains('ACCOUNT_BANNED')) {
         setState(() {
           _isBanned = true;
-          _error = 'Questo account è stato sospeso.';
+          _error = l10n.bannedAccountError;
         });
       } else {
         setState(
@@ -343,7 +343,7 @@ class _BannedOverlay extends StatelessWidget {
             Icon(Icons.block, size: 72 * scale, color: const Color(0xFFB84F4F)),
             SizedBox(height: 24 * scale),
             Text(
-              'Account sospeso',
+              AppLocalizations.of(context)!.bannedOverlayTitle,
               style: TextStyle(
                 fontSize: 26 * scale,
                 fontWeight: FontWeight.w900,
@@ -354,7 +354,7 @@ class _BannedOverlay extends StatelessWidget {
             ),
             SizedBox(height: 12 * scale),
             Text(
-              'Il tuo account è stato sospeso per violazione\ndei termini di servizio. \nContatta l\'assistenza per maggiori informazioni. \nEmail: cesenaremembers@gmail.com',
+              AppLocalizations.of(context)!.bannedOverlayMessage,
               style: TextStyle(
                 fontSize: 14 * scale,
                 color: Colors.white70,
