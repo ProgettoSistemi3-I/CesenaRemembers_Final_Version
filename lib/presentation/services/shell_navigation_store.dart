@@ -6,6 +6,8 @@ class ShellNavigationStore {
   static final ValueNotifier<int> tabIndex = ValueNotifier<int>(0);
   static final ValueNotifier<bool> focusGpsToggleInSettings =
       ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> openFriendRequestsPanel =
+      ValueNotifier<bool>(false);
 
   static void goToTab(int index) {
     if (tabIndex.value != index) {

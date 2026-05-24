@@ -12,6 +12,7 @@ class UserModel extends UserProfile {
     super.xp,
     super.visitedPoiIds,
     super.unlockedAchievements,
+    super.pendingAchievements,
     super.notificheEnabled,
     super.darkModeEnabled,
     super.gpsEnabled,
@@ -40,6 +41,9 @@ class UserModel extends UserProfile {
       visitedPoiIds: List<String>.from(json['visitedPoiIds'] ?? []),
       unlockedAchievements: List<String>.from(
         json['unlockedAchievements'] ?? [],
+      ),
+      pendingAchievements: List<String>.from(
+        json['pendingAchievements'] ?? [],
       ),
       notificheEnabled: json['preferences']?['notifiche'] ?? true,
       darkModeEnabled:
@@ -76,6 +80,7 @@ class UserModel extends UserProfile {
       'leaderboardScore': xp,
       'visitedPoiIds': visitedPoiIds,
       'unlockedAchievements': unlockedAchievements,
+      'pendingAchievements': pendingAchievements,
       'maxQuizScore': maxQuizScore,
       'totalQuizCompleted': totalQuizCompleted,
       'totalToursCompleted': totalToursCompleted,
@@ -91,3 +96,4 @@ class UserModel extends UserProfile {
     };
   }
 }
+

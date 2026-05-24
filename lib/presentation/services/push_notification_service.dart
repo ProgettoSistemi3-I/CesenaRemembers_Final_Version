@@ -1,6 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:cesena_remembers/l10n/app_localizations.dart';
 import '../../domain/usecases/user_profile_use_cases.dart';
 import '../../injection_container.dart';
 import 'shell_navigation_store.dart';
@@ -47,56 +46,14 @@ class PushNotificationService {
 
   static void _setupNotificationListeners() {
     // ------------------------------------------------------------------
-    // 1. APP APERTA (Foreground): Mostra un dialog o uno SnackBar custom
-    // ------------------------------------------------------------------
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      final context = navigatorKey.currentContext;
-      if (message.notification != null && context != null) {
-        scaffoldMessengerKey.currentState?.showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.people, color: Colors.white),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        message.notification!.title ?? '',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        message.notification!.body ?? '',
-                        style: const TextStyle(fontSize: 13),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 4),
-            action: SnackBarAction(
-              label: AppLocalizations.of(context)!.notificationOpenAction,
-              textColor: Colors.white,
-              onPressed: () => _handleNotificationClick(message.data),
-            ),
-          ),
-        );
-      }
-    });
-
-    // ------------------------------------------------------------------
-    // 2. APP IN BACKGROUND: L'utente clicca sulla notifica nel sistema
+    // 1. APP IN BACKGROUND: L'utente clicca sulla notifica nel sistema
     // ------------------------------------------------------------------
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       _handleNotificationClick(message.data);
     });
 
     // ------------------------------------------------------------------
-    // 3. APP CHIUSA (Terminata): L'utente clicca e l'app si accende da zero
+    // 2. APP CHIUSA (Terminata): L'utente clicca e l'app si accende da zero
     // ------------------------------------------------------------------
     FirebaseMessaging.instance.getInitialMessage().then((
       RemoteMessage? message,
@@ -110,9 +67,11 @@ class PushNotificationService {
   static void _handleNotificationClick(Map<String, dynamic> data) {
     final notificationType = data['type'];
 
-    if (notificationType == 'friend_request' ||
-        notificationType == 'friend_accepted') {
-      ShellNavigationStore.goToTab(1);
+    if (notificationType == 'friend_request') {
+      ShellNavigationStore.openFriendRequestsPanel.value = true;
+      ShellNavigationStore.goToTab(2); // Apri tab Profilo
+    } else if (notificationType == 'friend_accepted') {
+      ShellNavigationStore.goToTab(1); // Apri tab Community
     }
   }
 }

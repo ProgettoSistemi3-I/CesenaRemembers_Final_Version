@@ -1,4 +1,3 @@
-import 'package:cesena_remembers/l10n/app_localizations.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -63,17 +62,6 @@ class NotificationService {
     } catch (_) {
       // Evitiamo log rumorosi o sensibili in produzione.
     }
-
-    // Gestione notifiche Push ricevute mentre l'app è in FOREGROUND
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      if (message.notification != null) {
-        showLocalNotification(
-          message.notification!.title ??
-              AppLocalizations.of(context)!.notificationFallbackTitle,
-          message.notification!.body ?? '',
-        );
-      }
-    });
 
     _initialized = true;
   }

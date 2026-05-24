@@ -12,6 +12,8 @@ void showGlassSnackBar(
   GlassSnackType type = GlassSnackType.info,
   IconData? icon,
   Duration duration = const Duration(seconds: 3),
+  EdgeInsetsGeometry? margin,
+  VoidCallback? onTap,
 }) {
   final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -36,6 +38,13 @@ void showGlassSnackBar(
       break;
   }
 
+  final content = _GlassSnackContent(
+    message: message,
+    accentColor: accentColor,
+    icon: effectiveIcon,
+    isDark: isDark,
+  );
+
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
     ..showSnackBar(
@@ -43,15 +52,19 @@ void showGlassSnackBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         behavior: SnackBarBehavior.floating,
+        dismissDirection: margin != null ? DismissDirection.up : DismissDirection.down,
         duration: duration,
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
+        margin: margin ?? const EdgeInsets.fromLTRB(16, 0, 16, 80),
         padding: EdgeInsets.zero,
-        content: _GlassSnackContent(
-          message: message,
-          accentColor: accentColor,
-          icon: effectiveIcon,
-          isDark: isDark,
-        ),
+        content: onTap != null
+            ? GestureDetector(
+                onTap: () {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  onTap();
+                },
+                child: content,
+              )
+            : content,
       ),
     );
 }

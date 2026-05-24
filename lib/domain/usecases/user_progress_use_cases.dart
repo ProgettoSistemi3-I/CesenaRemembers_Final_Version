@@ -25,4 +25,7 @@ class UserProgressUseCases {
     tourElapsedSeconds: tourElapsedSeconds,
     isTourComplete: isTourComplete,
   );
+
+  Future<void> unlockPendingAchievement(String uid, String achievementId) =>
+      _repository.unlockPendingAchievement(uid, achievementId);
 }

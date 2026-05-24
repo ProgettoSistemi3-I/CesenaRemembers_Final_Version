@@ -19,6 +19,8 @@ import '../social/public_profile_page.dart';
 
 import 'avatar_catalog.dart';
 import 'package:cesena_remembers/l10n/l10n_extensions.dart';
+import '../../services/shell_navigation_store.dart';
+import '../../../domain/usecases/user_progress_use_cases.dart';
 
 part 'profile_page_sections.dart';
 
@@ -77,6 +79,7 @@ class _ProfilePageState extends State<ProfilePage>
     _profileController.addListener(_onProfileError);
 
     _socialController = sl<SocialController>();
+    ShellNavigationStore.openFriendRequestsPanel.addListener(_handleOpenFriendRequestsPanel);
   }
 
   @override
@@ -86,12 +89,29 @@ class _ProfilePageState extends State<ProfilePage>
     _profileController.dispose();
 
     _nameController.dispose();
+    ShellNavigationStore.openFriendRequestsPanel.removeListener(_handleOpenFriendRequestsPanel);
 
     super.dispose();
   }
 
+  void _handleOpenFriendRequestsPanel() {
+    if (!mounted) return;
+    if (ShellNavigationStore.openFriendRequestsPanel.value) {
+      final profile = _profileController.profile;
+      if (profile != null) {
+        ShellNavigationStore.openFriendRequestsPanel.value = false;
+        Future.microtask(() => _showNotificationsList(profile, Theme.of(context)));
+      }
+    }
+  }
+
   void _onProfileError() {
     if (!mounted) return;
+
+    if (_profileController.profile != null) {
+      _handleOpenFriendRequestsPanel();
+    }
+
     final err = _profileController.errorMessage;
     if (err != null) {
       final l10n = AppLocalizations.of(context)!;
@@ -246,8 +266,8 @@ class _ProfilePageState extends State<ProfilePage>
     );
   }
 
-  void _showRequestsList(UserProfile profile, ThemeData theme) async {
-    final users = await _socialController.loadUsersList(
+  void _showNotificationsList(UserProfile profile, ThemeData theme) async {
+    final friendRequestUsers = await _socialController.loadUsersList(
       profile.receivedFriendRequests,
     );
 
@@ -255,23 +275,238 @@ class _ProfilePageState extends State<ProfilePage>
 
     showModalBottomSheet(
       context: context,
-
       isScrollControlled: true,
-
       backgroundColor: theme.colorScheme.surface,
-
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
-
       builder: (_) => FractionallySizedBox(
         heightFactor: 0.8,
-
-        child: _buildUserListSheet(
-          AppLocalizations.of(context)!.profileFriendRequests,
-          users,
+        child: _buildNotificationsSheet(
+          'Notifiche',
+          friendRequestUsers,
+          profile.pendingAchievements,
           theme,
         ),
+      ),
+    );
+  }
+
+  Widget _buildNotificationsSheet(
+    String title,
+    List<UserProfile> friendRequestUsers,
+    List<String> pendingAchievements,
+    ThemeData theme,
+  ) {
+    final hasNotifications = friendRequestUsers.isNotEmpty || pendingAchievements.isNotEmpty;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 12, bottom: 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Drag handle moderno
+          Container(
+            width: 48,
+            height: 5,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.5,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          if (!hasNotifications)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(
+                    alpha: 0.35,
+                  ),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.notifications_off_outlined,
+                      size: 24,
+                      color: theme.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.7,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Nessuna notifica al momento.',
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 8,
+                ),
+                children: [
+                  // --- PENDING ACHIEVEMENTS ---
+                  for (final achId in pendingAchievements)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppPalette.olive.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: AppPalette.olive.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          leading: CircleAvatar(
+                            backgroundColor: Colors.transparent,
+                            radius: 22,
+                            backgroundImage: AssetImage(
+                              AchievementService.findById(achId)?.assetPath ?? 'assets/icon/app_icon.png',
+                            ),
+                          ),
+                          title: Text(
+                            'Obiettivo Sbloccato!',
+                            style: TextStyle(
+                              color: theme.colorScheme.onSurface,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 15,
+                            ),
+                          ),
+                          subtitle: Text(
+                            AppLocalizations.of(context)!.achievementTitle(achId),
+                            style: TextStyle(
+                              color: AppPalette.olive,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                          trailing: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: AppPalette.olive,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Text(
+                              'RISCATTA',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          onTap: () {
+                            Navigator.pop(context);
+                            // Riscattare farà scrollare fino all'achievement in teoria
+                          },
+                        ),
+                      ),
+                    ),
+
+                  // --- FRIEND REQUESTS ---
+                  for (final u in friendRequestUsers)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHighest
+                              .withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: theme.colorScheme.outline.withValues(alpha: 0.1),
+                          ),
+                        ),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          leading: CircleAvatar(
+                            backgroundColor: AppPalette.tan,
+                            radius: 22,
+                            backgroundImage: AssetImage(
+                              avatarById(u.avatarId).assetPath,
+                            ),
+                          ),
+                          title: Text(
+                            u.displayName,
+                            style: TextStyle(
+                              color: theme.colorScheme.onSurface,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            ),
+                          ),
+                          subtitle: Text(
+                            'Richiesta di amicizia',
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13,
+                            ),
+                          ),
+                          trailing: Icon(
+                            Icons.person_add_alt_1_rounded,
+                            color: theme.colorScheme.primary,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => PublicProfilePage(
+                                  uid: u.uid,
+                                  fallbackName: u.displayName,
+                                  fallbackUsername: u.username,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -566,11 +801,11 @@ class _ProfilePageState extends State<ProfilePage>
                                 ),
 
                                 onPressed: () =>
-                                    _showRequestsList(profile, theme),
+                                    _showNotificationsList(profile, theme),
                               ),
                             ),
 
-                            if (profile.receivedFriendRequests.isNotEmpty)
+                            if (profile.receivedFriendRequests.isNotEmpty || profile.pendingAchievements.isNotEmpty)
                               Positioned(
                                 right: -2,
 
@@ -592,7 +827,7 @@ class _ProfilePageState extends State<ProfilePage>
                                   ),
 
                                   child: Text(
-                                    '${profile.receivedFriendRequests.length}',
+                                    '${profile.receivedFriendRequests.length + profile.pendingAchievements.length}',
 
                                     style: const TextStyle(
                                       color: Colors.white,
@@ -755,6 +990,14 @@ class _ProfilePageState extends State<ProfilePage>
 
                           _AchievementsGrid(
                             unlockedIds: profile.unlockedAchievements,
+                            pendingIds: profile.pendingAchievements,
+                            onUnlock: (achId) async {
+                              final progressUseCases = sl<UserProgressUseCases>();
+                              await progressUseCases.unlockPendingAchievement(
+                                profile.uid,
+                                achId,
+                              );
+                            },
                           ),
 
                           const SizedBox(height: 48),

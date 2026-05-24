@@ -13,6 +13,10 @@ import '../theme/theme_controller.dart';
 import 'package:cesena_remembers/l10n/app_localizations.dart';
 import 'main_shell.dart';
 import 'notification_service.dart';
+import 'push_notification_service.dart';
+import 'shell_navigation_store.dart';
+import '../theme/app_palette.dart';
+import '../widgets/glass_snackbar.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -56,6 +60,7 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
   late final Future<void> _ensureFuture;
   StreamSubscription<UserProfile?>? _profileSubscription;
   int _previousReceivedRequestsCount = -1;
+  int _previousPendingAchievementsCount = -1;
 
   @override
   void initState() {
@@ -68,16 +73,6 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
   Future<void> _checkBanAndInit() async {
     final isBanned = await _profileUseCases.isUserBanned(widget.appUser.id);
     if (isBanned) {
-      // Prima fa signOut, poi lancia l'eccezione.
-      // Il signOut aggiorna userStream → AuthGate torna a LoginPage.
-      // L'eccezione ACCOUNT_BANNED viene catturata da LoginPage via _handleSignIn,
-      // oppure viene mostrata nell'errore del FutureBuilder qui sotto
-      // (ma lo stream si aggiorna quasi contemporaneamente, quindi
-      // la LoginPage riceve il segnale di ban tramite l'eccezione
-      // rilanciata da firebase_auth_repository in signInWithGoogle).
-      //
-      // Soluzione: passiamo il flag di ban a LoginPage tramite un meccanismo
-      // separato dallo stream: usiamo Navigator.pushReplacement con argomento.
       await _authRepository.signOut();
       throw const _BannedFromFirestoreException();
     }
@@ -101,16 +96,50 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
     _profileSubscription = _profileUseCases
         .getUserProfileStream(widget.appUser.id)
         .listen((profile) {
-      if (profile == null) return;
-      final currentRequestsCount = profile.receivedFriendRequests.length;
-      if (_previousReceivedRequestsCount != -1 &&
-          currentRequestsCount > _previousReceivedRequestsCount) {
-        final newRequestsCount =
-            currentRequestsCount - _previousReceivedRequestsCount;
-        notificationService.showFriendRequestNotification(newRequestsCount);
-      }
-      _previousReceivedRequestsCount = currentRequestsCount;
-    });
+          if (profile == null) return;
+
+          // Friend requests
+          final currentRequestsCount = profile.receivedFriendRequests.length;
+          if (_previousReceivedRequestsCount != -1 &&
+              currentRequestsCount > _previousReceivedRequestsCount) {
+            final newRequestsCount =
+                currentRequestsCount - _previousReceivedRequestsCount;
+            notificationService.showFriendRequestNotification(newRequestsCount);
+          }
+          _previousReceivedRequestsCount = currentRequestsCount;
+
+          // Pending Achievements
+          final currentPendingCount = profile.pendingAchievements.length;
+          if (_previousPendingAchievementsCount != -1 &&
+              currentPendingCount > _previousPendingAchievementsCount) {
+            final scaffoldMessenger =
+                PushNotificationService.scaffoldMessengerKey.currentState;
+            final currentContext =
+                PushNotificationService.navigatorKey.currentContext ?? context;
+
+            if (scaffoldMessenger != null) {
+              final topMargin = MediaQuery.of(currentContext).size.height - 150;
+
+              showGlassSnackBar(
+                currentContext,
+                message:
+                    'Hai sbloccato un nuovo obiettivo! Tocca per andare a riscattarlo.',
+                type: GlassSnackType.success,
+                icon: Icons.emoji_events,
+                duration: const Duration(seconds: 10),
+                margin: EdgeInsets.only(
+                  bottom: topMargin > 0 ? topMargin : 600,
+                  left: 16,
+                  right: 16,
+                ),
+                onTap: () {
+                  ShellNavigationStore.goToTab(2); // Vai al profilo
+                },
+              );
+            }
+          }
+          _previousPendingAchievementsCount = currentPendingCount;
+        });
   }
 
   @override

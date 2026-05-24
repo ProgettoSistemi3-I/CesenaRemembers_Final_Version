@@ -87,8 +87,12 @@ class UserProgressDataSource {
       final alreadyUnlocked = List<String>.from(
         data['unlockedAchievements'] ?? const [],
       );
+      final alreadyPending = List<String>.from(
+        data['pendingAchievements'] ?? const [],
+      );
+
       final newUnlocks = AchievementService.evaluateOnQuizCompletion(
-        alreadyUnlocked: alreadyUnlocked,
+        alreadyUnlocked: [...alreadyUnlocked, ...alreadyPending],
         visitedPoiIds: visitedPoiIds,
         totalQuizCompleted: nextQuizCompleted,
         totalToursCompleted: nextToursCompleted,
@@ -98,7 +102,8 @@ class UserProgressDataSource {
         tourElapsedSeconds: tourElapsedSeconds,
         isTourComplete: isTourComplete,
       );
-      final nextUnlocked = [...alreadyUnlocked, ...newUnlocks];
+      
+      final nextPending = [...alreadyPending, ...newUnlocks];
 
       // ── Write ─────────────────────────────────────────────────────────
       transaction.set(userRef, {
@@ -113,9 +118,36 @@ class UserProgressDataSource {
         'totalToursCompleted': nextToursCompleted,
         'totalCorrectAnswers': nextCorrectAnswers,
         'bestTourTimeSeconds': nextBestTourTime,
-        'unlockedAchievements': nextUnlocked,
+        'unlockedAchievements': alreadyUnlocked, // Resta inalterato
+        'pendingAchievements': nextPending, // Aggiungi ai pending
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
     });
   }
+
+  Future<void> unlockPendingAchievement(String uid, String achievementId) async {
+    final userRef = _users.doc(uid);
+    await _firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(userRef);
+      if (!snapshot.exists) return;
+
+      final data = snapshot.data() ?? {};
+      final pending = List<String>.from(data['pendingAchievements'] ?? []);
+      final unlocked = List<String>.from(data['unlockedAchievements'] ?? []);
+
+      if (pending.contains(achievementId)) {
+        pending.remove(achievementId);
+        if (!unlocked.contains(achievementId)) {
+          unlocked.add(achievementId);
+        }
+
+        transaction.update(userRef, {
+          'pendingAchievements': pending,
+          'unlockedAchievements': unlocked,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      }
+    });
+  }
 }
+

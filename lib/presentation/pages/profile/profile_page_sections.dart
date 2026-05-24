@@ -479,8 +479,14 @@ class _StatCard extends StatelessWidget {
 
 class _AchievementsGrid extends StatelessWidget {
   final List<String> unlockedIds;
+  final List<String> pendingIds;
+  final Function(String) onUnlock;
 
-  const _AchievementsGrid({required this.unlockedIds});
+  const _AchievementsGrid({
+    required this.unlockedIds,
+    required this.pendingIds,
+    required this.onUnlock,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -500,175 +506,293 @@ class _AchievementsGrid extends StatelessWidget {
       itemBuilder: (context, i) {
         final achievement = achievements[i];
         final isUnlocked = unlockedIds.contains(achievement.id);
+        final isPending = pendingIds.contains(achievement.id);
         return _AchievementTile(
           achievement: achievement,
           isUnlocked: isUnlocked,
+          isPending: isPending,
+          onUnlock: () => onUnlock(achievement.id),
         );
       },
     );
   }
 }
 
-class _AchievementTile extends StatelessWidget {
+class _AchievementTile extends StatefulWidget {
   final AchievementDefinition achievement;
   final bool isUnlocked;
+  final bool isPending;
+  final VoidCallback onUnlock;
 
-  const _AchievementTile({required this.achievement, required this.isUnlocked});
+  const _AchievementTile({
+    required this.achievement,
+    required this.isUnlocked,
+    required this.isPending,
+    required this.onUnlock,
+  });
+
+  @override
+  State<_AchievementTile> createState() => _AchievementTileState();
+}
+
+class _AchievementTileState extends State<_AchievementTile>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animCtrl;
+  late Animation<double> _scaleAnim;
+  late Animation<double> _spinAnim;
+  late Animation<double> _glowAnim;
+  bool _isAnimating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    );
+
+    _scaleAnim = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: 1.0, end: 1.25)
+            .chain(CurveTween(curve: Curves.easeOutBack)),
+        weight: 30,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.25, end: 1.25),
+        weight: 40,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.25, end: 1.0)
+            .chain(CurveTween(curve: Curves.elasticOut)),
+        weight: 30,
+      ),
+    ]).animate(_animCtrl);
+
+    _spinAnim = CurvedAnimation(
+      parent: _animCtrl,
+      curve: const Interval(0.0, 0.7, curve: Curves.easeInOutCubic),
+    ).drive(Tween(begin: 0.0, end: 2.0)); // 2 turns
+
+    _glowAnim = CurvedAnimation(
+      parent: _animCtrl,
+      curve: const Interval(0.2, 0.8, curve: Curves.easeInOut),
+    ).drive(Tween(begin: 0.0, end: 1.0));
+  }
+
+  @override
+  void dispose() {
+    _animCtrl.dispose();
+    super.dispose();
+  }
+
+  void _handleTap() async {
+    if (widget.isPending && !_isAnimating) {
+      setState(() => _isAnimating = true);
+      await _animCtrl.forward();
+      widget.onUnlock();
+      setState(() => _isAnimating = false);
+      _animCtrl.reset();
+    } else {
+      _showDetailsDialog();
+    }
+  }
+
+  void _showDetailsDialog() {
+    final theme = Theme.of(context);
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipOval(
+              child: SizedBox(
+                width: 80,
+                height: 80,
+                child: widget.isUnlocked
+                    ? Image.asset(widget.achievement.assetPath, fit: BoxFit.cover)
+                    : ColorFiltered(
+                        colorFilter: const ColorFilter.matrix([
+                          0.2126, 0.7152, 0.0722, 0, 0,
+                          0.2126, 0.7152, 0.0722, 0, 0,
+                          0.2126, 0.7152, 0.0722, 0, 0,
+                          0, 0, 0, 1, 0,
+                        ]),
+                        child: Image.asset(
+                          widget.achievement.assetPath,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              widget.isUnlocked
+                  ? AppLocalizations.of(context)!.achievementTitle(widget.achievement.id)
+                  : '???',
+              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        content: Text(
+          widget.isUnlocked
+              ? AppLocalizations.of(context)!.achievementDescription(widget.achievement.id)
+              : '\u{1F512}  ${AppLocalizations.of(context)!.achievementDescription(widget.achievement.id)}',
+          style: TextStyle(
+            color: widget.isUnlocked
+                ? theme.colorScheme.onSurface
+                : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+          ),
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppLocalizations.of(context)!.buttonOk),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isLocked = !widget.isUnlocked && !widget.isPending;
 
     return GestureDetector(
-      onTap: () {
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
-            ),
-            contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
-            title: Column(
-              mainAxisSize: MainAxisSize.min,
+      onTap: _handleTap,
+      child: AnimatedBuilder(
+        animation: _animCtrl,
+        builder: (context, child) {
+          final scale = _scaleAnim.value;
+          final turns = _spinAnim.value;
+          final glow = _glowAnim.value;
+
+          return Transform.scale(
+            scale: scale,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                // Badge preview in dialog
-                ClipOval(
-                  child: SizedBox(
-                    width: 80,
-                    height: 80,
-                    child: isUnlocked
-                        ? Image.asset(achievement.assetPath, fit: BoxFit.cover)
-                        : ColorFiltered(
-                            colorFilter: const ColorFilter.matrix([
-                              0.2126,
-                              0.7152,
-                              0.0722,
-                              0,
-                              0,
-                              0.2126,
-                              0.7152,
-                              0.0722,
-                              0,
-                              0,
-                              0.2126,
-                              0.7152,
-                              0.0722,
-                              0,
-                              0,
-                              0,
-                              0,
-                              0,
-                              0.3,
-                              0,
-                            ]),
-                            child: Image.asset(
-                              achievement.assetPath,
-                              fit: BoxFit.cover,
+                SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    clipBehavior: Clip.none,
+                    children: [
+                      // Glow effect during animation
+                      if (_isAnimating)
+                        OverflowBox(
+                          maxWidth: 160,
+                          maxHeight: 160,
+                          child: Container(
+                            width: 80 + (glow * 40),
+                            height: 80 + (glow * 40),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppPalette.olive.withValues(alpha: glow * 0.8),
+                                  blurRadius: 20 * glow,
+                                  spreadRadius: 10 * glow,
+                                ),
+                              ],
                             ),
                           ),
+                        ),
+
+                      // Badge Image
+                      AnimatedOpacity(
+                        duration: const Duration(milliseconds: 250),
+                        opacity: widget.isUnlocked || _isAnimating ? 1.0 : (widget.isPending ? 0.9 : 0.55),
+                        child: Transform.rotate(
+                          angle: turns * 3.1415926535 * 2,
+                          child: ClipOval(
+                            child: widget.isUnlocked || _isAnimating
+                                ? Image.asset(
+                                    widget.achievement.assetPath,
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                  )
+                                : ColorFiltered(
+                                    colorFilter: const ColorFilter.matrix([
+                                      0.2126, 0.7152, 0.0722, 0, 0,
+                                      0.2126, 0.7152, 0.0722, 0, 0,
+                                      0.2126, 0.7152, 0.0722, 0, 0,
+                                      0, 0, 0, 1, 0,
+                                    ]),
+                                    child: Image.asset(
+                                      widget.achievement.assetPath,
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ),
+
+                      // Pending Overlay
+                      if (widget.isPending && !_isAnimating)
+                        Positioned.fill(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.black.withValues(alpha: 0.3),
+                              border: Border.all(
+                                color: AppPalette.olive.withValues(alpha: 0.8),
+                                width: 3,
+                              ),
+                            ),
+                            child: Center(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppPalette.olive,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Text(
+                                  'SBLOCCA',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Text(
-                  isUnlocked
-                      ? AppLocalizations.of(
-                          context,
-                        )!.achievementTitle(achievement.id)
+                  widget.isUnlocked || widget.isPending
+                      ? AppLocalizations.of(context)!.achievementTitle(widget.achievement.id)
                       : '???',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 17,
-                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: widget.isUnlocked ? FontWeight.w700 : FontWeight.w500,
+                    color: widget.isUnlocked || widget.isPending
+                        ? theme.colorScheme.onSurface
+                        : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.45),
+                  ),
                 ),
               ],
             ),
-            content: Text(
-              isUnlocked
-                  ? AppLocalizations.of(
-                      context,
-                    )!.achievementDescription(achievement.id)
-                  : '\u{1F512}  ${AppLocalizations.of(context)!.achievementDescription(achievement.id)}',
-              style: TextStyle(
-                color: isUnlocked
-                    ? theme.colorScheme.onSurface
-                    : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(AppLocalizations.of(context)!.buttonOk),
-              ),
-            ],
-          ),
-        );
-      },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          // Badge image — clipped to circle, grayscale if locked
-          AnimatedOpacity(
-            duration: const Duration(milliseconds: 250),
-            opacity: isUnlocked ? 1.0 : 0.55,
-            child: ClipOval(
-              child: isUnlocked
-                  ? Image.asset(
-                      achievement.assetPath,
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.cover,
-                    )
-                  : ColorFiltered(
-                      colorFilter: const ColorFilter.matrix([
-                        0.2126,
-                        0.7152,
-                        0.0722,
-                        0,
-                        0,
-                        0.2126,
-                        0.7152,
-                        0.0722,
-                        0,
-                        0,
-                        0.2126,
-                        0.7152,
-                        0.0722,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        1,
-                        0,
-                      ]),
-                      child: Image.asset(
-                        achievement.assetPath,
-                        width: 80,
-                        height: 80,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            isUnlocked
-                ? AppLocalizations.of(context)!.achievementTitle(achievement.id)
-                : '???',
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: isUnlocked ? FontWeight.w700 : FontWeight.w500,
-              color: isUnlocked
-                  ? theme.colorScheme.onSurface
-                  : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.45),
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
