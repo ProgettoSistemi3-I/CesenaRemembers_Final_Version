@@ -214,14 +214,20 @@ class UserProfileDataSource {
     await _users.doc(uid).update(updates);
   }
 
+  String _capitalize(String s) {
+    if (s.isEmpty) return s;
+    return s[0].toUpperCase() + s.substring(1).toLowerCase();
+  }
+
   Future<List<UserProfile>> searchUsers(String query) async {
-    final cleanQuery = query.trim().toLowerCase();
+    final rawQuery = query.trim();
+    final cleanQuery = rawQuery.toLowerCase();
+    final capitalizedQuery = _capitalize(rawQuery);
+    
     if (cleanQuery.length < 2) return [];
 
     try {
-      // Due query parallele: una per username, una per displayName normalizzato.
-      // Firestore non supporta OR su campi diversi, quindi le eseguiamo in parallelo
-      // e uniamo i risultati deduplicando per uid.
+      // Per supportare utenti vecchi senza 'displayNameNormalized', facciamo query multiple
       final results = await Future.wait([
         _users
             .where('usernameNormalized', isGreaterThanOrEqualTo: cleanQuery)
@@ -231,6 +237,16 @@ class UserProfileDataSource {
         _users
             .where('displayNameNormalized', isGreaterThanOrEqualTo: cleanQuery)
             .where('displayNameNormalized', isLessThanOrEqualTo: '$cleanQuery\uf8ff')
+            .limit(10)
+            .get(),
+        _users
+            .where('displayName', isGreaterThanOrEqualTo: rawQuery)
+            .where('displayName', isLessThanOrEqualTo: '$rawQuery\uf8ff')
+            .limit(10)
+            .get(),
+        _users
+            .where('displayName', isGreaterThanOrEqualTo: capitalizedQuery)
+            .where('displayName', isLessThanOrEqualTo: '$capitalizedQuery\uf8ff')
             .limit(10)
             .get(),
       ]);

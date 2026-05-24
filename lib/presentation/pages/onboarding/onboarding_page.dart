@@ -154,8 +154,9 @@ class _OnboardingPageState extends State<OnboardingPage>
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor:
-          isDark ? const Color(0xFF0C0F0D) : const Color(0xFFF5F1EB),
+      backgroundColor: isDark
+          ? const Color(0xFF0C0F0D)
+          : const Color(0xFFF5F1EB),
       body: Stack(
         children: [
           _AnimatedBackground(ctrl: _bgCtrl, slide: _page, isDark: isDark),
@@ -164,8 +165,10 @@ class _OnboardingPageState extends State<OnboardingPage>
               children: [
                 // Skip row
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 8,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -651,9 +654,9 @@ class _TourMockup extends StatelessWidget {
                     height: 28 + pt * 14,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFF4A90D9).withValues(
-                        alpha: 0.15 * (1 - pt),
-                      ),
+                      color: const Color(
+                        0xFF4A90D9,
+                      ).withValues(alpha: 0.15 * (1 - pt)),
                     ),
                   ),
                   Container(
@@ -684,8 +687,10 @@ class _TourMockup extends StatelessWidget {
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: isDark
                           ? Colors.black.withValues(alpha: 0.55)
@@ -789,18 +794,12 @@ class _MapGridPainter extends CustomPainter {
     }
     // Block fills
     final blockPaint = Paint()
-      ..color = (isDark
-              ? const Color(0xFF2A3028)
-              : const Color(0xFFD8E4D2))
+      ..color = (isDark ? const Color(0xFF2A3028) : const Color(0xFFD8E4D2))
           .withValues(alpha: 0.5);
-    canvas.drawRect(
-        const Rect.fromLTWH(42, 57, 36, 36), blockPaint);
-    canvas.drawRect(
-        const Rect.fromLTWH(82, 57, 36, 36), blockPaint);
-    canvas.drawRect(
-        const Rect.fromLTWH(42, 97, 36, 41), blockPaint);
-    canvas.drawRect(
-        const Rect.fromLTWH(122, 97, 31, 41), blockPaint);
+    canvas.drawRect(const Rect.fromLTWH(42, 57, 36, 36), blockPaint);
+    canvas.drawRect(const Rect.fromLTWH(82, 57, 36, 36), blockPaint);
+    canvas.drawRect(const Rect.fromLTWH(42, 97, 36, 41), blockPaint);
+    canvas.drawRect(const Rect.fromLTWH(122, 97, 31, 41), blockPaint);
   }
 
   @override
@@ -916,8 +915,9 @@ class _QuizMockup extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF171A18) : Colors.white,
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(18)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(18),
+              ),
             ),
             padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
             child: Column(
@@ -946,8 +946,9 @@ class _QuizMockup extends StatelessWidget {
                     backgroundColor: isDark
                         ? Colors.white.withValues(alpha: 0.10)
                         : Colors.black.withValues(alpha: 0.08),
-                    valueColor:
-                        const AlwaysStoppedAnimation<Color>(AppPalette.olive),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      AppPalette.olive,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -966,15 +967,25 @@ class _QuizMockup extends StatelessWidget {
                 const SizedBox(height: 8),
                 // Answers
                 _QuizOption(
-                    text: '1350', isDark: isDark, state: _OptionState.normal),
+                  text: '1350',
+                  isDark: isDark,
+                  state: _OptionState.normal,
+                ),
                 _QuizOption(
-                    text: '1377',
-                    isDark: isDark,
-                    state: _OptionState.correct),
+                  text: '1377',
+                  isDark: isDark,
+                  state: _OptionState.correct,
+                ),
                 _QuizOption(
-                    text: '1412', isDark: isDark, state: _OptionState.normal),
+                  text: '1412',
+                  isDark: isDark,
+                  state: _OptionState.normal,
+                ),
                 _QuizOption(
-                    text: '1290', isDark: isDark, state: _OptionState.normal),
+                  text: '1290',
+                  isDark: isDark,
+                  state: _OptionState.normal,
+                ),
               ],
             ),
           ),
@@ -1007,14 +1018,20 @@ class _QuizOption extends StatelessWidget {
       bg = AppPalette.moss.withValues(alpha: 0.15);
       border = AppPalette.moss;
       textColor = AppPalette.moss;
-      trailing = const Icon(Icons.check_circle_outline,
-          size: 10, color: AppPalette.moss);
+      trailing = const Icon(
+        Icons.check_circle_outline,
+        size: 10,
+        color: AppPalette.moss,
+      );
     } else if (state == _OptionState.wrong) {
       bg = AppPalette.danger.withValues(alpha: 0.12);
       border = AppPalette.danger;
       textColor = AppPalette.danger;
-      trailing = const Icon(Icons.cancel_outlined,
-          size: 10, color: AppPalette.danger);
+      trailing = const Icon(
+        Icons.cancel_outlined,
+        size: 10,
+        color: AppPalette.danger,
+      );
     } else {
       bg = isDark
           ? Colors.white.withValues(alpha: 0.04)
@@ -1115,11 +1132,12 @@ class _LeaderboardMockup extends StatelessWidget {
               children: [
                 _PodiumPlace(rank: 2, name: 'Marco', xp: 2880, isDark: isDark),
                 _PodiumPlace(
-                    rank: 1,
-                    name: 'Eleonora',
-                    xp: 3240,
-                    isDark: isDark,
-                    isFirst: true),
+                  rank: 1,
+                  name: 'Eleonora',
+                  xp: 3240,
+                  isDark: isDark,
+                  isFirst: true,
+                ),
                 _PodiumPlace(rank: 3, name: 'Sofia', xp: 2415, isDark: isDark),
               ],
             ),
@@ -1136,11 +1154,15 @@ class _LeaderboardMockup extends StatelessWidget {
                 final isTop3 = i < 3;
                 return Container(
                   margin: const EdgeInsets.only(bottom: 4),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
                     color: isTop3
-                        ? AppPalette.olive.withValues(alpha: isDark ? 0.10 : 0.06)
+                        ? AppPalette.olive.withValues(
+                            alpha: isDark ? 0.10 : 0.06,
+                          )
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -1156,15 +1178,16 @@ class _LeaderboardMockup extends StatelessWidget {
                             color: i == 0
                                 ? AppPalette.tan
                                 : isDark
-                                    ? Colors.white.withValues(alpha: 0.45)
-                                    : Colors.black.withValues(alpha: 0.35),
+                                ? Colors.white.withValues(alpha: 0.45)
+                                : Colors.black.withValues(alpha: 0.35),
                           ),
                         ),
                       ),
                       CircleAvatar(
                         radius: 9,
-                        backgroundColor:
-                            AppPalette.olive.withValues(alpha: 0.25),
+                        backgroundColor: AppPalette.olive.withValues(
+                          alpha: 0.25,
+                        ),
                         child: Text(
                           e.$1[0],
                           style: TextStyle(
@@ -1226,8 +1249,8 @@ class _PodiumPlace extends StatelessWidget {
     final color = rank == 1
         ? AppPalette.tan
         : rank == 2
-            ? const Color(0xFF9AABB5)
-            : const Color(0xFFB08060);
+        ? const Color(0xFF9AABB5)
+        : const Color(0xFFB08060);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1250,8 +1273,9 @@ class _PodiumPlace extends StatelessWidget {
           style: TextStyle(
             fontSize: 7.5,
             fontWeight: FontWeight.w600,
-            color:
-                isDark ? Colors.white.withValues(alpha: 0.8) : const Color(0xFF1C1C1C),
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.8)
+                : const Color(0xFF1C1C1C),
           ),
         ),
         Text(
@@ -1272,10 +1296,7 @@ class _PodiumPlace extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _AchievementsMockup extends StatelessWidget {
-  const _AchievementsMockup({
-    required this.pulseCtrl,
-    required this.isDark,
-  });
+  const _AchievementsMockup({required this.pulseCtrl, required this.isDark});
   final AnimationController pulseCtrl;
   final bool isDark;
 
@@ -1313,7 +1334,9 @@ class _AchievementsMockup extends StatelessWidget {
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 6, vertical: 2),
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: AppPalette.olive.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
@@ -1338,8 +1361,7 @@ class _AchievementsMockup extends StatelessWidget {
                 return GridView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     crossAxisSpacing: 8,
                     mainAxisSpacing: 8,
@@ -1396,14 +1418,14 @@ class _AchievementCell extends StatelessWidget {
             color: unlocked
                 ? color.withValues(alpha: 0.18 + pulse * 0.06)
                 : isDark
-                    ? Colors.white.withValues(alpha: 0.06)
-                    : Colors.black.withValues(alpha: 0.06),
+                ? Colors.white.withValues(alpha: 0.06)
+                : Colors.black.withValues(alpha: 0.06),
             border: Border.all(
               color: unlocked
                   ? color.withValues(alpha: 0.45)
                   : (isDark
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : Colors.black.withValues(alpha: 0.08)),
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : Colors.black.withValues(alpha: 0.08)),
               width: 1.2,
             ),
           ),
@@ -1413,8 +1435,8 @@ class _AchievementCell extends StatelessWidget {
             color: unlocked
                 ? color
                 : (isDark
-                    ? Colors.white.withValues(alpha: 0.22)
-                    : Colors.black.withValues(alpha: 0.20)),
+                      ? Colors.white.withValues(alpha: 0.22)
+                      : Colors.black.withValues(alpha: 0.20)),
           ),
         ),
         const SizedBox(height: 3),
@@ -1425,10 +1447,12 @@ class _AchievementCell extends StatelessWidget {
             fontSize: 6.5,
             fontWeight: unlocked ? FontWeight.w600 : FontWeight.w400,
             color: unlocked
-                ? (isDark ? Colors.white.withValues(alpha: 0.85) : const Color(0xFF2A2A2A))
+                ? (isDark
+                      ? Colors.white.withValues(alpha: 0.85)
+                      : const Color(0xFF2A2A2A))
                 : (isDark
-                    ? Colors.white.withValues(alpha: 0.28)
-                    : Colors.black.withValues(alpha: 0.28)),
+                      ? Colors.white.withValues(alpha: 0.28)
+                      : Colors.black.withValues(alpha: 0.28)),
           ),
         ),
       ],
@@ -1474,8 +1498,7 @@ class _GlassBottomPanel extends StatelessWidget {
             color: isDark
                 ? Colors.white.withValues(alpha: 0.04)
                 : Colors.white.withValues(alpha: 0.75),
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(32)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
             border: Border(
               top: BorderSide(
                 color: isDark
@@ -1619,8 +1642,8 @@ class _ProgressSegments extends StatelessWidget {
               color: isActive
                   ? accent
                   : (isDark
-                      ? Colors.white.withValues(alpha: 0.14)
-                      : Colors.black.withValues(alpha: 0.10)),
+                        ? Colors.white.withValues(alpha: 0.14)
+                        : Colors.black.withValues(alpha: 0.10)),
             ),
           ),
         );
@@ -1658,9 +1681,10 @@ class _NextButtonState extends State<_NextButton>
     duration: const Duration(milliseconds: 90),
     reverseDuration: const Duration(milliseconds: 160),
   );
-  late final Animation<double> _scale = Tween<double>(begin: 1.0, end: 0.96)
-      .animate(
-          CurvedAnimation(parent: _pressCtrl, curve: Curves.easeOut));
+  late final Animation<double> _scale = Tween<double>(
+    begin: 1.0,
+    end: 0.96,
+  ).animate(CurvedAnimation(parent: _pressCtrl, curve: Curves.easeOut));
 
   @override
   void dispose() {
