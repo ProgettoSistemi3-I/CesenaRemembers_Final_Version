@@ -251,6 +251,13 @@ class UserProfileDataSource {
     }
   }
 
+  Future<void> markOnboardingCompleted(String uid) async {
+    await _users.doc(uid).update({
+      'onboardingCompleted': true,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
   // 🔴 AGGIUNTA LA FUNZIONE PER LE NOTIFICHE
   Future<void> saveFcmToken(String uid, String token) async {
     try {

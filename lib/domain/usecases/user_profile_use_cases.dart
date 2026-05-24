@@ -55,4 +55,8 @@ class UserProfileUseCases {
   // --- BAN ---
   /// Ritorna true se l'utente è presente nella collection banned_users.
   Future<bool> isUserBanned(String uid) => _repository.isUserBanned(uid);
+
+  // --- ONBOARDING ---
+  Future<void> markOnboardingCompleted(String uid) =>
+      _repository.markOnboardingCompleted(uid);
 }

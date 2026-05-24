@@ -8,6 +8,7 @@ class UserModel extends UserProfile {
     super.username,
     super.avatarId,
     super.profileCompleted,
+    super.onboardingCompleted,
     super.xp,
     super.visitedPoiIds,
     super.unlockedAchievements,
@@ -34,6 +35,7 @@ class UserModel extends UserProfile {
       username: json['username'] ?? '',
       avatarId: json['avatarId'] ?? 'soldier',
       profileCompleted: json['profileCompleted'] ?? false,
+      onboardingCompleted: json['onboardingCompleted'] ?? false,
       xp: json['xp'] ?? 0,
       visitedPoiIds: List<String>.from(json['visitedPoiIds'] ?? []),
       unlockedAchievements: List<String>.from(
@@ -69,6 +71,7 @@ class UserModel extends UserProfile {
       'usernameNormalized': username.toLowerCase(),
       'avatarId': avatarId,
       'profileCompleted': profileCompleted,
+      'onboardingCompleted': onboardingCompleted,
       'xp': xp,
       'leaderboardScore': xp,
       'visitedPoiIds': visitedPoiIds,

@@ -7,6 +7,7 @@ import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/user_profile_use_cases.dart';
 import '../../injection_container.dart';
 import '../pages/login_page.dart';
+import '../pages/onboarding/onboarding_page.dart';
 import '../pages/profile/profile_setup_page.dart';
 import '../theme/theme_controller.dart';
 import 'package:cesena_remembers/l10n/app_localizations.dart';
@@ -169,6 +170,8 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
             }
             final profileCompleted =
                 profileSnapshot.data?.profileCompleted == true;
+            final onboardingCompleted =
+                profileSnapshot.data?.onboardingCompleted == true;
 
             if (!profileCompleted) {
               return ProfileSetupPage(
@@ -176,6 +179,10 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
                 email: widget.appUser.email,
                 suggestedName: widget.appUser.displayName,
               );
+            }
+
+            if (!onboardingCompleted) {
+              return OnboardingPage(uid: widget.appUser.id);
             }
 
             return const MainShell();

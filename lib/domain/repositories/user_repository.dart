@@ -49,4 +49,7 @@ abstract class IUserRepository {
 
   // Ban
   Future<bool> isUserBanned(String uid);
+
+  // Onboarding
+  Future<void> markOnboardingCompleted(String uid);
 }

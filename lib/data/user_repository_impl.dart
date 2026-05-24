@@ -146,4 +146,9 @@ class UserRepositoryImpl implements IUserRepository {
     final doc = await firestore.collection('banned_users').doc(uid).get();
     return doc.exists;
   }
+
+  // --- ONBOARDING ---
+  @override
+  Future<void> markOnboardingCompleted(String uid) =>
+      _profile.markOnboardingCompleted(uid);
 }
