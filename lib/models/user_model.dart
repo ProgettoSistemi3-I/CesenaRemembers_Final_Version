@@ -64,6 +64,7 @@ class UserModel extends UserProfile {
     return {
       'email': email,
       'displayName': displayName,
+      'displayNameNormalized': displayName.toLowerCase(),
       'username': username,
       'usernameNormalized': username.toLowerCase(),
       'avatarId': avatarId,

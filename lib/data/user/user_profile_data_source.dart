@@ -136,6 +136,7 @@ class UserProfileDataSource {
     return {
       'email': email,
       'displayName': displayName.trim(),
+      'displayNameNormalized': displayName.trim().toLowerCase(),
       'username': username.trim(),
       'usernameNormalized': normalizedUsername,
       'avatarId': avatarId,
@@ -182,6 +183,7 @@ class UserProfileDataSource {
         throw Exception('OFFENSIVE_DISPLAY_NAME');
       }
       updates['displayName'] = displayName.trim();
+      updates['displayNameNormalized'] = displayName.trim().toLowerCase();
     }
     if (avatarId != null && avatarId.trim().isNotEmpty) {
       updates['avatarId'] = avatarId.trim();
@@ -217,15 +219,33 @@ class UserProfileDataSource {
     if (cleanQuery.length < 2) return [];
 
     try {
-      final snapshot = await _users
-          .where('usernameNormalized', isGreaterThanOrEqualTo: cleanQuery)
-          .where('usernameNormalized', isLessThanOrEqualTo: '$cleanQuery\uf8ff')
-          .limit(10)
-          .get();
+      // Due query parallele: una per username, una per displayName normalizzato.
+      // Firestore non supporta OR su campi diversi, quindi le eseguiamo in parallelo
+      // e uniamo i risultati deduplicando per uid.
+      final results = await Future.wait([
+        _users
+            .where('usernameNormalized', isGreaterThanOrEqualTo: cleanQuery)
+            .where('usernameNormalized', isLessThanOrEqualTo: '$cleanQuery\uf8ff')
+            .limit(10)
+            .get(),
+        _users
+            .where('displayNameNormalized', isGreaterThanOrEqualTo: cleanQuery)
+            .where('displayNameNormalized', isLessThanOrEqualTo: '$cleanQuery\uf8ff')
+            .limit(10)
+            .get(),
+      ]);
 
-      return snapshot.docs
-          .map((doc) => UserModel.fromJson(doc.data(), doc.id))
-          .toList();
+      // Merge + dedup per uid
+      final seen = <String>{};
+      final merged = <UserProfile>[];
+      for (final snapshot in results) {
+        for (final doc in snapshot.docs) {
+          if (seen.add(doc.id)) {
+            merged.add(UserModel.fromJson(doc.data(), doc.id));
+          }
+        }
+      }
+      return merged;
     } catch (e) {
       throw Exception('Errore durante la ricerca utenti: $e');
     }
