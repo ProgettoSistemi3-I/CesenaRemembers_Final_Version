@@ -8,18 +8,10 @@ extension _MapPageTourActions on _MapPageState {
         _isGpsPreferenceEnabled && _isGpsEnabled && _hasPermissions;
     if (!canStartTour) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.tourStartGpsRequired,
-          ),
-          backgroundColor: AppPalette.danger,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
-        ),
+      showGlassSnackBar(
+        context,
+        message: AppLocalizations.of(context)!.tourStartGpsRequired,
+        type: GlassSnackType.error,
       );
       _resolveLocationIssues();
       return;
@@ -65,13 +57,11 @@ extension _MapPageTourActions on _MapPageState {
     if (shouldStop != true || !mounted) return;
 
     _tourController.stopTour();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppLocalizations.of(context)!.tourStopped),
-        backgroundColor: AppPalette.danger,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
+    showGlassSnackBar(
+      context,
+      message: AppLocalizations.of(context)!.tourStopped,
+      type: GlassSnackType.error,
+      icon: Icons.stop_circle_outlined,
     );
   }
 
@@ -169,8 +159,8 @@ extension _MapPageTourActions on _MapPageState {
                 return FadeTransition(
                   opacity: animation,
                   child: TourCompletionAnimation(
+                    xpGained: 0,
                     onDismiss: () => Navigator.of(context).pop(),
-                    xpGained: _lastTourXpGained,
                   ),
                 );
               },
@@ -206,8 +196,6 @@ extension _MapPageTourActions on _MapPageState {
     );
 
     try {
-      _lastTourXpGained = score.totalXp;
-
       await _progressUseCases.registerQuizCompletion(
         uid: uid,
         poiId: poiId,
@@ -218,31 +206,20 @@ extension _MapPageTourActions on _MapPageState {
         isTourComplete: isLastStop,
       );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            '+${score.totalXp} XP (${score.baseXp} × ${score.timeMultiplier.toStringAsFixed(2)})',
-          ),
-          backgroundColor: AppPalette.olive,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
-        ),
+      showGlassSnackBar(
+        context,
+        message:
+            '+${score.totalXp} XP  (${score.baseXp} × ${score.timeMultiplier.toStringAsFixed(2)})',
+        type: GlassSnackType.xp,
+        icon: Icons.bolt_rounded,
+        duration: const Duration(seconds: 4),
       );
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.errorSaveScore),
-          backgroundColor: AppPalette.danger,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
-        ),
+      showGlassSnackBar(
+        context,
+        message: AppLocalizations.of(context)!.errorSaveScore,
+        type: GlassSnackType.error,
       );
     } finally {
       _isSavingQuizResult = false;

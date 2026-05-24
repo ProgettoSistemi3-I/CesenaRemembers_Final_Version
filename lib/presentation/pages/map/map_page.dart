@@ -33,6 +33,7 @@ import 'widgets/location_issue_banner.dart';
 import 'widgets/map_controls.dart';
 import 'widgets/poi_bottom_sheet.dart';
 import 'widgets/tour_completion_animation.dart';
+import '../../widgets/glass_snackbar.dart';
 
 part 'map_page_data.dart';
 part 'map_page_location.dart';
