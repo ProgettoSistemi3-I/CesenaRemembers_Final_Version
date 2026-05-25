@@ -542,6 +542,7 @@ class _AchievementTileState extends State<_AchievementTile>
   late Animation<double> _spinAnim;
   late Animation<double> _glowAnim;
   bool _isAnimating = false;
+  bool _justUnlocked = false;
 
   @override
   void initState() {
@@ -586,11 +587,16 @@ class _AchievementTileState extends State<_AchievementTile>
   }
 
   void _handleTap() async {
-    if (widget.isPending && !_isAnimating) {
+    final canUnlock = widget.isPending && !_justUnlocked;
+
+    if (canUnlock && !_isAnimating) {
       setState(() => _isAnimating = true);
       await _animCtrl.forward();
       widget.onUnlock();
-      setState(() => _isAnimating = false);
+      setState(() {
+        _isAnimating = false;
+        _justUnlocked = true;
+      });
       _animCtrl.reset();
     } else {
       _showDetailsDialog();
@@ -663,7 +669,7 @@ class _AchievementTileState extends State<_AchievementTile>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isLocked = !widget.isUnlocked && !widget.isPending;
+    final effectiveUnlocked = widget.isUnlocked || _justUnlocked;
 
     return GestureDetector(
       onTap: _handleTap,
@@ -710,11 +716,11 @@ class _AchievementTileState extends State<_AchievementTile>
                       // Badge Image
                       AnimatedOpacity(
                         duration: const Duration(milliseconds: 250),
-                        opacity: widget.isUnlocked || _isAnimating ? 1.0 : (widget.isPending ? 0.9 : 0.55),
+                        opacity: effectiveUnlocked || _isAnimating ? 1.0 : (widget.isPending ? 0.9 : 0.55),
                         child: Transform.rotate(
                           angle: turns * 3.1415926535 * 2,
                           child: ClipOval(
-                            child: widget.isUnlocked || _isAnimating
+                            child: effectiveUnlocked || _isAnimating
                                 ? Image.asset(
                                     widget.achievement.assetPath,
                                     width: 80,
@@ -740,7 +746,7 @@ class _AchievementTileState extends State<_AchievementTile>
                       ),
 
                       // Pending Overlay
-                      if (widget.isPending && !_isAnimating)
+                      if (widget.isPending && !effectiveUnlocked && !_isAnimating)
                         Positioned.fill(
                           child: Container(
                             decoration: BoxDecoration(
@@ -775,7 +781,7 @@ class _AchievementTileState extends State<_AchievementTile>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  widget.isUnlocked || widget.isPending
+                  effectiveUnlocked || widget.isPending
                       ? AppLocalizations.of(context)!.achievementTitle(widget.achievement.id)
                       : '???',
                   maxLines: 2,
@@ -783,8 +789,8 @@ class _AchievementTileState extends State<_AchievementTile>
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 11,
-                    fontWeight: widget.isUnlocked ? FontWeight.w700 : FontWeight.w500,
-                    color: widget.isUnlocked || widget.isPending
+                    fontWeight: effectiveUnlocked ? FontWeight.w700 : FontWeight.w500,
+                    color: effectiveUnlocked || widget.isPending
                         ? theme.colorScheme.onSurface
                         : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.45),
                   ),
