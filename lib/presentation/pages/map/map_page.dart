@@ -82,6 +82,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   bool _isCenteringOnUser = false;
   bool _isSavingQuizResult = false;
   int _lastTourXpGained = 0;
+  int? _cachedUserXp;
   Locale? _lastLocale;
   late VoidCallback _onLocaleChanged;
 
@@ -175,7 +176,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   }
 
   Future<void> _initTileCaching() async {
-    final cacheDir = await getTemporaryDirectory();
+    final cacheDir = await getApplicationSupportDirectory();
     final cachePath = '${cacheDir.path}/map_tiles_cache';
     final cacheStore = FileCacheStore(cachePath);
     if (!mounted) return;
