@@ -223,12 +223,15 @@ class UserProfileDataSource {
     final rawQuery = query.trim();
     final cleanQuery = rawQuery.toLowerCase();
     final capitalizedQuery = _capitalize(rawQuery);
-    
+
     if (cleanQuery.length < 2) return [];
 
     try {
-      // Per supportare utenti vecchi senza 'displayNameNormalized', facciamo query multiple
-      final results = await Future.wait([
+      // Riduciamo letture duplicate: eseguiamo solo varianti realmente diverse.
+      final displayNameProbes = <String>{rawQuery, capitalizedQuery}
+        ..removeWhere((value) => value.trim().isEmpty);
+
+      final queries = <Future<QuerySnapshot<Map<String, dynamic>>>>[
         _users
             .where('usernameNormalized', isGreaterThanOrEqualTo: cleanQuery)
             .where('usernameNormalized', isLessThanOrEqualTo: '$cleanQuery\uf8ff')
@@ -239,17 +242,19 @@ class UserProfileDataSource {
             .where('displayNameNormalized', isLessThanOrEqualTo: '$cleanQuery\uf8ff')
             .limit(10)
             .get(),
-        _users
-            .where('displayName', isGreaterThanOrEqualTo: rawQuery)
-            .where('displayName', isLessThanOrEqualTo: '$rawQuery\uf8ff')
-            .limit(10)
-            .get(),
-        _users
-            .where('displayName', isGreaterThanOrEqualTo: capitalizedQuery)
-            .where('displayName', isLessThanOrEqualTo: '$capitalizedQuery\uf8ff')
-            .limit(10)
-            .get(),
-      ]);
+      ];
+
+      for (final probe in displayNameProbes) {
+        queries.add(
+          _users
+              .where('displayName', isGreaterThanOrEqualTo: probe)
+              .where('displayName', isLessThanOrEqualTo: '$probe\uf8ff')
+              .limit(10)
+              .get(),
+        );
+      }
+
+      final results = await Future.wait(queries);
 
       // Merge + dedup per uid
       final seen = <String>{};
@@ -274,7 +279,6 @@ class UserProfileDataSource {
     });
   }
 
-  // 🔴 AGGIUNTA LA FUNZIONE PER LE NOTIFICHE
   Future<void> saveFcmToken(String uid, String token) async {
     try {
       await _users.doc(uid).set({

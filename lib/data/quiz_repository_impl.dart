@@ -9,8 +9,13 @@ import '../domain/repositories/i_quiz_repository.dart';
 import 'seeds/historic_places_seed.dart';
 
 class QuizRepositoryImpl implements IQuizRepository {
-  static const String _baseUrl = 'https://saggy-film-raven.ngrok-free.dev';
+  QuizRepositoryImpl({http.Client? httpClient}) : _httpClient = httpClient ?? http.Client();
+
+  final http.Client _httpClient;
+  static const String _defaultBaseUrl = 'https://saggy-film-raven.ngrok-free.dev';
   static const _fallbackDifficultyLabel = 'quiz_fallback_name';
+  static const _requestTimeout = Duration(seconds: 12);
+  static final Map<String, QuizLoadResult> _memoryCache = <String, QuizLoadResult>{};
 
   @override
   Future<QuizLoadResult> getQuizForPoi(
@@ -18,10 +23,21 @@ class QuizRepositoryImpl implements IQuizRepository {
     String poiName,
     int userXp,
   ) async {
+    final cacheKey = '$poiId::$userXp';
+    final cached = _memoryCache[cacheKey];
+    if (cached != null) {
+      return cached;
+    }
+
+    final baseUrl = const String.fromEnvironment(
+      'QUIZ_API_BASE_URL',
+      defaultValue: _defaultBaseUrl,
+    );
+
     try {
-      final response = await http
+      final response = await _httpClient
           .post(
-            Uri.parse('$_baseUrl/api/generate-quiz'),
+            Uri.parse('$baseUrl/api/generate-quiz'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id': poiId,
@@ -31,7 +47,7 @@ class QuizRepositoryImpl implements IQuizRepository {
               'userXp': userXp,
             }),
           )
-          .timeout(const Duration(seconds: 12));
+          .timeout(_requestTimeout);
 
       if (response.statusCode != 200) {
         throw StateError('HTTP ${response.statusCode}');
@@ -43,10 +59,12 @@ class QuizRepositoryImpl implements IQuizRepository {
           .map((q) => QuizQuestion.fromJson(q))
           .toList();
 
-      return QuizLoadResult(
+      final result = QuizLoadResult(
         questions: questions,
         usesPersonalizedQuestions: true,
       );
+      _memoryCache[cacheKey] = result;
+      return result;
     } catch (error, stackTrace) {
       AppLogger.error(
         'Quiz API unavailable. Using fallback quiz seed for poi=$poiId',
@@ -55,12 +73,14 @@ class QuizRepositoryImpl implements IQuizRepository {
         name: 'QuizRepository',
       );
 
-      return QuizLoadResult(
+      final fallbackResult = QuizLoadResult(
         questions: _fallbackQuestions(poiId),
         usesPersonalizedQuestions: false,
         fallbackNotice: 'quiz_fallback_desc',
         fallbackDifficultyLabel: _fallbackDifficultyLabel,
       );
+      _memoryCache[cacheKey] = fallbackResult;
+      return fallbackResult;
     }
   }
 

@@ -115,14 +115,17 @@ extension _MapPageTourActions on _MapPageState {
     if (currentStop == null) return;
     final visual = _tourStopVisuals.forStop(currentStop);
 
-    int userXp = 0;
-    try {
-      final uid = _profileUseCases.getCurrentUserUid();
-      if (uid != null) {
-        final profile = await _profileUseCases.getUserProfile(uid);
-        userXp = profile.xp;
-      }
-    } catch (_) {}
+    int userXp = _cachedUserXp ?? 0;
+    if (_cachedUserXp == null) {
+      try {
+        final uid = _profileUseCases.getCurrentUserUid();
+        if (uid != null) {
+          final profile = await _profileUseCases.getUserProfile(uid);
+          userXp = profile.xp;
+          _cachedUserXp = userXp;
+        }
+      } catch (_) {}
+    }
 
     final isLastStop =
         _tourController.currentStopIndex ==
@@ -205,6 +208,7 @@ extension _MapPageTourActions on _MapPageState {
         tourElapsedSeconds: _tourController.totalElapsedSeconds,
         isTourComplete: isLastStop,
       );
+      _cachedUserXp = (_cachedUserXp ?? 0) + score.totalXp;
       if (!mounted) return;
       showGlassSnackBar(
         context,
