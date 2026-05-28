@@ -1087,4 +1087,78 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quiz_rifugi_antiaerei_q2_o3 => '1945–1946';
+
+  @override
+  String get notificationNoNotifications => 'No notifications at the moment.';
+
+  @override
+  String get notificationAchievementUnlocked => 'Achievement Unlocked!';
+
+  @override
+  String get notificationFriendRequest => 'Friend request';
+
+  @override
+  String get notificationRedeemButton => 'REDEEM';
+
+  @override
+  String get achievementUnlockButton => 'UNLOCK';
+
+  @override
+  String get onboardingSkip => 'Skip';
+
+  @override
+  String get onboardingNext => 'Continue';
+
+  @override
+  String get onboardingStart => 'Start exploring';
+
+  @override
+  String get onboardingSlide0Tag => 'WELCOME';
+
+  @override
+  String get onboardingSlide0Title => 'Cesena
+Remembers';
+
+  @override
+  String get onboardingSlide0Desc => 'Explore the places that shaped the history of Cesena. A journey through memories, quizzes and people.';
+
+  @override
+  String get onboardingSlide1Tag => '01 — TOUR';
+
+  @override
+  String get onboardingSlide1Title => 'Follow
+the route';
+
+  @override
+  String get onboardingSlide1Desc => 'Start a guided tour and walk through historical sites. GPS guides you step by step.';
+
+  @override
+  String get onboardingSlide2Tag => '02 — QUIZ';
+
+  @override
+  String get onboardingSlide2Title => 'Put yourself
+to the test';
+
+  @override
+  String get onboardingSlide2Desc => 'Answer questions about each location. The more accurate you are, the more XP you earn.';
+
+  @override
+  String get onboardingSlide3Tag => '03 — LEADERBOARD';
+
+  @override
+  String get onboardingSlide3Title => 'Climb
+the top';
+
+  @override
+  String get onboardingSlide3Desc => 'Compete with other explorers on the real-time leaderboard.';
+
+  @override
+  String get onboardingSlide4Tag => '04 — ACHIEVEMENTS';
+
+  @override
+  String get onboardingSlide4Title => 'Collect
+badges';
+
+  @override
+  String get onboardingSlide4Desc => 'Every milestone unlocks an exclusive badge. Complete tours, ace quizzes and make friends.';
 }

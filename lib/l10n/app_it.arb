@@ -453,5 +453,28 @@
         "type": "int"
       }
     }
-  }
+  },
+  "notificationNoNotifications": "Nessuna notifica al momento.",
+  "notificationAchievementUnlocked": "Obiettivo Sbloccato!",
+  "notificationFriendRequest": "Richiesta di amicizia",
+  "notificationRedeemButton": "RISCATTA",
+  "achievementUnlockButton": "SBLOCCA",
+  "onboardingSkip": "Salta",
+  "onboardingNext": "Prosegui",
+  "onboardingStart": "Inizia a esplorare",
+  "onboardingSlide0Tag": "BENVENUTO",
+  "onboardingSlide0Title": "Cesena\nRemembers",
+  "onboardingSlide0Desc": "Esplora i luoghi che hanno scritto la storia di Cesena. Un viaggio tra memorie, quiz e persone.",
+  "onboardingSlide1Tag": "01 — TOUR",
+  "onboardingSlide1Title": "Segui\nil percorso",
+  "onboardingSlide1Desc": "Attiva un tour guidato e cammina tra i siti storici. Il GPS ti guida tappa dopo tappa.",
+  "onboardingSlide2Tag": "02 — QUIZ",
+  "onboardingSlide2Title": "Metti\nalla prova",
+  "onboardingSlide2Desc": "Rispondi alle domande di ogni luogo. Più sei preciso, più XP guadagni.",
+  "onboardingSlide3Tag": "03 — CLASSIFICA",
+  "onboardingSlide3Title": "Scala\nla vetta",
+  "onboardingSlide3Desc": "Confrontati con gli altri esploratori sulla classifica aggiornata in tempo reale.",
+  "onboardingSlide4Tag": "04 — ACHIEVEMENT",
+  "onboardingSlide4Title": "Colleziona\ni badge",
+  "onboardingSlide4Desc": "Ogni traguardo sblocca un riconoscimento esclusivo. Completa tour, supera quiz e conquista amici."
 }

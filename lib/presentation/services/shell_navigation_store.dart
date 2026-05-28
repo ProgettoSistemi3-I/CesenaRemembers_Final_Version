@@ -15,8 +15,20 @@ class ShellNavigationStore {
     }
   }
 
+  /// When set to true, ProfilePage scrolls to the achievements section.
+  static final ValueNotifier<bool> scrollToAchievements =
+      ValueNotifier<bool>(false);
+
   static void openSettingsAndFocusGpsToggle() {
     focusGpsToggleInSettings.value = true;
     goToTab(3);
+  }
+
+  /// Navigates to the Profile tab and scrolls to the achievements section.
+  static void goToAchievements() {
+    goToTab(2);
+    // Post-frame so the tab switch completes before scroll is triggered.
+    scrollToAchievements.value = false;
+    Future.microtask(() => scrollToAchievements.value = true);
   }
 }

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../theme/app_palette.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../injection_container.dart';
 import '../../../domain/usecases/user_profile_use_cases.dart';
 
@@ -68,7 +69,9 @@ class _OnboardingPageState extends State<OnboardingPage>
   }
 
   Future<void> _goTo(int index) async {
-    if (index >= _slides.length) {
+    final l10n = AppLocalizations.of(context)!;
+    final slides = _buildSlides(l10n);
+    if (index >= slides.length) {
       await _complete();
       return;
     }
@@ -100,49 +103,39 @@ class _OnboardingPageState extends State<OnboardingPage>
     super.dispose();
   }
 
-  static const List<_SlideData> _slides = [
+  List<_SlideData> _buildSlides(AppLocalizations l10n) => [
     _SlideData(
-      tag: 'BENVENUTO',
-      title: 'Cesena\nRemembers',
-      description:
-          'Esplora i luoghi che hanno scritto la storia di Cesena. '
-          'Un viaggio tra memorie, quiz e persone.',
+      tag: l10n.onboardingSlide0Tag,
+      title: l10n.onboardingSlide0Title,
+      description: l10n.onboardingSlide0Desc,
       accent: AppPalette.olive,
       visualType: _VisualType.welcome,
     ),
     _SlideData(
-      tag: '01 — TOUR',
-      title: 'Segui\nil percorso',
-      description:
-          'Attiva un tour guidato e cammina tra i siti storici. '
-          'Il GPS ti guida tappa dopo tappa.',
+      tag: l10n.onboardingSlide1Tag,
+      title: l10n.onboardingSlide1Title,
+      description: l10n.onboardingSlide1Desc,
       accent: AppPalette.moss,
       visualType: _VisualType.tour,
     ),
     _SlideData(
-      tag: '02 — QUIZ',
-      title: 'Metti\nalla prova',
-      description:
-          'Rispondi alle domande di ogni luogo. '
-          'Più sei preciso, più XP guadagni.',
+      tag: l10n.onboardingSlide2Tag,
+      title: l10n.onboardingSlide2Title,
+      description: l10n.onboardingSlide2Desc,
       accent: AppPalette.tan,
       visualType: _VisualType.quiz,
     ),
     _SlideData(
-      tag: '03 — CLASSIFICA',
-      title: 'Scala\nla vetta',
-      description:
-          'Confrontati con gli altri esploratori '
-          'sulla classifica aggiornata in tempo reale.',
+      tag: l10n.onboardingSlide3Tag,
+      title: l10n.onboardingSlide3Title,
+      description: l10n.onboardingSlide3Desc,
       accent: AppPalette.olive,
       visualType: _VisualType.leaderboard,
     ),
     _SlideData(
-      tag: '04 — ACHIEVEMENT',
-      title: 'Colleziona\ni badge',
-      description:
-          'Ogni traguardo sblocca un riconoscimento esclusivo. '
-          'Completa tour, supera quiz e conquista amici.',
+      tag: l10n.onboardingSlide4Tag,
+      title: l10n.onboardingSlide4Title,
+      description: l10n.onboardingSlide4Desc,
       accent: AppPalette.tan,
       visualType: _VisualType.achievements,
     ),
@@ -150,7 +143,9 @@ class _OnboardingPageState extends State<OnboardingPage>
 
   @override
   Widget build(BuildContext context) {
-    final slide = _slides[_page];
+    final l10n = AppLocalizations.of(context)!;
+    final slides = _buildSlides(l10n);
+    final slide = slides[_page];
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -172,13 +167,13 @@ class _OnboardingPageState extends State<OnboardingPage>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      if (_page < _slides.length - 1)
+                      if (_page < slides.length - 1)
                         GestureDetector(
                           onTap: _completing ? null : _complete,
                           child: Padding(
                             padding: const EdgeInsets.all(8),
                             child: Text(
-                              'Salta',
+                              l10n.onboardingSkip,
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
@@ -219,7 +214,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                 _GlassBottomPanel(
                   slide: slide,
                   page: _page,
-                  total: _slides.length,
+                  total: slides.length,
                   isDark: isDark,
                   tagAnim: _tagAnim,
                   titleAnim: _titleAnim,
@@ -1599,6 +1594,8 @@ class _GlassBottomPanel extends StatelessWidget {
                 isDark: isDark,
                 completing: completing,
                 onTap: onNext,
+                nextLabel: AppLocalizations.of(context)!.onboardingNext,
+                startLabel: AppLocalizations.of(context)!.onboardingStart,
               ),
               SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
             ],
@@ -1663,12 +1660,16 @@ class _NextButton extends StatefulWidget {
     required this.isDark,
     required this.completing,
     required this.onTap,
+    required this.nextLabel,
+    required this.startLabel,
   });
   final bool isLast;
   final Color accent;
   final bool isDark;
   final bool completing;
   final VoidCallback onTap;
+  final String nextLabel;
+  final String startLabel;
 
   @override
   State<_NextButton> createState() => _NextButtonState();
@@ -1737,7 +1738,7 @@ class _NextButtonState extends State<_NextButton>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      widget.isLast ? 'Inizia a esplorare' : 'Prosegui',
+                      widget.isLast ? widget.startLabel : widget.nextLabel,
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,

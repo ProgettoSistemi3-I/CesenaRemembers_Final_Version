@@ -233,22 +233,6 @@ class _GlassPoiLabel extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Accent dot
-              Container(
-                width: 5,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: accentColor,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: accentColor.withOpacity(0.65),
-                      blurRadius: 4,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 5),
               Flexible(
                 child: Text(
                   text,

@@ -1160,4 +1160,78 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get quiz_rifugi_antiaerei_q2_o3 => '1945–1946';
+
+  @override
+  String get notificationNoNotifications => 'Nessuna notifica al momento.';
+
+  @override
+  String get notificationAchievementUnlocked => 'Obiettivo Sbloccato!';
+
+  @override
+  String get notificationFriendRequest => 'Richiesta di amicizia';
+
+  @override
+  String get notificationRedeemButton => 'RISCATTA';
+
+  @override
+  String get achievementUnlockButton => 'SBLOCCA';
+
+  @override
+  String get onboardingSkip => 'Salta';
+
+  @override
+  String get onboardingNext => 'Prosegui';
+
+  @override
+  String get onboardingStart => 'Inizia a esplorare';
+
+  @override
+  String get onboardingSlide0Tag => 'BENVENUTO';
+
+  @override
+  String get onboardingSlide0Title => 'Cesena
+Remembers';
+
+  @override
+  String get onboardingSlide0Desc => "Esplora i luoghi che hanno scritto la storia di Cesena. Un viaggio tra memorie, quiz e persone.";
+
+  @override
+  String get onboardingSlide1Tag => '01 — TOUR';
+
+  @override
+  String get onboardingSlide1Title => 'Segui
+il percorso';
+
+  @override
+  String get onboardingSlide1Desc => 'Attiva un tour guidato e cammina tra i siti storici. Il GPS ti guida tappa dopo tappa.';
+
+  @override
+  String get onboardingSlide2Tag => '02 — QUIZ';
+
+  @override
+  String get onboardingSlide2Title => 'Metti
+alla prova';
+
+  @override
+  String get onboardingSlide2Desc => 'Rispondi alle domande di ogni luogo. Più sei preciso, più XP guadagni.';
+
+  @override
+  String get onboardingSlide3Tag => '03 — CLASSIFICA';
+
+  @override
+  String get onboardingSlide3Title => 'Scala
+la vetta';
+
+  @override
+  String get onboardingSlide3Desc => 'Confrontati con gli altri esploratori sulla classifica aggiornata in tempo reale.';
+
+  @override
+  String get onboardingSlide4Tag => '04 — ACHIEVEMENT';
+
+  @override
+  String get onboardingSlide4Title => 'Colleziona
+i badge';
+
+  @override
+  String get onboardingSlide4Desc => "Ogni traguardo sblocca un riconoscimento esclusivo. Completa tour, supera quiz e conquista amici.";
 }

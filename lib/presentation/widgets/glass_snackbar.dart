@@ -145,23 +145,7 @@ class _GlassSnackContent extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
-              // Accent glow dot
-              Container(
-                width: 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: accentColor,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: accentColor.withOpacity(0.65),
-                      blurRadius: 5,
-                      spreadRadius: 1,
-                    ),
-                  ],
-                ),
-              ),
+
             ],
           ),
         ),

@@ -453,5 +453,28 @@
         "type": "int"
       }
     }
-  }
+  },
+  "notificationNoNotifications": "No notifications at the moment.",
+  "notificationAchievementUnlocked": "Achievement Unlocked!",
+  "notificationFriendRequest": "Friend request",
+  "notificationRedeemButton": "REDEEM",
+  "achievementUnlockButton": "UNLOCK",
+  "onboardingSkip": "Skip",
+  "onboardingNext": "Continue",
+  "onboardingStart": "Start exploring",
+  "onboardingSlide0Tag": "WELCOME",
+  "onboardingSlide0Title": "Cesena\nRemembers",
+  "onboardingSlide0Desc": "Explore the places that shaped the history of Cesena. A journey through memories, quizzes and people.",
+  "onboardingSlide1Tag": "01 — TOUR",
+  "onboardingSlide1Title": "Follow\nthe route",
+  "onboardingSlide1Desc": "Start a guided tour and walk through historical sites. GPS guides you step by step.",
+  "onboardingSlide2Tag": "02 — QUIZ",
+  "onboardingSlide2Title": "Put yourself\nto the test",
+  "onboardingSlide2Desc": "Answer questions about each location. The more accurate you are, the more XP you earn.",
+  "onboardingSlide3Tag": "03 — LEADERBOARD",
+  "onboardingSlide3Title": "Climb\nthe top",
+  "onboardingSlide3Desc": "Compete with other explorers on the real-time leaderboard.",
+  "onboardingSlide4Tag": "04 — ACHIEVEMENTS",
+  "onboardingSlide4Title": "Collect\nbadges",
+  "onboardingSlide4Desc": "Every milestone unlocks an exclusive badge. Complete tours, ace quizzes and make friends."
 }

@@ -51,6 +51,9 @@ class _ProfilePageState extends State<ProfilePage>
 
   late final SocialController _socialController;
 
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _achievementsKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -80,6 +83,7 @@ class _ProfilePageState extends State<ProfilePage>
 
     _socialController = sl<SocialController>();
     ShellNavigationStore.openFriendRequestsPanel.addListener(_handleOpenFriendRequestsPanel);
+    ShellNavigationStore.scrollToAchievements.addListener(_handleScrollToAchievements);
   }
 
   @override
@@ -90,8 +94,26 @@ class _ProfilePageState extends State<ProfilePage>
 
     _nameController.dispose();
     ShellNavigationStore.openFriendRequestsPanel.removeListener(_handleOpenFriendRequestsPanel);
+    ShellNavigationStore.scrollToAchievements.removeListener(_handleScrollToAchievements);
+    _scrollController.dispose();
 
     super.dispose();
+  }
+
+  void _handleScrollToAchievements() {
+    if (!mounted) return;
+    if (!ShellNavigationStore.scrollToAchievements.value) return;
+    ShellNavigationStore.scrollToAchievements.value = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ctx = _achievementsKey.currentContext;
+      if (ctx == null) return;
+      Scrollable.ensureVisible(
+        ctx,
+        duration: const Duration(milliseconds: 450),
+        curve: Curves.easeOutCubic,
+        alignment: 0.05,
+      );
+    });
   }
 
   void _handleOpenFriendRequestsPanel() {
@@ -353,7 +375,7 @@ class _ProfilePageState extends State<ProfilePage>
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Nessuna notifica al momento.',
+                        AppLocalizations.of(context)!.notificationNoNotifications,
                         style: TextStyle(
                           color: theme.colorScheme.onSurfaceVariant,
                           fontSize: 14,
@@ -398,7 +420,7 @@ class _ProfilePageState extends State<ProfilePage>
                             ),
                           ),
                           title: Text(
-                            'Obiettivo Sbloccato!',
+                            AppLocalizations.of(context)!.notificationAchievementUnlocked,
                             style: TextStyle(
                               color: theme.colorScheme.onSurface,
                               fontWeight: FontWeight.w800,
@@ -413,18 +435,24 @@ class _ProfilePageState extends State<ProfilePage>
                               fontSize: 13,
                             ),
                           ),
-                          trailing: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: AppPalette.olive,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Text(
-                              'RISCATTA',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 10,
+                          trailing: GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                              ShellNavigationStore.goToAchievements();
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: AppPalette.olive,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                AppLocalizations.of(context)!.notificationRedeemButton,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
+                                ),
                               ),
                             ),
                           ),
@@ -433,7 +461,7 @@ class _ProfilePageState extends State<ProfilePage>
                           ),
                           onTap: () {
                             Navigator.pop(context);
-                            // Riscattare farà scrollare fino all'achievement in teoria
+                            ShellNavigationStore.goToAchievements();
                           },
                         ),
                       ),
@@ -473,7 +501,7 @@ class _ProfilePageState extends State<ProfilePage>
                             ),
                           ),
                           subtitle: Text(
-                            'Richiesta di amicizia',
+                            AppLocalizations.of(context)!.notificationFriendRequest,
                             style: TextStyle(
                               color: theme.colorScheme.primary,
                               fontWeight: FontWeight.w500,
@@ -744,6 +772,7 @@ class _ProfilePageState extends State<ProfilePage>
               position: _slideAnim,
 
               child: CustomScrollView(
+                controller: _scrollController,
                 physics: const BouncingScrollPhysics(),
 
                 slivers: [
@@ -984,6 +1013,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                           _SectionLabel(
                             AppLocalizations.of(context)!.sectionAchievements,
+                            key: _achievementsKey,
                           ),
 
                           const SizedBox(height: 12),

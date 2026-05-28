@@ -764,9 +764,9 @@ class _AchievementTileState extends State<_AchievementTile>
                                   color: AppPalette.olive,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: const Text(
-                                  'SBLOCCA',
-                                  style: TextStyle(
+                                child: Text(
+                                  AppLocalizations.of(context)!.achievementUnlockButton,
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 10,
                                     fontWeight: FontWeight.w900,
@@ -807,7 +807,7 @@ class _AchievementTileState extends State<_AchievementTile>
 class _SectionLabel extends StatelessWidget {
   final String text;
 
-  const _SectionLabel(this.text);
+  const _SectionLabel(this.text, {super.key});
 
   @override
   Widget build(BuildContext context) {

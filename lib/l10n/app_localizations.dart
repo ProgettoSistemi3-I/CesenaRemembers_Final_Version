@@ -2200,6 +2200,74 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'1945–1946'**
   String get quiz_rifugi_antiaerei_q2_o3;
+  /// No description provided for @notificationNoNotifications.
+  String get notificationNoNotifications;
+
+  /// No description provided for @notificationAchievementUnlocked.
+  String get notificationAchievementUnlocked;
+
+  /// No description provided for @notificationFriendRequest.
+  String get notificationFriendRequest;
+
+  /// No description provided for @notificationRedeemButton.
+  String get notificationRedeemButton;
+
+  /// No description provided for @achievementUnlockButton.
+  String get achievementUnlockButton;
+
+  /// No description provided for @onboardingSkip.
+  String get onboardingSkip;
+
+  /// No description provided for @onboardingNext.
+  String get onboardingNext;
+
+  /// No description provided for @onboardingStart.
+  String get onboardingStart;
+
+  /// No description provided for @onboardingSlide0Tag.
+  String get onboardingSlide0Tag;
+
+  /// No description provided for @onboardingSlide0Title.
+  String get onboardingSlide0Title;
+
+  /// No description provided for @onboardingSlide0Desc.
+  String get onboardingSlide0Desc;
+
+  /// No description provided for @onboardingSlide1Tag.
+  String get onboardingSlide1Tag;
+
+  /// No description provided for @onboardingSlide1Title.
+  String get onboardingSlide1Title;
+
+  /// No description provided for @onboardingSlide1Desc.
+  String get onboardingSlide1Desc;
+
+  /// No description provided for @onboardingSlide2Tag.
+  String get onboardingSlide2Tag;
+
+  /// No description provided for @onboardingSlide2Title.
+  String get onboardingSlide2Title;
+
+  /// No description provided for @onboardingSlide2Desc.
+  String get onboardingSlide2Desc;
+
+  /// No description provided for @onboardingSlide3Tag.
+  String get onboardingSlide3Tag;
+
+  /// No description provided for @onboardingSlide3Title.
+  String get onboardingSlide3Title;
+
+  /// No description provided for @onboardingSlide3Desc.
+  String get onboardingSlide3Desc;
+
+  /// No description provided for @onboardingSlide4Tag.
+  String get onboardingSlide4Tag;
+
+  /// No description provided for @onboardingSlide4Title.
+  String get onboardingSlide4Title;
+
+  /// No description provided for @onboardingSlide4Desc.
+  String get onboardingSlide4Desc;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
