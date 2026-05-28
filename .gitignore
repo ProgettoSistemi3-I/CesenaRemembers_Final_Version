@@ -42,6 +42,8 @@ app.*.map.json
 # Ignora TUTTI i file JSON delle chiavi segrete nella cartella notifier_service
 notifier_service/*.json
 notifier_service/*serviceAccountKey*.json
+server_docker/notifier-service/serviceAccountKey.json
+server_docker/quiz-service/.env
 
 # Android Studio will place build artifacts here
 /android/app/debug
