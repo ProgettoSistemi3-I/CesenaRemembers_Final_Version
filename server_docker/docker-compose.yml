@@ -4,18 +4,18 @@ services:
   # 1. MICROSERVIZIO QUIZ (Python)
   quiz-server:
     build: 
-      context: ./quiz_server
+      context: ./quiz-service
     container_name: cesena-quiz-server
     ports:
       - "8000:8000" # Porta esposta su internet tramite Ngrok
     env_file:
-      - ./quiz_server/.env # Passa la chiave GROQ_API_KEY al container
+      - ./quiz-service/.env # Passa la chiave GROQ_API_KEY al container
     restart: unless-stopped
 
   # 2. MICROSERVIZIO NOTIFICHE (Node.js)
   notifier-service:
     build: 
-      context: ./notifier_service
+      context: ./notifier-service
     container_name: cesena-notifier-service
     # Nessuna porta esposta, lavora in background ascoltando Firestore
     restart: unless-stopped

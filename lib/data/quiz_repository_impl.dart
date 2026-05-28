@@ -9,13 +9,16 @@ import '../domain/repositories/i_quiz_repository.dart';
 import 'seeds/historic_places_seed.dart';
 
 class QuizRepositoryImpl implements IQuizRepository {
-  QuizRepositoryImpl({http.Client? httpClient}) : _httpClient = httpClient ?? http.Client();
+  QuizRepositoryImpl({http.Client? httpClient})
+    : _httpClient = httpClient ?? http.Client();
 
   final http.Client _httpClient;
-  static const String _defaultBaseUrl = 'https://saggy-film-raven.ngrok-free.dev';
+  static const String _defaultBaseUrl =
+      'http://pascal.ispascalcomandini.it:8000';
   static const _fallbackDifficultyLabel = 'quiz_fallback_name';
   static const _requestTimeout = Duration(seconds: 12);
-  static final Map<String, QuizLoadResult> _memoryCache = <String, QuizLoadResult>{};
+  static final Map<String, QuizLoadResult> _memoryCache =
+      <String, QuizLoadResult>{};
 
   @override
   Future<QuizLoadResult> getQuizForPoi(
