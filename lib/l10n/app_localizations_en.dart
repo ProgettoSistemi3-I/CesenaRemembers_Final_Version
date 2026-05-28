@@ -18,7 +18,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsHeaderTitle => 'Interactive WWII Tour';
 
   @override
-  String get settingsHeaderSubtitle => 'Manage privacy, notifications and language in one place.';
+  String get settingsHeaderSubtitle =>
+      'Manage privacy, notifications and language in one place.';
 
   @override
   String get sectionCredits => 'Credits';
@@ -36,7 +37,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get creditsAppName => 'Cesena Remembers';
 
   @override
-  String get creditsAppDescription => 'Made with passion to preserve the historical memory of our city.';
+  String get creditsAppDescription =>
+      'Made with passion to preserve the historical memory of our city.';
 
   @override
   String get sectionTeam => 'The Team';
@@ -81,13 +83,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteAccountDialogTitle => 'Delete account?';
 
   @override
-  String get deleteAccountDialogBody => 'This action permanently removes the account, progress and all associated data.';
+  String get deleteAccountDialogBody =>
+      'This action permanently removes the account, progress and all associated data.';
 
   @override
   String get deleteAccountSuccess => 'Account permanently deleted.';
 
   @override
-  String get deleteAccountFailure => 'Could not complete now. Check the error message.';
+  String get deleteAccountFailure =>
+      'Could not complete now. Check the error message.';
 
   @override
   String get sectionPreferences => 'App Preferences';
@@ -120,7 +124,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get privacyPolicySubtitle => 'Read how your data is handled';
 
   @override
-  String get gpsPermissionDenied => 'Permission denied or GPS disabled. Check your phone settings.';
+  String get gpsPermissionDenied =>
+      'Permission denied or GPS disabled. Check your phone settings.';
 
   @override
   String get sectionGeneral => 'General';
@@ -212,7 +217,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get errorDeleteAccountPartial => 'Account not fully deleted. App data was removed, but auth deletion failed. You will be signed out for safety.';
+  String get errorDeleteAccountPartial =>
+      'Account not fully deleted. App data was removed, but auth deletion failed. You will be signed out for safety.';
 
   @override
   String errorDeleteData(String error) {
@@ -262,13 +268,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tourConfirmStopTitle => 'Stop the tour?';
 
   @override
-  String get tourConfirmStopBody => 'The tour will be ended and you will lose the current stop order.';
+  String get tourConfirmStopBody =>
+      'The tour will be ended and you will lose the current stop order.';
 
   @override
   String get buttonStop => 'Stop';
 
   @override
-  String get tourStartGpsRequired => 'To start the tour, enable GPS, location permission and the in-app option.';
+  String get tourStartGpsRequired =>
+      'To start the tour, enable GPS, location permission and the in-app option.';
 
   @override
   String get tourCompleted => '🎉 Tour completed! Great job.';
@@ -338,7 +346,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get profileNameOffensive => 'The name contains forbidden terms.\nPlease choose a different one.';
+  String get profileNameOffensive =>
+      'The name contains forbidden terms.\nPlease choose a different one.';
 
   @override
   String get avatarPickerTitle => 'Choose your Avatar';
@@ -426,10 +435,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get locationBannerGpsOff => 'GPS Disabled';
 
   @override
-  String get locationBannerEnableLocation => 'Enable location to explore the map in real time.';
+  String get locationBannerEnableLocation =>
+      'Enable location to explore the map in real time.';
 
   @override
-  String get locationBannerReEnableLocation => 'Re-enable location in settings to show your position on the map.';
+  String get locationBannerReEnableLocation =>
+      'Re-enable location in settings to show your position on the map.';
 
   @override
   String get locationBannerResolve => 'Fix';
@@ -461,7 +472,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get socialMustBeFriend => 'You must be friends to view their friend list.';
+  String get socialMustBeFriend =>
+      'You must be friends to view their friend list.';
 
   @override
   String get socialRequestSent => 'Request sent';
@@ -506,13 +518,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get publicStatLevel => 'Level';
 
   @override
-  String get errorLoginFailed => 'Login failed. Check your connection and try again.';
+  String get errorLoginFailed =>
+      'Login failed. Check your connection and try again.';
 
   @override
-  String get errorOffline => 'You are offline. Check your Internet connection and try again.';
+  String get errorOffline =>
+      'You are offline. Check your Internet connection and try again.';
 
   @override
-  String get errorLoginGeneric => 'Login failed. Please try again in a few seconds.';
+  String get errorLoginGeneric =>
+      'Login failed. Please try again in a few seconds.';
 
   @override
   String get loginGoogleButton => 'SIGN IN WITH GOOGLE';
@@ -527,7 +542,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorLoadPrefs => 'Error loading preferences.';
 
   @override
-  String get errorGpsDenied => 'Permission denied or GPS disabled. Check your settings.';
+  String get errorGpsDenied =>
+      'Permission denied or GPS disabled. Check your settings.';
 
   @override
   String get errorConnectionSettings => 'Connection error. Changes reverted.';
@@ -536,7 +552,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorDeleteAccount => 'Failed to delete data.';
 
   @override
-  String get errorDeleteAccountAuth => 'Account not fully deleted. App data removed, but auth deletion failed. Logging out for security.';
+  String get errorDeleteAccountAuth =>
+      'Account not fully deleted. App data removed, but auth deletion failed. Logging out for security.';
 
   @override
   String get errorSyncProfile => 'Failed to sync profile.';
@@ -551,7 +568,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTourTitle => 'WWII Interactive Tour';
 
   @override
-  String get settingsTourSubtitle => 'Manage privacy, notifications, and language in one place.';
+  String get settingsTourSubtitle =>
+      'Manage privacy, notifications, and language in one place.';
 
   @override
   String get settingsCredits => 'Credits';
@@ -560,7 +578,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsCreditsTitle => 'Credits & Acknowledgements';
 
   @override
-  String get settingsCreditsSubtitle => 'Discover the team behind Cesena Remembers';
+  String get settingsCreditsSubtitle =>
+      'Discover the team behind Cesena Remembers';
 
   @override
   String get settingsAccount => 'Account';
@@ -644,7 +663,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDeleteConfirmTitle => 'Delete account?';
 
   @override
-  String get settingsDeleteConfirmBody => 'This operation permanently removes your account, progress, and associated data.';
+  String get settingsDeleteConfirmBody =>
+      'This operation permanently removes your account, progress, and associated data.';
 
   @override
   String get settingsCancel => 'Cancel';
@@ -656,7 +676,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDeleteSuccess => 'Account permanently deleted.';
 
   @override
-  String get settingsDeleteError => 'Unable to complete now. Check the error message.';
+  String get settingsDeleteError =>
+      'Unable to complete now. Check the error message.';
 
   @override
   String get achievement_first_visit_title => 'First Step';
@@ -686,7 +707,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get achievement_perfect_tour_title => 'Flawless';
 
   @override
-  String get achievement_perfect_tour_desc => 'Answer all questions correctly in a tour';
+  String get achievement_perfect_tour_desc =>
+      'Answer all questions correctly in a tour';
 
   @override
   String get achievement_xp_500_title => 'Collector';
@@ -698,13 +720,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get achievement_tour_under_1h_title => 'On the March';
 
   @override
-  String get achievement_tour_under_1h_desc => 'Complete a tour in under 1 hour';
+  String get achievement_tour_under_1h_desc =>
+      'Complete a tour in under 1 hour';
 
   @override
   String get achievement_tour_under_30m_title => 'Lightning';
 
   @override
-  String get achievement_tour_under_30m_desc => 'Complete a tour in under 30 minutes';
+  String get achievement_tour_under_30m_desc =>
+      'Complete a tour in under 30 minutes';
 
   @override
   String get achievement_friend_1_title => 'Citizen';
@@ -722,61 +746,71 @@ class AppLocalizationsEn extends AppLocalizations {
   String get poi_santa_cristina_name => 'Church of Santa Cristina';
 
   @override
-  String get poi_santa_cristina_desc => 'Historic church with a hemispherical dome and bell tower, set within Cesena\'s residential urban fabric. It represents the balance between religious architecture and urban development. During World War II, it likely served as a visual landmark during bombings, useful for population orientation. The surrounding area was partially affected or modified in the post-war period, with redefined urban spaces.';
+  String get poi_santa_cristina_desc =>
+      'Historic church with a hemispherical dome and bell tower, set within Cesena\'s residential urban fabric. It represents the balance between religious architecture and urban development. During World War II, it likely served as a visual landmark during bombings, useful for population orientation. The surrounding area was partially affected or modified in the post-war period, with redefined urban spaces.';
 
   @override
   String get poi_rocca_name => 'Malatestiana Fortress';
 
   @override
-  String get poi_rocca_desc => 'A medieval fortress dominating the city, featuring crenellated walls and towers; a central defensive and symbolic element of Cesena. Built by the Malatesta in 1380, it houses the Malatestiana Library, a UNESCO World Heritage site since 2005. During World War II, it was repurposed as a natural shelter thanks to its massive structure: the hill hosted tunnels and air-raid shelters to protect the civilian population during bombings.';
+  String get poi_rocca_desc =>
+      'A medieval fortress dominating the city, featuring crenellated walls and towers; a central defensive and symbolic element of Cesena. Built by the Malatesta in 1380, it houses the Malatestiana Library, a UNESCO World Heritage site since 2005. During World War II, it was repurposed as a natural shelter thanks to its massive structure: the hill hosted tunnels and air-raid shelters to protect the civilian population during bombings.';
 
   @override
   String get poi_san_rocco_name => 'Church of San Rocco';
 
   @override
-  String get poi_san_rocco_desc => 'A church located in a working-class neighborhood of Cesena, surrounded by simple buildings and historically unpaved roads. Dedicated to Saint Roch, the patron saint of plague victims, it has been a spiritual reference point for the working classes for centuries. During WWII, the neighborhood, inhabited by working families, was directly exposed to the hardships of the bombings, and the church served as a possible gathering point and transit area towards shelters during air raids.';
+  String get poi_san_rocco_desc =>
+      'A church located in a working-class neighborhood of Cesena, surrounded by simple buildings and historically unpaved roads. Dedicated to Saint Roch, the patron saint of plague victims, it has been a spiritual reference point for the working classes for centuries. During WWII, the neighborhood, inhabited by working families, was directly exposed to the hardships of the bombings, and the church served as a possible gathering point and transit area towards shelters during air raids.';
 
   @override
   String get poi_abbazia_monte_name => 'Abbey of Santa Maria del Monte';
 
   @override
-  String get poi_abbazia_monte_desc => 'A monastic complex on a hill overlooking the city, surrounded by cultivated countryside; a strong religious and territorial symbol of Cesena for over a thousand years. Its elevated position made it strategically significant during World War II: it was used as an observation point or visual reference for military operations. The hilly area offered shelter and isolation from the urban center\'s bombings.';
+  String get poi_abbazia_monte_desc =>
+      'A monastic complex on a hill overlooking the city, surrounded by cultivated countryside; a strong religious and territorial symbol of Cesena for over a thousand years. Its elevated position made it strategically significant during World War II: it was used as an observation point or visual reference for military operations. The hilly area offered shelter and isolation from the urban center\'s bombings.';
 
   @override
   String get poi_osservanza_name => 'Church and Convent of the Osservanza';
 
   @override
-  String get poi_osservanza_desc => 'A Franciscan religious complex nestled in the Cesena countryside, historically separated from the urban center. The church preserves valuable artworks from the 15th and 16th centuries. During World War II, its isolation from the city made it less exposed to direct attacks, becoming a possible place of refuge and spiritual assistance for evacuees and the rural population fleeing the bombings.';
+  String get poi_osservanza_desc =>
+      'A Franciscan religious complex nestled in the Cesena countryside, historically separated from the urban center. The church preserves valuable artworks from the 15th and 16th centuries. During World War II, its isolation from the city made it less exposed to direct attacks, becoming a possible place of refuge and spiritual assistance for evacuees and the rural population fleeing the bombings.';
 
   @override
   String get poi_palazzo_ridotto_name => 'Palazzo del Ridotto';
 
   @override
-  String get poi_palazzo_ridotto_desc => 'A historic building with a civic tower, a symbol of the city center and public life in Cesena. It overlooks Piazza del Popolo, the heart of the city since the Middle Ages, also dominated by the Masini fountain. During World War II, it housed an air-raid siren essential for signaling incoming bombings, acting as a vital node in the alarm and coordination system for the civilian population.';
+  String get poi_palazzo_ridotto_desc =>
+      'A historic building with a civic tower, a symbol of the city center and public life in Cesena. It overlooks Piazza del Popolo, the heart of the city since the Middle Ages, also dominated by the Masini fountain. During World War II, it housed an air-raid siren essential for signaling incoming bombings, acting as a vital node in the alarm and coordination system for the civilian population.';
 
   @override
   String get poi_stazione_name => 'Cesena Railway Station';
 
   @override
-  String get poi_stazione_desc => 'An important railway hub for freight and passenger transport between the 19th and 20th centuries, on the Bologna–Rimini Adriatic line. During World War II, it was one of the primary strategic targets of Allied bombings, as disrupting its supplies was essential to halting the German advance. It suffered severe destruction, becoming one of the most heavily bombed areas in the city.';
+  String get poi_stazione_desc =>
+      'An important railway hub for freight and passenger transport between the 19th and 20th centuries, on the Bologna–Rimini Adriatic line. During World War II, it was one of the primary strategic targets of Allied bombings, as disrupting its supplies was essential to halting the German advance. It suffered severe destruction, becoming one of the most heavily bombed areas in the city.';
 
   @override
   String get poi_arrigoni_name => 'Arrigoni Factory';
 
   @override
-  String get poi_arrigoni_desc => 'A large canning industry founded in 1880, the heart of the local economy and working-class labor in Cesena for over a century. Specializing in canned fish, it was among the most important companies in Romagna. During World War II, the production facility was strategically relevant for food logistics and was the site of strikes and strong social tensions, especially in the 1943–1944 biennium.';
+  String get poi_arrigoni_desc =>
+      'A large canning industry founded in 1880, the heart of the local economy and working-class labor in Cesena for over a century. Specializing in canned fish, it was among the most important companies in Romagna. During World War II, the production facility was strategically relevant for food logistics and was the site of strikes and strong social tensions, especially in the 1943–1944 biennium.';
 
   @override
   String get poi_fantaguzzi_name => 'Palazzo Fantaguzzi';
 
   @override
-  String get poi_fantaguzzi_desc => 'A historic building in the heart of Cesena, the local headquarters of the National Fascist Party during Mussolini\'s regime. It represents one of the symbols of the Fascist era in the city. During World War II, it was the center of fascist political and administrative power at the city level, likely a place of repression, population control, and the organization of wartime activities in the territory.';
+  String get poi_fantaguzzi_desc =>
+      'A historic building in the heart of Cesena, the local headquarters of the National Fascist Party during Mussolini\'s regime. It represents one of the symbols of the Fascist era in the city. During World War II, it was the center of fascist political and administrative power at the city level, likely a place of repression, population control, and the organization of wartime activities in the territory.';
 
   @override
   String get poi_rifugi_antiaerei_name => 'Air-Raid Shelters of the Fortress';
 
   @override
-  String get poi_rifugi_antiaerei_desc => 'A system of underground tunnels excavated beneath and around the Malatestiana Fortress to protect the civilian population from aerial bombings. During World War II, they were fundamental for the survival of hundreds of citizens: the shelters accommodated entire families, becoming true spaces of temporary underground life during the Allied attacks between 1943 and 1944.';
+  String get poi_rifugi_antiaerei_desc =>
+      'A system of underground tunnels excavated beneath and around the Malatestiana Fortress to protect the civilian population from aerial bombings. During World War II, they were fundamental for the survival of hundreds of citizens: the shelters accommodated entire families, becoming true spaces of temporary underground life during the Allied attacks between 1943 and 1944.';
 
   @override
   String setupUsernameInvalid(int min, int max) {
@@ -784,10 +818,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get setupUsernameOffensive => 'Username contains prohibited terms. Please choose another.';
+  String get setupUsernameOffensive =>
+      'Username contains prohibited terms. Please choose another.';
 
   @override
-  String get setupUsernameTaken => 'Username is already taken. Please choose another.';
+  String get setupUsernameTaken =>
+      'Username is already taken. Please choose another.';
 
   @override
   String setupFirestoreError(Object username) {
@@ -795,16 +831,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get setupPermissionDenied => 'Insufficient Firestore permissions to complete the profile. Check project rules.';
+  String get setupPermissionDenied =>
+      'Insufficient Firestore permissions to complete the profile. Check project rules.';
 
   @override
-  String get setupGenericError => 'Unable to save profile. Please try again in a few seconds.';
+  String get setupGenericError =>
+      'Unable to save profile. Please try again in a few seconds.';
 
   @override
   String get setupTitle => 'Create your profile';
 
   @override
-  String get setupSubtitle => 'Choose a unique username (cannot be changed), display name, and avatar.';
+  String get setupSubtitle =>
+      'Choose a unique username (cannot be changed), display name, and avatar.';
 
   @override
   String get setupNameLabel => 'Display Name';
@@ -825,7 +864,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get creditRoleDiplo => 'German Diplomatic Missions in Italy';
 
   @override
-  String get creditRoleDiploDesc => 'Developed with their valuable contribution';
+  String get creditRoleDiploDesc =>
+      'Developed with their valuable contribution';
 
   @override
   String get sectionSupport => 'Collaborators and Support';
@@ -834,10 +874,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quiz_fallback_name => 'Standard difficulty (local seed)';
 
   @override
-  String get quiz_fallback_desc => 'Due to a server error, questions are not personalized and use a specific local difficulty.';
+  String get quiz_fallback_desc =>
+      'Due to a server error, questions are not personalized and use a specific local difficulty.';
 
   @override
-  String get quiz_santa_cristina_q1 => 'Which architectural element characterizes the church?';
+  String get quiz_santa_cristina_q1 =>
+      'Which architectural element characterizes the church?';
 
   @override
   String get quiz_santa_cristina_q1_o1 => 'A Gothic bell tower';
@@ -849,16 +891,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quiz_santa_cristina_q1_o3 => 'A Renaissance rose window';
 
   @override
-  String get quiz_santa_cristina_q2 => 'What role did the church play during World War II?';
+  String get quiz_santa_cristina_q2 =>
+      'What role did the church play during World War II?';
 
   @override
   String get quiz_santa_cristina_q2_o1 => 'It was used as a field hospital';
 
   @override
-  String get quiz_santa_cristina_q2_o2 => 'It was a visual landmark for orientation during bombings';
+  String get quiz_santa_cristina_q2_o2 =>
+      'It was a visual landmark for orientation during bombings';
 
   @override
-  String get quiz_santa_cristina_q2_o3 => 'It was the headquarters of the German military command';
+  String get quiz_santa_cristina_q2_o3 =>
+      'It was the headquarters of the German military command';
 
   @override
   String get quiz_rocca_q1 => 'Who had the Fortress built?';
@@ -873,7 +918,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quiz_rocca_q1_o3 => 'Federico da Montefeltro';
 
   @override
-  String get quiz_rocca_q2 => 'In what year did the Malatestiana Library become a UNESCO World Heritage site?';
+  String get quiz_rocca_q2 =>
+      'In what year did the Malatestiana Library become a UNESCO World Heritage site?';
 
   @override
   String get quiz_rocca_q2_o1 => '1995';
@@ -909,7 +955,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quiz_san_rocco_q1_o3 => 'Saint Anthony';
 
   @override
-  String get quiz_san_rocco_q2 => 'In what kind of neighborhood is the church located?';
+  String get quiz_san_rocco_q2 =>
+      'In what kind of neighborhood is the church located?';
 
   @override
   String get quiz_san_rocco_q2_o1 => 'Noble neighborhood';
@@ -933,19 +980,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quiz_abbazia_monte_q1_o3 => 'In the historical center';
 
   @override
-  String get quiz_abbazia_monte_q2 => 'What advantage did the abbey offer during the war?';
+  String get quiz_abbazia_monte_q2 =>
+      'What advantage did the abbey offer during the war?';
 
   @override
   String get quiz_abbazia_monte_q2_o1 => 'It housed a military food depot';
 
   @override
-  String get quiz_abbazia_monte_q2_o2 => 'Its elevated position made it useful as an observation point';
+  String get quiz_abbazia_monte_q2_o2 =>
+      'Its elevated position made it useful as an observation point';
 
   @override
-  String get quiz_abbazia_monte_q2_o3 => 'It was the seat of the provisional government';
+  String get quiz_abbazia_monte_q2_o3 =>
+      'It was the seat of the provisional government';
 
   @override
-  String get quiz_osservanza_q1 => 'To which religious order does the convent belong?';
+  String get quiz_osservanza_q1 =>
+      'To which religious order does the convent belong?';
 
   @override
   String get quiz_osservanza_q1_o1 => 'Dominicans';
@@ -957,7 +1008,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quiz_osservanza_q1_o3 => 'Benedictines';
 
   @override
-  String get quiz_osservanza_q2 => 'Why was the convent less exposed to bombings?';
+  String get quiz_osservanza_q2 =>
+      'Why was the convent less exposed to bombings?';
 
   @override
   String get quiz_osservanza_q2_o1 => 'It was protected by underground bunkers';
@@ -969,7 +1021,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quiz_osservanza_q2_o3 => 'It was garrisoned by the Allied army';
 
   @override
-  String get quiz_palazzo_ridotto_q1 => 'What is the name of the fountain in Piazza del Popolo?';
+  String get quiz_palazzo_ridotto_q1 =>
+      'What is the name of the fountain in Piazza del Popolo?';
 
   @override
   String get quiz_palazzo_ridotto_q1_o1 => 'Fountain of Neptune';
@@ -981,7 +1034,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quiz_palazzo_ridotto_q1_o3 => 'Fountain of the Dolphins';
 
   @override
-  String get quiz_palazzo_ridotto_q2 => 'What military device was installed in the palace?';
+  String get quiz_palazzo_ridotto_q2 =>
+      'What military device was installed in the palace?';
 
   @override
   String get quiz_palazzo_ridotto_q2_o1 => 'An anti-aircraft machine gun';
@@ -993,19 +1047,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quiz_palazzo_ridotto_q2_o3 => 'A spotting radar';
 
   @override
-  String get quiz_stazione_q1 => 'Why was the station a target of Allied bombings?';
+  String get quiz_stazione_q1 =>
+      'Why was the station a target of Allied bombings?';
 
   @override
   String get quiz_stazione_q1_o1 => 'It housed the German headquarters';
 
   @override
-  String get quiz_stazione_q1_o2 => 'It was a strategic node for military supplies';
+  String get quiz_stazione_q1_o2 =>
+      'It was a strategic node for military supplies';
 
   @override
   String get quiz_stazione_q1_o3 => 'It was the only hospital in the city';
 
   @override
-  String get quiz_stazione_q2 => 'On which railway line is the Cesena station located?';
+  String get quiz_stazione_q2 =>
+      'On which railway line is the Cesena station located?';
 
   @override
   String get quiz_stazione_q2_o1 => 'Bologna–Florence';
@@ -1017,7 +1074,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quiz_stazione_q2_o3 => 'Rimini–Rome';
 
   @override
-  String get quiz_arrigoni_q1 => 'In which sector did the Arrigoni Factory operate?';
+  String get quiz_arrigoni_q1 =>
+      'In which sector did the Arrigoni Factory operate?';
 
   @override
   String get quiz_arrigoni_q1_o1 => 'Textile industry';
@@ -1035,13 +1093,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quiz_arrigoni_q2_o1 => 'It was converted into a military hospital';
 
   @override
-  String get quiz_arrigoni_q2_o2 => 'It was the scene of strikes and social tensions';
+  String get quiz_arrigoni_q2_o2 =>
+      'It was the scene of strikes and social tensions';
 
   @override
   String get quiz_arrigoni_q2_o3 => 'It was used as a prison by the Germans';
 
   @override
-  String get quiz_fantaguzzi_q1 => 'Which organization was headquartered in Palazzo Fantaguzzi during the regime?';
+  String get quiz_fantaguzzi_q1 =>
+      'Which organization was headquartered in Palazzo Fantaguzzi during the regime?';
 
   @override
   String get quiz_fantaguzzi_q1_o1 => 'The Municipality of Cesena';
@@ -1053,31 +1113,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quiz_fantaguzzi_q1_o3 => 'The Red Cross';
 
   @override
-  String get quiz_fantaguzzi_q2 => 'What role did the palace play during the war?';
+  String get quiz_fantaguzzi_q2 =>
+      'What role did the palace play during the war?';
 
   @override
-  String get quiz_fantaguzzi_q2_o1 => 'Coordination center for partisan resistance';
+  String get quiz_fantaguzzi_q2_o1 =>
+      'Coordination center for partisan resistance';
 
   @override
-  String get quiz_fantaguzzi_q2_o2 => 'Center of fascist political and administrative power';
+  String get quiz_fantaguzzi_q2_o2 =>
+      'Center of fascist political and administrative power';
 
   @override
-  String get quiz_fantaguzzi_q2_o3 => 'Headquarters of the Allied military tribunal';
+  String get quiz_fantaguzzi_q2_o3 =>
+      'Headquarters of the Allied military tribunal';
 
   @override
-  String get quiz_rifugi_antiaerei_q1 => 'Where were the air-raid shelters excavated?';
+  String get quiz_rifugi_antiaerei_q1 =>
+      'Where were the air-raid shelters excavated?';
 
   @override
   String get quiz_rifugi_antiaerei_q1_o1 => 'Under the Palazzo del Ridotto';
 
   @override
-  String get quiz_rifugi_antiaerei_q1_o2 => 'Under and around the Malatestiana Fortress';
+  String get quiz_rifugi_antiaerei_q1_o2 =>
+      'Under and around the Malatestiana Fortress';
 
   @override
   String get quiz_rifugi_antiaerei_q1_o3 => 'Under the railway station';
 
   @override
-  String get quiz_rifugi_antiaerei_q2 => 'In which years were the shelters mainly used?';
+  String get quiz_rifugi_antiaerei_q2 =>
+      'In which years were the shelters mainly used?';
 
   @override
   String get quiz_rifugi_antiaerei_q2_o1 => '1940–1941';
@@ -1116,49 +1183,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingSlide0Tag => 'WELCOME';
 
   @override
-  String get onboardingSlide0Title => 'Cesena
-Remembers';
+  String get onboardingSlide0Title => 'Cesena Remembers';
 
   @override
-  String get onboardingSlide0Desc => 'Explore the places that shaped the history of Cesena. A journey through memories, quizzes and people.';
+  String get onboardingSlide0Desc =>
+      'Explore the places that shaped the history of Cesena. A journey through memories, quizzes and people.';
 
   @override
   String get onboardingSlide1Tag => '01 — TOUR';
 
   @override
-  String get onboardingSlide1Title => 'Follow
-the route';
+  String get onboardingSlide1Title => 'Follow the route';
 
   @override
-  String get onboardingSlide1Desc => 'Start a guided tour and walk through historical sites. GPS guides you step by step.';
+  String get onboardingSlide1Desc =>
+      'Start a guided tour and walk through historical sites. GPS guides you step by step.';
 
   @override
   String get onboardingSlide2Tag => '02 — QUIZ';
 
   @override
-  String get onboardingSlide2Title => 'Put yourself
-to the test';
+  String get onboardingSlide2Title => 'Put yourself to the test';
 
   @override
-  String get onboardingSlide2Desc => 'Answer questions about each location. The more accurate you are, the more XP you earn.';
+  String get onboardingSlide2Desc =>
+      'Answer questions about each location. The more accurate you are, the more XP you earn.';
 
   @override
   String get onboardingSlide3Tag => '03 — LEADERBOARD';
 
   @override
-  String get onboardingSlide3Title => 'Climb
-the top';
+  String get onboardingSlide3Title => 'Climb the top';
 
   @override
-  String get onboardingSlide3Desc => 'Compete with other explorers on the real-time leaderboard.';
+  String get onboardingSlide3Desc =>
+      'Compete with other explorers on the real-time leaderboard.';
 
   @override
   String get onboardingSlide4Tag => '04 — ACHIEVEMENTS';
 
   @override
-  String get onboardingSlide4Title => 'Collect
-badges';
+  String get onboardingSlide4Title => 'Collect badges';
 
   @override
-  String get onboardingSlide4Desc => 'Every milestone unlocks an exclusive badge. Complete tours, ace quizzes and make friends.';
+  String get onboardingSlide4Desc =>
+      'Every milestone unlocks an exclusive badge. Complete tours, ace quizzes and make friends.';
 }

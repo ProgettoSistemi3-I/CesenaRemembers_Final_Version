@@ -1,11 +1,6 @@
-import 'package:flutter/material.dart';
-
 /// Definizione statica di un achievement con asset image.
 class AchievementDefinition {
-  const AchievementDefinition({
-    required this.id,
-    required this.assetPath,
-  });
+  const AchievementDefinition({required this.id, required this.assetPath});
 
   final String id;
 

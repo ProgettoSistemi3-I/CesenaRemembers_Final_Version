@@ -15,7 +15,6 @@ import 'main_shell.dart';
 import 'notification_service.dart';
 import 'push_notification_service.dart';
 import 'shell_navigation_store.dart';
-import '../theme/app_palette.dart';
 import '../widgets/glass_snackbar.dart';
 
 class AuthGate extends StatelessWidget {
