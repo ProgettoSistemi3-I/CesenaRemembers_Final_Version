@@ -26,6 +26,7 @@ Dependency injection centralizzata in `lib/injection_container.dart` con `get_it
 L'app usa:
 - Firebase (auth + firestore)
 - Mappe tile esterne
+- Mapbox Directions API per disegnare la linea del percorso verso la tappa corrente
 - Backend quiz AI (endpoint HTTP configurato internamente nel repository quiz)
 
 ### Quiz: fallback resiliente
@@ -38,6 +39,7 @@ Prerequisiti:
 - Flutter SDK (versione compatibile con `pubspec.yaml`)
 - Dart SDK (incluso in Flutter)
 - Configurazione Firebase valida per le piattaforme target
+- Token Mapbox Directions passato con `--dart-define=MAPBOX_ACCESS_TOKEN=<token>`; se manca, il tour mostra comunque una linea diretta di fallback.
 
 Comandi principali:
 

@@ -47,6 +47,7 @@ class TourSessionController {
   int get currentStopIndex => _currentStopIndex;
   TourStop? get currentStop =>
       _orderedStops.isEmpty ? null : _orderedStops[_currentStopIndex];
+  LatLng? get userPosition => _userPosition;
 
   List<TourStop> get upcomingStops {
     if (_orderedStops.isEmpty || _currentStopIndex >= _orderedStops.length) {

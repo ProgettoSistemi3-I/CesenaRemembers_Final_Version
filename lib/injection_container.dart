@@ -6,10 +6,13 @@ import 'data/firebase_auth_repository.dart';
 import 'data/poi_repository_impl.dart';
 import 'data/user_repository_impl.dart';
 import 'data/quiz_repository_impl.dart';
+import 'data/mapbox_directions_repository.dart';
 import 'domain/repositories/auth_repository.dart';
 import 'domain/repositories/i_poi_repository.dart';
 import 'domain/repositories/user_repository.dart';
 import 'domain/repositories/i_quiz_repository.dart';
+import 'domain/repositories/route_directions_repository.dart';
+import 'domain/services/tour_route_path_service.dart';
 import 'domain/usecases/auth_use_cases.dart';
 import 'domain/usecases/poi_use_cases.dart';
 import 'domain/usecases/user_preferences_use_cases.dart';
@@ -47,6 +50,11 @@ Future<void> init() async {
   if (!sl.isRegistered<IQuizRepository>()) {
     sl.registerLazySingleton<IQuizRepository>(() => QuizRepositoryImpl());
   }
+  if (!sl.isRegistered<RouteDirectionsRepository>()) {
+    sl.registerLazySingleton<RouteDirectionsRepository>(
+      () => MapboxDirectionsRepository(),
+    );
+  }
 
   // --- USE CASES ---
   if (!sl.isRegistered<GetPoisUseCase>()) {
@@ -75,6 +83,9 @@ Future<void> init() async {
   }
   if (!sl.isRegistered<UserSocialUseCases>()) {
     sl.registerLazySingleton(() => UserSocialUseCases(sl()));
+  }
+  if (!sl.isRegistered<TourRoutePathService>()) {
+    sl.registerLazySingleton(() => TourRoutePathService(directions: sl()));
   }
 
   // --- CONTROLLERS ---
