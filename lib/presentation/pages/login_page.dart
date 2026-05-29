@@ -198,27 +198,15 @@ class _LoginPageState extends State<LoginPage>
                           ),
                         ),
                         SizedBox(height: spacingMd),
-                        Text(
-                          "CESENA",
-                          style: TextStyle(
-                            fontSize: titleSize,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 4.0,
-                            color: Colors.white,
-                            height: 1.0,
-                          ),
-                          textAlign: TextAlign.center,
+                        _LoginTitleLine(
+                          text: 'CESENA',
+                          fontSize: titleSize,
+                          color: Colors.white,
                         ),
-                        Text(
-                          "REMEMBERS",
-                          style: TextStyle(
-                            fontSize: titleSize,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 4.0,
-                            color: _tan,
-                            height: 1.0,
-                          ),
-                          textAlign: TextAlign.center,
+                        _LoginTitleLine(
+                          text: 'REMEMBERS',
+                          fontSize: titleSize,
+                          color: _tan,
                         ),
                         SizedBox(height: spacingLg),
                         if (_isLoading)
@@ -318,6 +306,42 @@ class _LoginPageState extends State<LoginPage>
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LoginTitleLine extends StatelessWidget {
+  const _LoginTitleLine({
+    required this.text,
+    required this.fontSize,
+    required this.color,
+  });
+
+  final String text;
+  final double fontSize;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.center,
+        child: Text(
+          text,
+          maxLines: 1,
+          softWrap: false,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: fontSize,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 4.0,
+            color: color,
+            height: 1.0,
+          ),
         ),
       ),
     );

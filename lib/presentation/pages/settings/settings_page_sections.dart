@@ -3,12 +3,14 @@ part of 'settings_page.dart';
 class _HeaderCard extends StatelessWidget {
   final String title;
   final String subtitle;
-  final IconData icon;
+  final IconData? icon;
+  final String? imageAsset;
 
   const _HeaderCard({
     required this.title,
     required this.subtitle,
-    required this.icon,
+    this.icon,
+    this.imageAsset,
   });
 
   @override
@@ -18,7 +20,9 @@ class _HeaderCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
       decoration: BoxDecoration(
-        color: AppPalette.olive.withValues(alpha: theme.brightness == Brightness.light ? 0.05 : 0.1),
+        color: AppPalette.olive.withValues(
+          alpha: theme.brightness == Brightness.light ? 0.05 : 0.1,
+        ),
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
           color: AppPalette.olive.withValues(alpha: 0.15),
@@ -40,23 +44,35 @@ class _HeaderCard extends StatelessWidget {
                 ),
               ],
             ),
-            child: Icon(icon, size: 32, color: AppPalette.olive),
+            child: imageAsset != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset(
+                      imageAsset!,
+                      width: 32,
+                      height: 32,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Icon(icon, size: 32, color: AppPalette.olive),
           ),
           const SizedBox(width: 20),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w800,
-                    color: theme.colorScheme.onSurface, 
-                    letterSpacing: -0.3,
+                if (title.isNotEmpty) ...[
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 19,
+                      fontWeight: FontWeight.w800,
+                      color: theme.colorScheme.onSurface,
+                      letterSpacing: -0.3,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 6),
+                  const SizedBox(height: 6),
+                ],
                 Text(
                   subtitle,
                   style: TextStyle(
