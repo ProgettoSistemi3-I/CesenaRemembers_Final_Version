@@ -214,6 +214,10 @@ extension _MapPageTourActions on _MapPageState {
       _cachedUserXp = (_cachedUserXp ?? 0) + score.totalXp;
       _tourXpEarned += score.totalXp;
       if (!mounted) return;
+      final double tourBannerBottomMargin =
+          (MediaQuery.of(context).size.height * 0.38)
+              .clamp(260.0, 360.0)
+              .toDouble();
       showGlassSnackBar(
         context,
         message:
@@ -221,6 +225,7 @@ extension _MapPageTourActions on _MapPageState {
         type: GlassSnackType.xp,
         icon: Icons.bolt_rounded,
         duration: const Duration(seconds: 4),
+        margin: EdgeInsets.fromLTRB(16, 0, 16, tourBannerBottomMargin),
       );
     } catch (_) {
       if (!mounted) return;

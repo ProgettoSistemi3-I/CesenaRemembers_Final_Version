@@ -421,10 +421,10 @@ class _SettingsPageState extends State<SettingsPage>
                         children: [
                           const SizedBox(height: 16),
                           _HeaderCard(
-                            title: AppLocalizations.of(context)!.settingsTourTitle,
+                            title: '',
                             subtitle:
                                 AppLocalizations.of(context)!.settingsTourSubtitle,
-                            icon: Icons.tour_outlined,
+                            imageAsset: 'assets/icon/app_icon.png',
                           ),
                           const SizedBox(height: 32),
 
