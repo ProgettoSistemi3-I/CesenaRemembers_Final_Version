@@ -210,7 +210,7 @@ class _LoginPageState extends State<LoginPage>
                           textAlign: TextAlign.center,
                         ),
                         Text(
-                          "1945",
+                          "REMEMBERS",
                           style: TextStyle(
                             fontSize: titleSize,
                             fontWeight: FontWeight.w900,
