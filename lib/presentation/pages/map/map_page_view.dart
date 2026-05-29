@@ -44,6 +44,7 @@ extension _MapPageView on _MapPageState {
             selectedMapStyle: _selectedMapStyle,
             cachedTileProvider: _cachedTileProvider,
             markers: _markers,
+            routeLinePoints: _routeLinePoints,
             scaffoldBackgroundColor: data.theme.scaffoldBackgroundColor,
           ),
           _buildOverlay(data),
@@ -270,6 +271,7 @@ class _MapCanvas extends StatefulWidget {
     required this.selectedMapStyle,
     required this.cachedTileProvider,
     required this.markers,
+    required this.routeLinePoints,
     required this.scaffoldBackgroundColor,
   });
 
@@ -287,6 +289,7 @@ class _MapCanvas extends StatefulWidget {
   final MapStyle selectedMapStyle;
   final CachedTileProvider? cachedTileProvider;
   final List<Marker> markers;
+  final List<LatLng> routeLinePoints;
   final Color scaffoldBackgroundColor;
 
   @override
@@ -350,6 +353,18 @@ class _MapCanvasState extends State<_MapCanvas> {
           tileBounds: widget.cesenaBounds,
           tileProvider: widget.cachedTileProvider,
         ),
+        if (widget.routeLinePoints.length >= 2)
+          PolylineLayer(
+            polylines: [
+              Polyline(
+                points: widget.routeLinePoints,
+                color: AppPalette.olive,
+                strokeWidth: 5,
+                borderColor: Colors.white.withValues(alpha: 0.85),
+                borderStrokeWidth: 2,
+              ),
+            ],
+          ),
         if (widget.canUseLocation)
           CurrentLocationLayer(
             alignPositionOnUpdate: widget.alignPositionOnUpdate,

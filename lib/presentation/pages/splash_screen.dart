@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../services/auth_gate.dart'; 
+import '../services/auth_gate.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -39,10 +39,7 @@ class _SplashScreenState extends State<SplashScreen>
           PageRouteBuilder(
             pageBuilder: (_, _, _) => const AuthGate(),
             transitionsBuilder: (_, animation, _, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              ); 
+              return FadeTransition(opacity: animation, child: child);
             },
             transitionDuration: const Duration(milliseconds: 800),
           ),
@@ -60,7 +57,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, 
+      backgroundColor: Colors.black,
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnimation,
@@ -70,8 +67,8 @@ class _SplashScreenState extends State<SplashScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Image.asset(
-                  'assets/icon/app_icon.png', 
-                  width: 220, 
+                  'assets/icon/splash_image.png',
+                  width: 220,
                   height: 220,
                   fit: BoxFit.contain,
                 ),

@@ -17,6 +17,8 @@ import 'package:latlong2/latlong.dart';
 import '../../../domain/entities/poi.dart';
 import '../../../config/app_runtime_config.dart';
 import '../../../domain/entities/tour_stop.dart';
+import '../../../domain/entities/route_path.dart';
+import '../../../domain/services/tour_route_path_service.dart';
 import '../../../domain/services/tour_scoring_service.dart';
 import '../../../domain/usecases/poi_use_cases.dart';
 import '../../../domain/usecases/user_profile_use_cases.dart';
@@ -38,6 +40,7 @@ import '../../widgets/glass_snackbar.dart';
 part 'map_page_data.dart';
 part 'map_page_location.dart';
 part 'map_page_tour.dart';
+part 'map_page_route.dart';
 part 'map_page_view.dart';
 
 class MapPage extends StatefulWidget {
@@ -53,6 +56,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   final TourStopMapper _tourStopMapper = const TourStopMapper();
   final TourStopVisuals _tourStopVisuals = const TourStopVisuals();
   final TourScoringService _tourScoringService = const TourScoringService();
+  final TourRoutePathService _routePathService = sl<TourRoutePathService>();
   final UserProfileUseCases _profileUseCases = sl<UserProfileUseCases>();
   final UserProgressUseCases _progressUseCases = sl<UserProgressUseCases>();
 
@@ -88,6 +92,9 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
 
   List<Poi> _pois = [];
   List<Marker> _markers = const [];
+  List<LatLng> _routeLinePoints = const [];
+  int _routeLineRequestId = 0;
+  String? _lastRouteLineSignature;
   bool _isLoading = true;
   String? _loadError;
 

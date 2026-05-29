@@ -10,4 +10,9 @@ class AppRuntimeConfig {
     'STADIA_MAPS_API_KEY',
     defaultValue: '',
   );
+
+  static const String mapboxAccessToken = String.fromEnvironment(
+    'MAPBOX_ACCESS_TOKEN',
+    defaultValue: '',
+  );
 }

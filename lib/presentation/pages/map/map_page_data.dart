@@ -92,8 +92,11 @@ extension _MapPageDataLogic on _MapPageState {
   void _bindTourUpdates() {
     _tourUpdatesSub?.cancel();
     _tourUpdatesSub = _tourController.updates.listen((_) {
-      // Aggiorna solo lo stato del tour, NON i marker
-      if (mounted) setState(() {});
+      // Aggiorna solo lo stato del tour, NON i marker.
+      if (mounted) {
+        setState(() {});
+        unawaited(_refreshRouteLine());
+      }
     });
   }
 }
