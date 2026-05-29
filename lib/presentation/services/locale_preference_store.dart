@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:ui' as ui;
 
 class LocalePreferenceStore {
   const LocalePreferenceStore._();
@@ -12,7 +13,16 @@ class LocalePreferenceStore {
     if (code != null && (code == 'en' || code == 'it')) {
       return Locale(code);
     }
-    return const Locale('it');
+    // Prima apertura: adatta la lingua del dispositivo.
+    // Se il dispositivo è italiano → italiano, altrimenti → inglese.
+    final deviceLocales = ui.PlatformDispatcher.instance.locales;
+    final isItalian = deviceLocales.any(
+      (l) => l.languageCode.toLowerCase() == 'it',
+    );
+    final defaultLocale = Locale(isItalian ? 'it' : 'en');
+    // Salva subito la scelta così i ritorni futuri sono coerenti.
+    await prefs.setString(_localeCodeKey, defaultLocale.languageCode);
+    return defaultLocale;
   }
 
   static Future<void> saveLocale(Locale locale) async {

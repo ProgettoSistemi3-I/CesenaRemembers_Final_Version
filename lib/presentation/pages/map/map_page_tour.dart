@@ -18,6 +18,9 @@ extension _MapPageTourActions on _MapPageState {
     }
 
     final hasStarted = await _tourController.startTour();
+    if (hasStarted) {
+      _tourXpEarned = 0;
+    }
     if (hasStarted && mounted && _tourController.currentStop != null) {
       _centerOnStop(_toLatLng(_tourController.currentStop!.position));
     }
@@ -162,7 +165,7 @@ extension _MapPageTourActions on _MapPageState {
                 return FadeTransition(
                   opacity: animation,
                   child: TourCompletionAnimation(
-                    xpGained: 0,
+                    xpGained: _tourXpEarned,
                     onDismiss: () => Navigator.of(context).pop(),
                   ),
                 );
@@ -209,6 +212,7 @@ extension _MapPageTourActions on _MapPageState {
         isTourComplete: isLastStop,
       );
       _cachedUserXp = (_cachedUserXp ?? 0) + score.totalXp;
+      _tourXpEarned += score.totalXp;
       if (!mounted) return;
       showGlassSnackBar(
         context,

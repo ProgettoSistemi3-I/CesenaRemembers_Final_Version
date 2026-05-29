@@ -1060,7 +1060,7 @@ class _QuizOption extends StatelessWidget {
               ),
             ),
           ),
-          if (trailing != null) trailing,
+          ?trailing,
         ],
       ),
     );

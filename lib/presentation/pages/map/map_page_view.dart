@@ -179,7 +179,7 @@ extension _MapPageView on _MapPageState {
                             opacity: animation,
                             child: TourCompletionAnimation(
                               onDismiss: () => Navigator.of(context).pop(),
-                              xpGained: _lastTourXpGained,
+                              xpGained: _tourXpEarned,
                             ),
                           );
                         },
