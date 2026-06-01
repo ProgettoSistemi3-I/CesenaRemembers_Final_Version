@@ -34,6 +34,7 @@ import '../../theme/app_palette.dart';
 import 'widgets/location_issue_banner.dart';
 import 'widgets/map_controls.dart';
 import 'widgets/poi_bottom_sheet.dart';
+import 'widgets/poi_preview_sheet.dart';
 import 'widgets/tour_completion_animation.dart';
 import '../../widgets/glass_snackbar.dart';
 
@@ -93,6 +94,7 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   List<Poi> _pois = [];
   List<Marker> _markers = const [];
   List<LatLng> _routeLinePoints = const [];
+  Poi? _selectedPoi;
   int _routeLineRequestId = 0;
   String? _lastRouteLineSignature;
   bool _isLoading = true;

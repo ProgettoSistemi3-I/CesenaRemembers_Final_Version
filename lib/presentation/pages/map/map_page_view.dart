@@ -46,8 +46,10 @@ extension _MapPageView on _MapPageState {
             markers: _markers,
             routeLinePoints: _routeLinePoints,
             scaffoldBackgroundColor: data.theme.scaffoldBackgroundColor,
+            onMapTap: _clearSelectedPoi,
           ),
           _buildOverlay(data),
+          _buildPoiPreviewSheet(),
         ],
       ),
     );
@@ -219,6 +221,34 @@ extension _MapPageView on _MapPageState {
     );
   }
 
+  Widget _buildPoiPreviewSheet() {
+    final selectedPoi = _selectedPoi;
+
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: IgnorePointer(
+        ignoring: selectedPoi == null,
+        child: AnimatedSlide(
+          offset: selectedPoi == null ? const Offset(0, 1) : Offset.zero,
+          duration: const Duration(milliseconds: 260),
+          curve: Curves.easeOutCubic,
+          child: AnimatedOpacity(
+            opacity: selectedPoi == null ? 0 : 1,
+            duration: const Duration(milliseconds: 180),
+            child: selectedPoi == null
+                ? const SizedBox.shrink()
+                : PoiPreviewSheet(
+                    poi: selectedPoi,
+                    onClose: _clearSelectedPoi,
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildErrorState(ThemeData theme) {
     return Center(
       child: Padding(
@@ -273,6 +303,7 @@ class _MapCanvas extends StatefulWidget {
     required this.markers,
     required this.routeLinePoints,
     required this.scaffoldBackgroundColor,
+    required this.onMapTap,
   });
 
   final MapController mapController;
@@ -291,6 +322,7 @@ class _MapCanvas extends StatefulWidget {
   final List<Marker> markers;
   final List<LatLng> routeLinePoints;
   final Color scaffoldBackgroundColor;
+  final VoidCallback onMapTap;
 
   @override
   State<_MapCanvas> createState() => _MapCanvasState();
@@ -326,6 +358,7 @@ class _MapCanvasState extends State<_MapCanvas> {
         interactionOptions: InteractionOptions(
           flags: widget.isMapLocked ? InteractiveFlag.none : InteractiveFlag.all,
         ),
+        onTap: (_, __) => widget.onMapTap(),
         onMapEvent: (event) {
           if (event is MapEventMove || event is MapEventRotate) {
             final rotation = widget.mapController.camera.rotation;
