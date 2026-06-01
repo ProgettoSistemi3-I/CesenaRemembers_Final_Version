@@ -78,7 +78,7 @@ class _HeaderCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     height: 1.5,
-                    color: theme.colorScheme.onSurfaceVariant, 
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -99,7 +99,7 @@ class _SettingsCard extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface, 
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
           color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
@@ -121,8 +121,12 @@ class _ThinDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 1,
-      margin: const EdgeInsets.only(left: 68), // Allineato col testo, non con l'icona
-      color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.3), 
+      margin: const EdgeInsets.only(
+        left: 68,
+      ), // Allineato col testo, non con l'icona
+      color: Theme.of(
+        context,
+      ).colorScheme.outlineVariant.withValues(alpha: 0.3),
     );
   }
 }
@@ -140,7 +144,7 @@ class _SectionLabel extends StatelessWidget {
         style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w800,
-          color: AppPalette.olive, 
+          color: AppPalette.olive,
           letterSpacing: 1.2,
         ),
       ),
@@ -171,7 +175,7 @@ class _ActionRow extends StatelessWidget {
     final textColor = destructive
         ? AppPalette.danger
         : theme.colorScheme.onSurface;
-        
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -216,7 +220,9 @@ class _ActionRow extends StatelessWidget {
               Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 16,
-                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                color: theme.colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.4,
+                ),
               ),
             ],
           ),
@@ -365,7 +371,9 @@ class _ChoiceSheet extends StatelessWidget {
                       border: Border.all(
                         color: option == selected
                             ? AppPalette.olive
-                            : theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+                            : theme.colorScheme.outlineVariant.withValues(
+                                alpha: 0.4,
+                              ),
                         width: option == selected ? 2 : 1,
                       ),
                     ),
@@ -379,8 +387,8 @@ class _ChoiceSheet extends StatelessWidget {
                               fontWeight: option == selected
                                   ? FontWeight.w800
                                   : FontWeight.w600,
-                              color: option == selected 
-                                  ? AppPalette.olive 
+                              color: option == selected
+                                  ? AppPalette.olive
                                   : theme.colorScheme.onSurface,
                             ),
                           ),
