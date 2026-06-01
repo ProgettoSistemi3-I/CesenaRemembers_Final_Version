@@ -67,13 +67,7 @@ extension _MapPageDataLogic on _MapPageState {
           questions: poi.questions,
         ),
         counterRotationDegrees: _currentRotation,
-        onTap: () => showGlassSnackBar(
-          context,
-          message: localizedName,
-          type: GlassSnackType.info,
-          icon: Icons.place_rounded,
-          duration: const Duration(seconds: 2),
-        ),
+        onTap: () => _selectPoi(poi),
       );
     }).toList(growable: false);
   }
@@ -98,5 +92,16 @@ extension _MapPageDataLogic on _MapPageState {
         unawaited(_refreshRouteLine());
       }
     });
+  }
+}
+
+extension _MapPagePoiPreviewLogic on _MapPageState {
+  void _selectPoi(Poi poi) {
+    setState(() => _selectedPoi = poi);
+  }
+
+  void _clearSelectedPoi() {
+    if (_selectedPoi == null) return;
+    setState(() => _selectedPoi = null);
   }
 }
