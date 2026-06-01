@@ -28,15 +28,12 @@ class PoiMarkerFactory {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _GlassPoiPin(
+              _PoiPin(
                 color: _colorFromType(poi.type),
                 icon: _iconFromType(poi.type),
               ),
               const SizedBox(height: 5),
-              _GlassPoiLabel(
-                text: poi.name,
-                accentColor: _colorFromType(poi.type),
-              ),
+              _PoiLabel(text: poi.name, accentColor: _colorFromType(poi.type)),
             ],
           ),
         ),
@@ -49,15 +46,15 @@ class PoiMarkerFactory {
   Color _colorFromType(String type) {
     switch (type.toLowerCase()) {
       case 'church':
-        return const Color(0xFF7B6AA5); // soft purple
+        return const Color(0xFF7B6AA5);
       case 'monument':
         return AppPalette.olive;
       case 'square':
         return AppPalette.tan;
       case 'school':
-        return const Color(0xFF3D7ABF); // steel blue
+        return const Color(0xFF3D7ABF);
       case 'bridge':
-        return const Color(0xFF6B8E77); // muted sage
+        return const Color(0xFF6B8E77);
       case 'library':
         return AppPalette.moss;
       case 'shelter':
@@ -91,10 +88,10 @@ class PoiMarkerFactory {
   }
 }
 
-// ── Glass Teardrop Pin ────────────────────────────────────────────────────────
+// ── Teardrop Pin (no BackdropFilter) ─────────────────────────────────────────
 
-class _GlassPoiPin extends StatelessWidget {
-  const _GlassPoiPin({required this.color, required this.icon});
+class _PoiPin extends StatelessWidget {
+  const _PoiPin({required this.color, required this.icon});
 
   final Color color;
   final IconData icon;
@@ -105,6 +102,9 @@ class _GlassPoiPin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final fillColor = isDark
+        ? Color.lerp(Colors.black, color, 0.22)!
+        : Color.lerp(Colors.white, color, 0.12)!;
 
     return SizedBox(
       width: _pinW,
@@ -113,34 +113,17 @@ class _GlassPoiPin extends StatelessWidget {
         alignment: Alignment.topCenter,
         clipBehavior: Clip.none,
         children: [
-          // 1. Colored glow shadow
+          // 1. Solid teardrop fill (replaces BackdropFilter+blur)
           CustomPaint(
             size: const Size(_pinW, _pinH),
-            painter: _PinGlowPainter(color: color),
-          ),
-
-          // 2. Glass fill — clips to teardrop, blurs the map behind
-          ClipPath(
-            clipper: const _TearDropClipper(_pinW, _pinH),
-            child: BackdropFilter(
-              filter: ui.ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-              child: Container(
-                width: _pinW,
-                height: _pinH,
-                color: isDark
-                    ? Colors.black.withOpacity(0.52)
-                    : Colors.white.withOpacity(0.48),
-              ),
+            painter: _PinFillPainter(
+              fillColor: fillColor,
+              accentColor: color,
+              isDark: isDark,
             ),
           ),
 
-          // 3. Accent border + glass refraction highlight
-          CustomPaint(
-            size: const Size(_pinW, _pinH),
-            painter: _PinBorderPainter(color: color, isDark: isDark),
-          ),
-
-          // 4. Icon circle
+          // 2. Icon circle
           Positioned(
             top: 8,
             child: _PinIconCircle(icon: icon, color: color, isDark: isDark),
@@ -171,15 +154,16 @@ class _PinIconCircle extends StatelessWidget {
       height: 28,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: color.withOpacity(isDark ? 0.28 : 0.15),
+        color: color.withOpacity(isDark ? 0.30 : 0.18),
         border: Border.all(
-          color: color.withOpacity(isDark ? 0.85 : 0.6),
+          color: color.withOpacity(isDark ? 0.85 : 0.65),
           width: 1.5,
         ),
+        // Single subtle shadow — no spread, small blur
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.4),
-            blurRadius: 7,
+            color: color.withOpacity(0.30),
+            blurRadius: 4,
             spreadRadius: 0,
           ),
         ],
@@ -193,10 +177,10 @@ class _PinIconCircle extends StatelessWidget {
   }
 }
 
-// ── Glass Label ───────────────────────────────────────────────────────────────
+// ── Label (no BackdropFilter) ─────────────────────────────────────────────────
 
-class _GlassPoiLabel extends StatelessWidget {
-  const _GlassPoiLabel({required this.text, required this.accentColor});
+class _PoiLabel extends StatelessWidget {
+  const _PoiLabel({required this.text, required this.accentColor});
 
   final String text;
   final Color accentColor;
@@ -204,130 +188,113 @@ class _GlassPoiLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 155),
-          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-          decoration: BoxDecoration(
-            color: isDark
-                ? Colors.black.withOpacity(0.55)
-                : Colors.white.withOpacity(0.62),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: isDark
-                  ? Colors.white.withOpacity(0.13)
-                  : Colors.white.withOpacity(0.85),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: accentColor.withOpacity(0.14),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Flexible(
-                child: Text(
-                  text,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w800,
-                    color: isDark
-                        ? Colors.white.withOpacity(0.95)
-                        : const Color(0xFF1A1A1A),
-                    letterSpacing: 0.15,
-                    shadows: isDark
-                        ? [
-                            Shadow(
-                              color: Colors.black.withOpacity(0.5),
-                              blurRadius: 3,
-                            ),
-                          ]
-                        : null,
-                  ),
-                ),
-              ),
-            ],
-          ),
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 155),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      decoration: BoxDecoration(
+        // Solid opaque background — no blur needed
+        color: isDark ? const Color(0xDD1A1A2E) : const Color(0xF5FFFFFF),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withOpacity(0.12)
+              : accentColor.withOpacity(0.25),
+          width: 1,
         ),
+        // Single lightweight shadow
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.40 : 0.12),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w800,
+                color: isDark
+                    ? Colors.white.withOpacity(0.95)
+                    : const Color(0xFF1A1A1A),
+                letterSpacing: 0.15,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-// ── Painters ─────────────────────────────────────────────────────────────────
+// ── Painter: fills teardrop with solid color + accent border ──────────────────
 
-/// Colored glow + drop shadow beneath the teardrop
-class _PinGlowPainter extends CustomPainter {
-  const _PinGlowPainter({required this.color});
-  final Color color;
+class _PinFillPainter extends CustomPainter {
+  const _PinFillPainter({
+    required this.fillColor,
+    required this.accentColor,
+    required this.isDark,
+  });
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    final path = _tearDropPath(size);
-    // Color glow
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = color.withOpacity(0.38)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 9),
-    );
-    // Dark shadow (depth)
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = Colors.black.withOpacity(0.22)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
-    );
-  }
-
-  @override
-  bool shouldRepaint(_PinGlowPainter old) => old.color != color;
-}
-
-/// Accent border + inner glass-edge refraction
-class _PinBorderPainter extends CustomPainter {
-  const _PinBorderPainter({required this.color, required this.isDark});
-  final Color color;
+  final Color fillColor;
+  final Color accentColor;
   final bool isDark;
 
   @override
   void paint(Canvas canvas, Size size) {
     final path = _tearDropPath(size);
 
-    // Outer colored accent border
+    // Solid fill
     canvas.drawPath(
       path,
       Paint()
-        ..color = color.withOpacity(isDark ? 0.72 : 0.5)
+        ..color = fillColor
+        ..style = PaintingStyle.fill,
+    );
+
+    // Subtle drop shadow (one pass only, small blur)
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = Colors.black.withOpacity(0.20)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+    );
+
+    // Accent border
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = accentColor.withOpacity(isDark ? 0.72 : 0.55)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.8,
     );
 
-    // Inner white refraction line (glass edge simulation)
+    // Inner highlight line (glass-edge look without blur)
     canvas.drawPath(
       path,
       Paint()
-        ..color = Colors.white.withOpacity(isDark ? 0.18 : 0.55)
+        ..color = Colors.white.withOpacity(isDark ? 0.16 : 0.50)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 0.8,
     );
   }
 
   @override
-  bool shouldRepaint(_PinBorderPainter old) =>
-      old.color != color || old.isDark != isDark;
+  bool shouldRepaint(_PinFillPainter old) =>
+      old.fillColor != fillColor ||
+      old.accentColor != accentColor ||
+      old.isDark != isDark;
 }
+
+// ── Shared path helper ────────────────────────────────────────────────────────
 
 ui.Path _tearDropPath(Size size) {
   final double r = size.width / 2;
