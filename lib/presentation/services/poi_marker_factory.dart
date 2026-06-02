@@ -18,8 +18,8 @@ class PoiMarkerFactory {
   }) {
     return Marker(
       point: LatLng(poi.latitude, poi.longitude),
-      width: 180,
-      height: 110,
+      width: 170,
+      height: 92,
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: onTap,
@@ -32,7 +32,7 @@ class PoiMarkerFactory {
                 color: _colorFromType(poi.type),
                 icon: _iconFromType(poi.type),
               ),
-              const SizedBox(height: 5),
+              const SizedBox(height: 4),
               _PoiLabel(text: poi.name, accentColor: _colorFromType(poi.type)),
             ],
           ),
@@ -88,7 +88,7 @@ class PoiMarkerFactory {
   }
 }
 
-// ── Teardrop Pin (no BackdropFilter) ─────────────────────────────────────────
+// ── Minimal teardrop pin ─────────────────────────────────────────────────────
 
 class _PoiPin extends StatelessWidget {
   const _PoiPin({required this.color, required this.icon});
@@ -96,16 +96,11 @@ class _PoiPin extends StatelessWidget {
   final Color color;
   final IconData icon;
 
-  static const double _pinW = 44.0;
-  static const double _pinH = 58.0;
+  static const double _pinW = 40.0;
+  static const double _pinH = 52.0;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final fillColor = isDark
-        ? Color.lerp(Colors.black, color, 0.22)!
-        : Color.lerp(Colors.white, color, 0.12)!;
-
     return SizedBox(
       width: _pinW,
       height: _pinH,
@@ -113,20 +108,13 @@ class _PoiPin extends StatelessWidget {
         alignment: Alignment.topCenter,
         clipBehavior: Clip.none,
         children: [
-          // 1. Solid teardrop fill (replaces BackdropFilter+blur)
           CustomPaint(
             size: const Size(_pinW, _pinH),
-            painter: _PinFillPainter(
-              fillColor: fillColor,
-              accentColor: color,
-              isDark: isDark,
-            ),
+            painter: _PinFillPainter(accentColor: color),
           ),
-
-          // 2. Icon circle
           Positioned(
-            top: 8,
-            child: _PinIconCircle(icon: icon, color: color, isDark: isDark),
+            top: 7,
+            child: _PinIconCircle(icon: icon, color: color),
           ),
         ],
       ),
@@ -137,47 +125,27 @@ class _PoiPin extends StatelessWidget {
 // ── Icon Circle ───────────────────────────────────────────────────────────────
 
 class _PinIconCircle extends StatelessWidget {
-  const _PinIconCircle({
-    required this.icon,
-    required this.color,
-    required this.isDark,
-  });
+  const _PinIconCircle({required this.icon, required this.color});
 
   final IconData icon;
   final Color color;
-  final bool isDark;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 28,
-      height: 28,
+      width: 27,
+      height: 27,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: color.withOpacity(isDark ? 0.30 : 0.18),
-        border: Border.all(
-          color: color.withOpacity(isDark ? 0.85 : 0.65),
-          width: 1.5,
-        ),
-        // Single subtle shadow — no spread, small blur
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.30),
-            blurRadius: 4,
-            spreadRadius: 0,
-          ),
-        ],
+        color: Colors.white,
+        border: Border.all(color: color, width: 1.4),
       ),
-      child: Icon(
-        icon,
-        color: isDark ? Colors.white.withOpacity(0.95) : color,
-        size: 15,
-      ),
+      child: Icon(icon, color: color, size: 15),
     );
   }
 }
 
-// ── Label (no BackdropFilter) ─────────────────────────────────────────────────
+// ── Minimal label ────────────────────────────────────────────────────────────
 
 class _PoiLabel extends StatelessWidget {
   const _PoiLabel({required this.text, required this.accentColor});
@@ -187,28 +155,13 @@ class _PoiLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      constraints: const BoxConstraints(maxWidth: 155),
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      constraints: const BoxConstraints(maxWidth: 150),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        // Solid opaque background — no blur needed
-        color: isDark ? const Color(0xDD1A1A2E) : const Color(0xF5FFFFFF),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withOpacity(0.12)
-              : accentColor.withOpacity(0.25),
-          width: 1,
-        ),
-        // Single lightweight shadow
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.40 : 0.12),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(9),
+        border: Border.all(color: accentColor.withOpacity(0.28)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -219,13 +172,11 @@ class _PoiLabel extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.left,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 10.5,
-                fontWeight: FontWeight.w800,
-                color: isDark
-                    ? Colors.white.withOpacity(0.95)
-                    : const Color(0xFF1A1A1A),
-                letterSpacing: 0.15,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF232323),
+                letterSpacing: 0.1,
               ),
             ),
           ),
@@ -235,63 +186,35 @@ class _PoiLabel extends StatelessWidget {
   }
 }
 
-// ── Painter: fills teardrop with solid color + accent border ──────────────────
+// ── Painter: clean fill + accent border ──────────────────────────────────────
 
 class _PinFillPainter extends CustomPainter {
-  const _PinFillPainter({
-    required this.fillColor,
-    required this.accentColor,
-    required this.isDark,
-  });
+  const _PinFillPainter({required this.accentColor});
 
-  final Color fillColor;
   final Color accentColor;
-  final bool isDark;
 
   @override
   void paint(Canvas canvas, Size size) {
     final path = _tearDropPath(size);
 
-    // Solid fill
     canvas.drawPath(
       path,
       Paint()
-        ..color = fillColor
+        ..color = Colors.white
         ..style = PaintingStyle.fill,
     );
 
-    // Subtle drop shadow (one pass only, small blur)
     canvas.drawPath(
       path,
       Paint()
-        ..color = Colors.black.withOpacity(0.20)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
-    );
-
-    // Accent border
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = accentColor.withOpacity(isDark ? 0.72 : 0.55)
+        ..color = accentColor
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.8,
-    );
-
-    // Inner highlight line (glass-edge look without blur)
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = Colors.white.withOpacity(isDark ? 0.16 : 0.50)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 0.8,
+        ..strokeWidth = 1.6,
     );
   }
 
   @override
-  bool shouldRepaint(_PinFillPainter old) =>
-      old.fillColor != fillColor ||
-      old.accentColor != accentColor ||
-      old.isDark != isDark;
+  bool shouldRepaint(_PinFillPainter old) => old.accentColor != accentColor;
 }
 
 // ── Shared path helper ────────────────────────────────────────────────────────
@@ -310,17 +233,4 @@ ui.Path _tearDropPath(Size size) {
   path.lineTo(cx, size.height);
   path.close();
   return path;
-}
-
-class _TearDropClipper extends CustomClipper<ui.Path> {
-  const _TearDropClipper(this.width, this.height);
-  final double width;
-  final double height;
-
-  @override
-  ui.Path getClip(Size size) => _tearDropPath(Size(width, height));
-
-  @override
-  bool shouldReclip(_TearDropClipper old) =>
-      old.width != width || old.height != height;
 }

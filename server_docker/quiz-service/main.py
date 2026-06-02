@@ -97,7 +97,7 @@ async def generate_quiz(poi: PoiRequest):
             ],
             model="llama-3.1-8b-instant",
             response_format={"type": "json_object"},
-            temperature=0.4, # Leggermente alzata per dare più creatività nella formulazione di domande difficili
+            temperature=0.1, # Leggermente alzata per dare più creatività nella formulazione di domande difficili
         )
 
         response_content = chat_completion.choices[0].message.content
