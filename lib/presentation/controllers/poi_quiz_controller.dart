@@ -36,7 +36,13 @@ class PoiQuizController extends ChangeNotifier {
   String? get fallbackNotice => _fallbackNotice;
   String? get fallbackDifficultyLabel => _fallbackDifficultyLabel;
 
-  Future<void> initQuiz(String poiId, String poiName, int userXp) async {
+  Future<void> initQuiz(
+    String poiId,
+    String poiName,
+    int userXp, {
+    required String languageCode,
+    required String poiDescription,
+  }) async {
     _isLoading = true;
     _error = null;
     _fallbackNotice = null;
@@ -44,7 +50,13 @@ class PoiQuizController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final result = await _getQuizUseCase(poiId, poiName, userXp);
+      final result = await _getQuizUseCase(
+        poiId,
+        poiName,
+        userXp,
+        languageCode: languageCode,
+        poiDescription: poiDescription,
+      );
       _questions = result.questions;
       _usesPersonalizedQuestions = result.usesPersonalizedQuestions;
       _fallbackNotice = result.fallbackNotice;

@@ -1,5 +1,11 @@
 import '../entities/quiz_load_result.dart';
 
 abstract class IQuizRepository {
-  Future<QuizLoadResult> getQuizForPoi(String poiId, String poiName, int userXP);
+  Future<QuizLoadResult> getQuizForPoi(
+    String poiId,
+    String poiName,
+    int userXP, {
+    required String languageCode,
+    required String poiDescription,
+  });
 }

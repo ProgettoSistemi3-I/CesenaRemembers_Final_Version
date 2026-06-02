@@ -6,7 +6,19 @@ class GetPoiQuizUseCase {
 
   const GetPoiQuizUseCase(this.repository);
 
-  Future<QuizLoadResult> call(String poiId, String poiName, int userXp) {
-    return repository.getQuizForPoi(poiId, poiName, userXp);
+  Future<QuizLoadResult> call(
+    String poiId,
+    String poiName,
+    int userXp, {
+    required String languageCode,
+    required String poiDescription,
+  }) {
+    return repository.getQuizForPoi(
+      poiId,
+      poiName,
+      userXp,
+      languageCode: languageCode,
+      poiDescription: poiDescription,
+    );
   }
 }
