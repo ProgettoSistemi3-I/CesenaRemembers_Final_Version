@@ -98,9 +98,10 @@ async def generate_quiz(poi: PoiRequest):
         2. Anche tutte le opzioni di risposta devono essere nella LINGUA OBBLIGATORIA.
         3. TEMA CENTRALE: La stragrande maggioranza delle domande DEVE riguardare vicende, eventi o il contesto della Seconda Guerra Mondiale (WWII) legati a questo luogo.
         4. DIVIETO ASSOLUTO DI BANALITÀ: Non fare MAI domande scontate come "In che città si trova?", "Come si chiama questo luogo?" o dettagli visivi ovvi. Dai per scontato che l'utente sia già fisicamente lì.
-        5. INTEGRAZIONE: Usa le informazioni della DESCRIZIONE, ma arricchiscile con la tua conoscenza storica accurata sulla Seconda Guerra Mondiale a Cesena per rispettare il livello di difficoltà richiesto.
-        6. Ogni domanda deve avere tra 3 e 4 opzioni di risposta sensate. Non mettere opzioni palesemente false o ridicole.
-        7. Indica l'indice corretto (partendo da 0). Randomizza la posizione della risposta corretta (non metterla sempre alla posizione 0).
+        5. VARIETÀ DEI TEMI: Ogni domanda delle 5 richieste deve trattare un aspetto, un aneddoto o un dettaglio storico DIFFERENTE della Seconda Guerra Mondiale. Evita assolutamente di ripetere lo stesso concetto o lo stesso evento (es. rastrellamenti) in più domande.
+        6. INTEGRAZIONE: Usa le informazioni della DESCRIZIONE, ma arricchiscile con la tua conoscenza storica accurata sulla Seconda Guerra Mondiale a Cesena per rispettare il livello di difficoltà richiesto.
+        7. Ogni domanda deve avere tra 3 e 4 opzioni di risposta sensate. Non mettere opzioni palesemente false o ridicole.
+        8. Indica l'indice corretto (partendo da 0). Randomizza la posizione della risposta corretta (non metterla sempre alla posizione 0).
 
         DEVI e puoi SOLO restituire un oggetto JSON valido con questa esatta struttura:
         {{
@@ -125,9 +126,9 @@ async def generate_quiz(poi: PoiRequest):
                     "content": prompt,
                 }
             ],
-            model="llama-3.1-8b-instant",
+            model="llama-3.3-70b-versatile",
             response_format={"type": "json_object"},
-            temperature=0.1, # Leggermente alzata per dare più creatività nella formulazione di domande difficili
+            temperature=0.2,
         )
 
         response_content = chat_completion.choices[0].message.content
