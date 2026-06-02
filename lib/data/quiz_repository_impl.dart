@@ -24,9 +24,12 @@ class QuizRepositoryImpl implements IQuizRepository {
   Future<QuizLoadResult> getQuizForPoi(
     String poiId,
     String poiName,
-    int userXp,
-  ) async {
-    final cacheKey = '$poiId::$userXp';
+    int userXp, {
+    required String languageCode,
+    required String poiDescription,
+  }) async {
+    final normalizedLanguageCode = languageCode == 'en' ? 'en' : 'it';
+    final cacheKey = '$poiId::$userXp::$normalizedLanguageCode';
     final cached = _memoryCache[cacheKey];
     if (cached != null) {
       return cached;
@@ -45,9 +48,11 @@ class QuizRepositoryImpl implements IQuizRepository {
             body: jsonEncode({
               'id': poiId,
               'name': poiName,
-              'description':
-                  'General historical information about $poiName in the city of Cesena.',
+              'description': poiDescription.trim().isEmpty
+                  ? 'General historical information about $poiName in the city of Cesena.'
+                  : poiDescription,
               'userXp': userXp,
+              'languageCode': normalizedLanguageCode,
             }),
           )
           .timeout(_requestTimeout);

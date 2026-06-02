@@ -73,7 +73,16 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
   }
 
   Future<void> _initQuizWithUserXp() async {
-    _quizController!.initQuiz(widget.stop.id, AppLocalizations.of(context)!.getPoiName(widget.stop.id), widget.userXp);
+    final l10n = AppLocalizations.of(context)!;
+    final poiId = widget.stop.id;
+
+    _quizController!.initQuiz(
+      poiId,
+      l10n.getPoiName(poiId),
+      widget.userXp,
+      languageCode: Localizations.localeOf(context).languageCode,
+      poiDescription: l10n.getPoiDescription(poiId),
+    );
   }
 
   void _onAnswerTap(int index) {

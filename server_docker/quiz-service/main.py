@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Literal
 from groq import Groq
 from dotenv import load_dotenv
 import json
@@ -34,50 +34,80 @@ class PoiRequest(BaseModel):
     id: str
     name: str
     description: str
-    userXp: int  # <-- NUOVO CAMPO AGGIUNTO
+    userXp: int
+    languageCode: Literal["it", "en"] = "it"
 # ------------------------
 
 @app.post("/api/generate-quiz", response_model=QuizResponse)
 async def generate_quiz(poi: PoiRequest):
     try:
         # 1. Calcolo del livello di difficoltà in base agli XP
-        xp = poi.userXp
-        if xp <= 200:
-            difficulty_level = "Livello 1 (Facile)"
-            difficulty_desc = "Domande sui fatti storici principali e più noti legati al luogo durante la guerra."
-        elif xp <= 400:
-            difficulty_level = "Livello 2 (Medio)"
-            difficulty_desc = "Dettagli meno noti, date specifiche o eventi tattici generali della Seconda Guerra Mondiale nel contesto locale."
-        elif xp <= 600:
-            difficulty_level = "Livello 3 (Difficile)"
-            difficulty_desc = "Cause, conseguenze complesse, figure chiave minori e dinamiche partigiane o militari specifiche di questo luogo."
-        else:
-            difficulty_level = "Livello 4 (Esperto)"
-            difficulty_desc = "Analisi profonda, aneddoti microscopici, documenti storici o dettagli tattici estremamente specifici della Seconda Guerra Mondiale a Cesena."
+        language_code = poi.languageCode if poi.languageCode in ("it", "en") else "it"
+        language_name = "Italiano" if language_code == "it" else "English"
+        sample_question = (
+            "testo della domanda in italiano"
+            if language_code == "it"
+            else "question text in English"
+        )
+        sample_options = (
+            ["opzione 1", "opzione 2", "opzione 3"]
+            if language_code == "it"
+            else ["option 1", "option 2", "option 3"]
+        )
 
-        # 2. Prompt aggiornato con focus sulla WWII, blocco delle banalità e iniezione della difficoltà
+        xp = poi.userXp
+        if language_code == "it":
+            if xp <= 200:
+                difficulty_level = "Livello 1 (Facile)"
+                difficulty_desc = "Domande sui fatti storici principali e più noti legati al luogo durante la guerra."
+            elif xp <= 400:
+                difficulty_level = "Livello 2 (Medio)"
+                difficulty_desc = "Dettagli meno noti, date specifiche o eventi tattici generali della Seconda Guerra Mondiale nel contesto locale."
+            elif xp <= 600:
+                difficulty_level = "Livello 3 (Difficile)"
+                difficulty_desc = "Cause, conseguenze complesse, figure chiave minori e dinamiche partigiane o militari specifiche di questo luogo."
+            else:
+                difficulty_level = "Livello 4 (Esperto)"
+                difficulty_desc = "Analisi profonda, aneddoti microscopici, documenti storici o dettagli tattici estremamente specifici della Seconda Guerra Mondiale a Cesena."
+        else:
+            if xp <= 200:
+                difficulty_level = "Level 1 (Easy)"
+                difficulty_desc = "Questions about the main and best-known historical facts connected to the place during the war."
+            elif xp <= 400:
+                difficulty_level = "Level 2 (Medium)"
+                difficulty_desc = "Less-known details, specific dates, or general tactical events from World War II in the local context."
+            elif xp <= 600:
+                difficulty_level = "Level 3 (Hard)"
+                difficulty_desc = "Causes, complex consequences, minor key figures, and partisan or military dynamics specific to this place."
+            else:
+                difficulty_level = "Level 4 (Expert)"
+                difficulty_desc = "Deep analysis, micro-anecdotes, historical documents, or extremely specific tactical details about World War II in Cesena."
+
+        # 2. Prompt aggiornato con focus sulla WWII, blocco delle banalità, difficoltà e lingua scelta nell'app
         prompt = f"""
         Sei un esperto di storia locale della città di Cesena e un creatore di quiz storici di alto livello.
         Devi generare un quiz a risposta multipla su questo luogo storico:
-        
+
         NOME LUOGO: {poi.name}
         DESCRIZIONE: {poi.description}
+        LINGUA OBBLIGATORIA DEL QUIZ: {language_name} ({language_code})
         DIFFICOLTÀ RICHIESTA: {difficulty_level} - {difficulty_desc}
-        
+
         Regole FONDAMENTALI:
-        1. Genera esattamente 5 domande in italiano.
-        2. TEMA CENTRALE: La stragrande maggioranza delle domande DEVE riguardare vicende, eventi o il contesto della Seconda Guerra Mondiale (WWII) legati a questo luogo.
-        3. DIVIETO ASSOLUTO DI BANALITÀ: Non fare MAI domande scontate come "In che città si trova?", "Come si chiama questo luogo?" o dettagli visivi ovvi. Dai per scontato che l'utente sia già fisicamente lì.
-        4. INTEGRAZIONE: Usa le informazioni della DESCRIZIONE, ma arricchiscile con la tua conoscenza storica accurata sulla Seconda Guerra Mondiale a Cesena per rispettare il livello di difficoltà richiesto.
-        5. Ogni domanda deve avere tra 3 e 4 opzioni di risposta sensate (sempre in italiano). Non mettere opzioni palesemente false o ridicole.
-        6. Indica l'indice corretto (partendo da 0). Randomizza la posizione della risposta corretta (non metterla sempre alla posizione 0).
-        
+        1. Genera esattamente 5 domande nella LINGUA OBBLIGATORIA indicata sopra.
+        2. Anche tutte le opzioni di risposta devono essere nella LINGUA OBBLIGATORIA.
+        3. TEMA CENTRALE: La stragrande maggioranza delle domande DEVE riguardare vicende, eventi o il contesto della Seconda Guerra Mondiale (WWII) legati a questo luogo.
+        4. DIVIETO ASSOLUTO DI BANALITÀ: Non fare MAI domande scontate come "In che città si trova?", "Come si chiama questo luogo?" o dettagli visivi ovvi. Dai per scontato che l'utente sia già fisicamente lì.
+        5. INTEGRAZIONE: Usa le informazioni della DESCRIZIONE, ma arricchiscile con la tua conoscenza storica accurata sulla Seconda Guerra Mondiale a Cesena per rispettare il livello di difficoltà richiesto.
+        6. Ogni domanda deve avere tra 3 e 4 opzioni di risposta sensate. Non mettere opzioni palesemente false o ridicole.
+        7. Indica l'indice corretto (partendo da 0). Randomizza la posizione della risposta corretta (non metterla sempre alla posizione 0).
+
         DEVI e puoi SOLO restituire un oggetto JSON valido con questa esatta struttura:
         {{
             "questions": [
                 {{
-                    "question": "testo della domanda in italiano",
-                    "options": ["opzione 1", "opzione 2", "opzione 3"],
+                    "question": "{sample_question}",
+                    "options": {json.dumps(sample_options, ensure_ascii=False)},
                     "correctIndex": 0
                 }}
             ]
@@ -88,7 +118,7 @@ async def generate_quiz(poi: PoiRequest):
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a JSON generator. You must return ONLY a valid JSON object matching the requested schema exactly."
+                    "content": f"You are a JSON generator. Return ONLY valid JSON matching the requested schema. All human-readable quiz text must be in {language_name}."
                 },
                 {
                     "role": "user",

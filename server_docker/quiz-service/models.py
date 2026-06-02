@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Literal
 
 class QuizQuestion(BaseModel):
     question: str = Field(description="La domanda del quiz sul POI")
@@ -13,3 +13,5 @@ class PoiRequest(BaseModel):
     id: str
     name: str
     description: str
+    userXp: int
+    languageCode: Literal["it", "en"] = "it"
