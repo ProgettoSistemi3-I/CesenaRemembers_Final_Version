@@ -1,25 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
-  <base href="$FLUTTER_BASE_HREF">
-
-  <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
-
-  <meta name="google-signin-client_id" content="966666011561-jg82mh4vbt29s6cggi0kij05d6h0coo4.apps.googleusercontent.com">
-
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="cesena_remembers">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <link rel="icon" type="image/png" href="favicon.png"/>
-
-  <title>cesena_remembers</title>
-  <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cesena Remembers</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+    <div class="bg-overlay"></div>
+
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="logo">Cesena Remembers</div>
+            <a href="mailto:cesenaremembers@gmail.com" class="btn-outline">Contattaci</a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <div class="badge">Progetto ITT Blaise Pascal - Classe 3^I</div>
+            <h1 class="hero-title">Vivi la storia.<br>Scopri la città.</h1>
+            <p class="hero-subtitle">Un'esperienza interattiva che trasforma Cesena in un museo a cielo aperto, esplorando i luoghi simbolo del passaggio del fronte nel 1945.</p>
+            
+            <div class="embassy-banner glass-panel">
+                <i class="ph phosphor-bank"></i>
+                <div class="embassy-text">
+                    <span class="embassy-title">Progetto per il concorso <a href="https://italien.diplo.de/it-it/03-italiaegermania/2717134-2717134" target="_blank" rel="noopener" class="accent-link">"Ieri è oggi è domani"</a></span>
+                    <span class="embassy-subtitle">Promosso in collaborazione con l'Ambasciata della Repubblica Federale di Germania in Italia</span>
+                </div>
+            </div>
+
+            <div class="hero-actions">
+                <a href="#download" class="btn-primary">
+                    <i class="ph phosphor-download-simple"></i>
+                    Scarica l'App
+                </a>
+                <a href="#features" class="btn-secondary">Scopri di più</a>
+            </div>
+        </div>
+    </header>
+
+    <section id="features" class="bento-section">
+        <div class="bento-grid">
+            <div class="bento-card span-2 glass-panel fade-up">
+                <div class="card-icon"><i class="ph phosphor-map-trifold"></i></div>
+                <h3>Tour Interattivi</h3>
+                <p>Esplora percorsi geolocalizzati. Confronta la Cesena del 1945 con quella attuale attraverso testimonianze, foto storiche e rilievi.</p>
+            </div>
+            
+            <div class="bento-card glass-panel fade-up" style="transition-delay: 100ms;">
+                <div class="card-icon"><i class="ph phosphor-game-controller"></i></div>
+                <h3>Sfide e Quiz</h3>
+                <p>Supera i micro-giochi storici ad ogni tappa per sbloccare la destinazione successiva e accumulare esperienza.</p>
+            </div>
+
+            <div class="bento-card glass-panel fade-up" style="transition-delay: 200ms;">
+                <div class="card-icon"><i class="ph phosphor-users"></i></div>
+                <h3>Community</h3>
+                <p>Aggiungi amici, confronta i punteggi nella classifica globale e scopri chi ha completato i tour nel minor tempo.</p>
+            </div>
+
+            <div class="bento-card span-2 glass-panel fade-up" style="transition-delay: 300ms;">
+                <div class="card-icon"><i class="ph phosphor-book-open-text"></i></div>
+                <h3>Didattica Attiva</h3>
+                <p>Uno strumento al servizio delle scuole. La tecnologia incontra la memoria per trasmettere alle nuove generazioni il valore della storia locale.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content glass-panel">
+            <h2>Pronto a iniziare l'esplorazione?</h2>
+            <p>Contattaci per informazioni, supporto o per portare il progetto nella tua scuola.</p>
+            <a href="mailto:cesenaremembers@gmail.com" class="email-link">cesenaremembers@gmail.com</a>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Cesena Remembers. Tutti i diritti riservati.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>

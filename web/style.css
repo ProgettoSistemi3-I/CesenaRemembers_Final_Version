@@ -1,0 +1,335 @@
+:root {
+    --bg-dark: #09090B;
+    --text-main: #FAFAFA;
+    --text-muted: #A1A1AA;
+    
+    /* Palette colori dell'app */
+    --accent-tan: #D4B483;
+    --accent-olive: #8B9A46;
+    
+    /* Variabili Glassmorphism (leggermente aumentata l'opacità per bilanciare l'immagine) */
+    --glass-bg: rgba(9, 9, 11, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-highlight: rgba(255, 255, 255, 0.2);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-dark);
+    /* Inserimento Sfondo Immagine FISSO */
+    background-image: url('loginView.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    
+    color: var(--text-main);
+    font-family: 'Manrope', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Overlay per oscurare la foto e rendere leggibile il testo bianco */
+.bg-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(9, 9, 11, 0.75); /* Tinta zinc scura */
+    z-index: -1;
+}
+
+h1, h2, h3 {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.03em;
+}
+
+/* --- Navigazione --- */
+#navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+    padding: 1.5rem 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#navbar.scrolled {
+    padding: 1rem 0;
+    background: rgba(9, 9, 11, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+/* --- Bottoni --- */
+.btn-outline, .btn-primary, .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    border-radius: 99px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-outline {
+    border: 1px solid var(--glass-border);
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-outline:hover {
+    background: var(--glass-highlight);
+}
+
+.btn-primary {
+    background: var(--accent-olive);
+    color: var(--bg-dark);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -10px rgba(139, 154, 70, 0.5);
+}
+
+.btn-secondary {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-main);
+    backdrop-filter: blur(12px);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* --- Hero Section --- */
+.hero {
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    padding: 8rem 2rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.hero-content {
+    max-width: 800px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 99px;
+    background: rgba(212, 180, 131, 0.15);
+    color: var(--accent-tan);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(212, 180, 131, 0.3);
+    backdrop-filter: blur(8px);
+}
+
+.hero-title {
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    line-height: 1;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(180deg, #FFFFFF 0%, #D4D4D8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: #E4E4E7; /* Grigio leggermente più chiaro per contrastare lo sfondo */
+    max-width: 600px;
+    margin-bottom: 2rem;
+}
+
+/* --- Banner Ambasciata --- */
+.embassy-banner {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2.5rem;
+    border-radius: 16px;
+    max-width: 600px;
+}
+
+.embassy-banner i {
+    font-size: 2.2rem;
+    color: var(--accent-tan);
+}
+
+.embassy-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.embassy-title {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.accent-link {
+    color: var(--accent-tan);
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    border-bottom: 1px dotted rgba(212, 180, 131, 0.4);
+}
+
+.accent-link:hover {
+    color: #fff;
+    border-bottom-color: #fff;
+}
+
+.embassy-subtitle {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* --- Bento Grid / Panels (Liquid Glass) --- */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: inset 0 1px 0 var(--glass-highlight), 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.bento-section {
+    max-width: 1200px;
+    margin: 0 auto 8rem;
+    padding: 0 2rem;
+}
+
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .bento-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .span-2 {
+        grid-column: span 2;
+    }
+}
+
+.bento-card {
+    padding: 2.5rem;
+    transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+
+.bento-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.05); /* Schiarisce leggermente il vetro al passaggio del mouse */
+}
+
+.card-icon {
+    font-size: 2rem;
+    color: var(--accent-tan);
+    margin-bottom: 1.5rem;
+}
+
+.bento-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.bento-card p {
+    color: #D4D4D8;
+}
+
+/* --- Footer --- */
+.footer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem 2rem;
+}
+
+.footer-content {
+    padding: 4rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.footer-content h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.footer-content p {
+    color: #D4D4D8;
+    margin-bottom: 2rem;
+}
+
+.email-link {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-tan);
+    text-decoration: none;
+    font-family: 'Outfit', sans-serif;
+    transition: color 0.2s ease;
+}
+
+.email-link:hover {
+    color: #fff;
+}
+
+.footer-bottom {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+/* --- Animazioni Scroll --- */
+.fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
