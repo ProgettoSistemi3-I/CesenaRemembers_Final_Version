@@ -576,10 +576,6 @@ class _SettingsPageState extends State<SettingsPage>
                                 title: AppLocalizations.of(context)!.settingsVersion,
                                 subtitle: AppLocalizations.of(context)!.versionSubtitle,
                                 accent: AppPalette.moss,
-                                onTap: () => _showActionSheet(
-                                  AppLocalizations.of(context)!.versionSheetTitle,
-                                  AppLocalizations.of(context)!.versionSheetBody,
-                                ),
                               ),
                               const _ThinDivider(),
                               _ActionRow(
