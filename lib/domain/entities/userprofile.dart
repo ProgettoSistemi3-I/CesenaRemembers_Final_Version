@@ -29,7 +29,7 @@ class UserProfile {
     required this.email,
     required this.displayName,
     this.username = '',
-    this.avatarId = 'soldier',
+    this.avatarId = 'soldato',
     this.profileCompleted = false,
     this.onboardingCompleted = false,
     this.xp = 0,

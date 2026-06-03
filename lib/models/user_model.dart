@@ -34,7 +34,7 @@ class UserModel extends UserProfile {
       email: json['email'] ?? '',
       displayName: json['displayName'] ?? 'Utente',
       username: json['username'] ?? '',
-      avatarId: json['avatarId'] ?? 'soldier',
+      avatarId: json['avatarId'] ?? 'soldato',
       profileCompleted: json['profileCompleted'] ?? false,
       onboardingCompleted: json['onboardingCompleted'] ?? false,
       xp: json['xp'] ?? 0,
