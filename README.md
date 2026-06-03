@@ -1,4 +1,4 @@
-# Cesena Remembers 1945
+# Cesena Remembers
 
 App Flutter educativa/gamificata per esplorare luoghi storici di Cesena con percorso su mappa, quiz e profilo utente.
 
