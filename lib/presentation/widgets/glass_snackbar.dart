@@ -21,7 +21,7 @@ void showGlassSnackBar(
   IconData effectiveIcon;
   switch (type) {
     case GlassSnackType.success:
-      accentColor = AppPalette.olive;
+      accentColor = const Color(0xFF7ED957);
       effectiveIcon = icon ?? Icons.check_circle_outline_rounded;
       break;
     case GlassSnackType.error:
@@ -29,7 +29,7 @@ void showGlassSnackBar(
       effectiveIcon = icon ?? Icons.error_outline_rounded;
       break;
     case GlassSnackType.xp:
-      accentColor = AppPalette.tan;
+      accentColor = const Color(0xFFFFC857);
       effectiveIcon = icon ?? Icons.bolt_rounded;
       break;
     case GlassSnackType.info:
@@ -43,6 +43,8 @@ void showGlassSnackBar(
     accentColor: accentColor,
     icon: effectiveIcon,
     isDark: isDark,
+    isHighlighted:
+        type == GlassSnackType.xp || type == GlassSnackType.success,
   );
 
   ScaffoldMessenger.of(context)
@@ -52,7 +54,9 @@ void showGlassSnackBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         behavior: SnackBarBehavior.floating,
-        dismissDirection: margin != null ? DismissDirection.up : DismissDirection.down,
+        dismissDirection: margin != null
+            ? DismissDirection.up
+            : DismissDirection.down,
         duration: duration,
         margin: margin ?? const EdgeInsets.fromLTRB(16, 0, 16, 80),
         padding: EdgeInsets.zero,
@@ -75,12 +79,14 @@ class _GlassSnackContent extends StatelessWidget {
     required this.accentColor,
     required this.icon,
     required this.isDark,
+    required this.isHighlighted,
   });
 
   final String message;
   final Color accentColor;
   final IconData icon;
   final bool isDark;
+  final bool isHighlighted;
 
   @override
   Widget build(BuildContext context) {
@@ -92,23 +98,40 @@ class _GlassSnackContent extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
           decoration: BoxDecoration(
             color: isDark
-                ? Colors.black.withOpacity(0.58)
-                : Colors.white.withOpacity(0.65),
+                ? Colors.black.withValues(alpha: isHighlighted ? 0.72 : 0.58)
+                : Colors.white.withValues(alpha: isHighlighted ? 0.82 : 0.65),
+            gradient: isHighlighted
+                ? LinearGradient(
+                    colors: [
+                      accentColor.withValues(alpha: isDark ? 0.30 : 0.24),
+                      (isDark ? Colors.black : Colors.white).withValues(
+                        alpha: isDark ? 0.70 : 0.78,
+                      ),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : null,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: isDark
-                  ? Colors.white.withOpacity(0.13)
-                  : Colors.white.withOpacity(0.9),
-              width: 1,
+              color: isHighlighted
+                  ? accentColor.withValues(alpha: 0.72)
+                  : isDark
+                  ? Colors.white.withValues(alpha: 0.13)
+                  : Colors.white.withValues(alpha: 0.9),
+              width: isHighlighted ? 1.4 : 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: accentColor.withOpacity(0.22),
-                blurRadius: 18,
-                offset: const Offset(0, 5),
+                color: accentColor.withValues(
+                  alpha: isHighlighted ? 0.46 : 0.22,
+                ),
+                blurRadius: isHighlighted ? 28 : 18,
+                spreadRadius: isHighlighted ? 1 : 0,
+                offset: const Offset(0, 6),
               ),
               BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.35 : 0.06),
+                color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.06),
                 blurRadius: 6,
                 offset: const Offset(0, 2),
               ),
@@ -120,14 +143,24 @@ class _GlassSnackContent extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(7),
                 decoration: BoxDecoration(
-                  color: accentColor.withOpacity(isDark ? 0.22 : 0.1),
+                  color: accentColor.withValues(
+                    alpha: isHighlighted
+                        ? (isDark ? 0.34 : 0.22)
+                        : (isDark ? 0.22 : 0.1),
+                  ),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: accentColor.withOpacity(isDark ? 0.5 : 0.28),
-                    width: 1,
+                    color: accentColor.withValues(
+                      alpha: isHighlighted ? 0.72 : (isDark ? 0.5 : 0.28),
+                    ),
+                    width: isHighlighted ? 1.2 : 1,
                   ),
                 ),
-                child: Icon(icon, color: accentColor, size: 17),
+                child: Icon(
+                  icon,
+                  color: accentColor,
+                  size: isHighlighted ? 19 : 17,
+                ),
               ),
               const SizedBox(width: 12),
               // Message
@@ -138,14 +171,13 @@ class _GlassSnackContent extends StatelessWidget {
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: isDark
-                        ? Colors.white.withOpacity(0.95)
+                        ? Colors.white.withValues(alpha: 0.95)
                         : const Color(0xFF1A1A1A),
                     letterSpacing: 0.1,
                     height: 1.3,
                   ),
                 ),
               ),
-
             ],
           ),
         ),

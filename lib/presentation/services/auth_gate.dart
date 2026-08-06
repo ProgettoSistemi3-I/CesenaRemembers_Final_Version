@@ -117,7 +117,10 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
                 PushNotificationService.navigatorKey.currentContext ?? context;
 
             if (scaffoldMessenger != null) {
-              final topMargin = MediaQuery.of(currentContext).size.height - 150;
+              final double achievementBannerBottomMargin =
+                  (MediaQuery.of(currentContext).size.height * 0.38)
+                      .clamp(260.0, 360.0)
+                      .toDouble();
 
               showGlassSnackBar(
                 currentContext,
@@ -126,10 +129,11 @@ class _AuthenticatedGateState extends State<_AuthenticatedGate> {
                 type: GlassSnackType.success,
                 icon: Icons.emoji_events,
                 duration: const Duration(seconds: 10),
-                margin: EdgeInsets.only(
-                  bottom: topMargin > 0 ? topMargin : 600,
-                  left: 16,
-                  right: 16,
+                margin: EdgeInsets.fromLTRB(
+                  16,
+                  0,
+                  16,
+                  achievementBannerBottomMargin,
                 ),
                 onTap: () {
                   ShellNavigationStore.goToTab(2); // Vai al profilo
