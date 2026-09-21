@@ -9,6 +9,7 @@ class Poi {
   final String period;
   final String description;
   final List<QuizQuestion> questions;
+  final String? imagePath;
 
   Poi({
     required this.id,
@@ -19,5 +20,6 @@ class Poi {
     required this.period,
     required this.description,
     this.questions = const [],
+    this.imagePath,
   });
 }

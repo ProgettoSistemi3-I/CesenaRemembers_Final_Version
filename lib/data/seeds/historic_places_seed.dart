@@ -14,6 +14,7 @@ class HistoricPlaceSeedItem {
     required this.icon,
     required this.iconBackground,
     required this.questions,
+    this.imagePath,
   });
 
   final String id;
@@ -26,6 +27,7 @@ class HistoricPlaceSeedItem {
   final IconData icon;
   final Color iconBackground;
   final List<QuizQuestion> questions;
+  final String? imagePath;
 }
 
 class HistoricPlacesSeed {
@@ -35,6 +37,7 @@ class HistoricPlacesSeed {
     // ─── 1. Chiesa di Santa Cristina ───────────────────────────────────────
     HistoricPlaceSeedItem(
       id: 'santa_cristina',
+      imagePath: 'assets/images/pois/santa_cristina.jpg',
       name: 'poi_santa_cristina_name',
       latitude: 44.14100,
       longitude: 12.24236,
@@ -70,6 +73,7 @@ class HistoricPlacesSeed {
     // ─── 2. Rocca Malatestiana ─────────────────────────────────────────────
     HistoricPlaceSeedItem(
       id: 'rocca',
+      imagePath: 'assets/images/pois/rocca.jpg',
       name: 'poi_rocca_name',
       latitude: 44.13619,
       longitude: 12.23989,
@@ -107,6 +111,7 @@ class HistoricPlacesSeed {
     // ─── 3. Chiesa di San Rocco ────────────────────────────────────────────
     HistoricPlaceSeedItem(
       id: 'san_rocco',
+      imagePath: 'assets/images/pois/san_rocco.jpg',
       name: 'poi_san_rocco_name',
       latitude: 44.14022,
       longitude: 12.24072,
@@ -137,6 +142,7 @@ class HistoricPlacesSeed {
     // ─── 4. Abbazia di Santa Maria del Monte ──────────────────────────────
     HistoricPlaceSeedItem(
       id: 'abbazia_monte',
+      imagePath: 'assets/images/pois/abbazia_monte.jpg',
       name: 'poi_abbazia_monte_name',
       latitude: 44.13164,
       longitude: 12.25486,
@@ -171,6 +177,7 @@ class HistoricPlacesSeed {
     // ─── 5. Chiesa e Convento dell'Osservanza ─────────────────────────────
     HistoricPlaceSeedItem(
       id: 'osservanza',
+      imagePath: 'assets/images/pois/osservanza.jpg',
       name: 'poi_osservanza_name',
       latitude: 44.13277,
       longitude: 12.24424,
@@ -201,6 +208,7 @@ class HistoricPlacesSeed {
     // ─── 6. Palazzo del Ridotto (ex Piazza del Popolo) ────────────────────
     HistoricPlaceSeedItem(
       id: 'palazzo_ridotto',
+      imagePath: 'assets/images/pois/palazzo_ridotto.jpg',
       name: 'poi_palazzo_ridotto_name',
       latitude: 44.13819,
       longitude: 12.24361,
@@ -235,6 +243,7 @@ class HistoricPlacesSeed {
     // ─── 7. Stazione ferroviaria di Cesena ────────────────────────────────
     HistoricPlaceSeedItem(
       id: 'stazione',
+      imagePath: 'assets/images/pois/stazione.jpg',
       name: 'poi_stazione_name',
       latitude: 44.14525,
       longitude: 12.24956,
@@ -271,6 +280,7 @@ class HistoricPlacesSeed {
     // ─── 8. Stabilimento Arrigoni ─────────────────────────────────────────
     HistoricPlaceSeedItem(
       id: 'arrigoni',
+      imagePath: 'assets/images/pois/arrigoni.jpg',
       name: 'poi_arrigoni_name',
       latitude: 44.14400,
       longitude: 12.24753,
@@ -305,6 +315,7 @@ class HistoricPlacesSeed {
     // ─── 9. Palazzo Fantaguzzi ────────────────────────────────────────────
     HistoricPlaceSeedItem(
       id: 'fantaguzzi',
+      imagePath: 'assets/images/pois/fantaguzzi.jpg',
       name: 'poi_fantaguzzi_name',
       latitude: 44.13822,
       longitude: 12.24531,
@@ -340,6 +351,7 @@ class HistoricPlacesSeed {
     // ─── 10. Rifugi antiaerei della Rocca ─────────────────────────────────
     HistoricPlaceSeedItem(
       id: 'rifugi_antiaerei',
+      imagePath: 'assets/images/pois/rifugi_antiaerei.jpg',
       name: 'poi_rifugi_antiaerei_name',
       latitude: 44.13703,
       longitude: 12.23931,

@@ -11,6 +11,7 @@ class PoiModel extends Poi {
     required super.period,
     required super.description,
     super.questions,
+    super.imagePath,
   });
 
   factory PoiModel.fromJson(Map<String, dynamic> json) {
@@ -31,6 +32,7 @@ class PoiModel extends Poi {
             ),
           )
           .toList(growable: false),
+      imagePath: json['imagePath'] as String?,
     );
   }
 
@@ -52,6 +54,7 @@ class PoiModel extends Poi {
             },
           )
           .toList(growable: false),
+      'imagePath': imagePath,
     };
   }
 }

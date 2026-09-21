@@ -77,7 +77,7 @@ class PoiPreviewSheet extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                const _PoiImagePlaceholder(),
+                _PoiImage(imagePath: poi.imagePath),
               ],
             ),
           ),
@@ -112,6 +112,33 @@ class _CloseButton extends StatelessWidget {
           Icons.close_rounded,
           size: 18,
           color: theme.colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
+  }
+}
+
+class _PoiImage extends StatelessWidget {
+  const _PoiImage({required this.imagePath});
+
+  final String? imagePath;
+
+  @override
+  Widget build(BuildContext context) {
+    final path = imagePath;
+    if (path == null || path.isEmpty) {
+      return const _PoiImagePlaceholder();
+    }
+
+    return AspectRatio(
+      aspectRatio: 16 / 9,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: Image.asset(
+          path,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) =>
+              const _PoiImagePlaceholder(),
         ),
       ),
     );
