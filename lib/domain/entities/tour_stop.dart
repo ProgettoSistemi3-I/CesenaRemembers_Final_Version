@@ -15,6 +15,7 @@ class TourStop {
   final String description;
   final GeoPoint position;
   final List<QuizQuestion> questions;
+  final String? imagePath;
 
   const TourStop({
     required this.id,
@@ -24,5 +25,6 @@ class TourStop {
     required this.description,
     required this.position,
     required this.questions,
+    this.imagePath,
   });
 }

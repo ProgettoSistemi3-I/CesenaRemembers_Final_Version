@@ -15,6 +15,7 @@ class TourStopMapper {
             description: poi.description,
             position: GeoPoint(latitude: poi.latitude, longitude: poi.longitude),
             questions: poi.questions,
+            imagePath: poi.imagePath,
           ),
         )
         .toList(growable: false);

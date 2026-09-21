@@ -130,13 +130,19 @@ class _PoiImage extends StatelessWidget {
       return const _PoiImagePlaceholder();
     }
 
-    return AspectRatio(
-      aspectRatio: 16 / 9,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
+    final theme = Theme.of(context);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        width: double.infinity,
+        constraints: const BoxConstraints(maxHeight: 260),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(
+          alpha: 0.35,
+        ),
         child: Image.asset(
           path,
-          fit: BoxFit.cover,
+          fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) =>
               const _PoiImagePlaceholder(),
         ),

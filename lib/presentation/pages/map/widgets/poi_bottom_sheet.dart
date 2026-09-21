@@ -245,19 +245,10 @@ class _PoiBottomSheetState extends State<PoiBottomSheet>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            height: 140,
-                            decoration: BoxDecoration(
-                              color: widget.iconBackground,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Center(
-                              child: Icon(
-                                widget.icon,
-                                size: 56,
-                                color: Colors.black.withValues(alpha: 0.3),
-                              ),
-                            ),
+                          _StopImage(
+                            imagePath: widget.stop.imagePath,
+                            icon: widget.icon,
+                            iconBackground: widget.iconBackground,
                           ),
                           const SizedBox(height: 16),
                           Row(
@@ -670,6 +661,57 @@ class _QuizFallbackBanner extends StatelessWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class _StopImage extends StatelessWidget {
+  const _StopImage({
+    required this.imagePath,
+    required this.icon,
+    required this.iconBackground,
+  });
+
+  final String? imagePath;
+  final IconData icon;
+  final Color iconBackground;
+
+  @override
+  Widget build(BuildContext context) {
+    final path = imagePath;
+    if (path == null || path.isEmpty) {
+      return _placeholder();
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        width: double.infinity,
+        constraints: const BoxConstraints(maxHeight: 220),
+        color: iconBackground.withValues(alpha: 0.12),
+        child: Image.asset(
+          path,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) => _placeholder(),
+        ),
+      ),
+    );
+  }
+
+  Widget _placeholder() {
+    return Container(
+      height: 140,
+      decoration: BoxDecoration(
+        color: iconBackground,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Center(
+        child: Icon(
+          icon,
+          size: 56,
+          color: Colors.black.withValues(alpha: 0.3),
+        ),
       ),
     );
   }
