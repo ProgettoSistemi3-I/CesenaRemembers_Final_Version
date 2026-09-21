@@ -49,5 +49,18 @@
 	<string>La tua posizione viene usata per centrarti sulla mappa e mostrarti dove ti trovi.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>La tua posizione viene usata per centrarti sulla mappa e mostrarti dove ti trovi.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>pascal.ispascalcomandini.it</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
 </dict>
 </plist>
