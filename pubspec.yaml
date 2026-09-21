@@ -86,7 +86,7 @@ flutter:
     - assets/icon/logoScuola.png
     - assets/loginView.png
     - assets/avatars/
-    - assets/achievements/\
+    - assets/achievements/
     - assets/images/pois/
 
 flutter_launcher_icons:
