@@ -216,10 +216,7 @@ extension _MapPageView on _MapPageState {
             duration: const Duration(milliseconds: 180),
             child: selectedPoi == null
                 ? const SizedBox.shrink()
-                : PoiPreviewSheet(
-                    poi: selectedPoi,
-                    onClose: _clearSelectedPoi,
-                  ),
+                : PoiPreviewSheet(poi: selectedPoi, onClose: _clearSelectedPoi),
           ),
         ),
       ),
@@ -316,7 +313,9 @@ class _MapCanvasState extends State<_MapCanvas> {
 
   late final Stream<LocationMarkerPosition?> _positionStream =
       const LocationMarkerDataStreamFactory().fromGeolocatorPositionStream(
-        stream: Geolocator.getPositionStream(locationSettings: _locationSettings),
+        stream: Geolocator.getPositionStream(
+          locationSettings: _locationSettings,
+        ),
       );
 
   static const _defaultCesenaCenter = LatLng(44.1384, 12.2471);
@@ -333,9 +332,11 @@ class _MapCanvasState extends State<_MapCanvas> {
         cameraConstraint: CameraConstraint.contain(bounds: widget.cesenaBounds),
         backgroundColor: widget.scaffoldBackgroundColor,
         interactionOptions: InteractionOptions(
-          flags: widget.isMapLocked ? InteractiveFlag.none : InteractiveFlag.all,
+          flags: widget.isMapLocked
+              ? InteractiveFlag.none
+              : InteractiveFlag.all,
         ),
-        onTap: (_, __) => widget.onMapTap(),
+        onTap: (_, _) => widget.onMapTap(),
         onMapEvent: (event) {
           if (event is MapEventMove || event is MapEventRotate) {
             final rotation = widget.mapController.camera.rotation;
@@ -348,7 +349,8 @@ class _MapCanvasState extends State<_MapCanvas> {
           }
         },
         onPositionChanged: (_, hasGesture) {
-          if (hasGesture && widget.alignPositionOnUpdate != AlignOnUpdate.never) {
+          if (hasGesture &&
+              widget.alignPositionOnUpdate != AlignOnUpdate.never) {
             widget.onDisableFollowUser();
           }
         },

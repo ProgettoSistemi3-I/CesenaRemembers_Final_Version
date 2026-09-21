@@ -9,8 +9,8 @@ class _HeaderCard extends StatelessWidget {
   const _HeaderCard({
     required this.title,
     required this.subtitle,
-    this.icon,
     this.imageAsset,
+    this.icon,
   });
 
   @override
@@ -217,9 +217,7 @@ class _ActionRow extends StatelessWidget {
             Icon(
               Icons.arrow_forward_ios_rounded,
               size: 16,
-              color: theme.colorScheme.onSurfaceVariant.withValues(
-                alpha: 0.4,
-              ),
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
             ),
         ],
       ),
@@ -231,10 +229,7 @@ class _ActionRow extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        child: content,
-      ),
+      child: InkWell(onTap: onTap, child: content),
     );
   }
 }
