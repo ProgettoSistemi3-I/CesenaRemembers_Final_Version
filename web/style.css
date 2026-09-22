@@ -3,14 +3,23 @@
     --text-main: #FAFAFA;
     --text-muted: #A1A1AA;
     
-    /* Palette colori dell'app */
+    /* Original Palette */
     --accent-tan: #D4B483;
     --accent-olive: #8B9A46;
     
-    /* Variabili Glassmorphism (leggermente aumentata l'opacità per bilanciare l'immagine) */
-    --glass-bg: rgba(9, 9, 11, 0.4);
-    --glass-border: rgba(255, 255, 255, 0.12);
-    --glass-highlight: rgba(255, 255, 255, 0.2);
+    /* Enhanced Palette for Gradients & Glows */
+    --accent-tan-glow: rgba(212, 180, 131, 0.3);
+    --accent-olive-glow: rgba(139, 154, 70, 0.3);
+    
+    /* Glassmorphism Variables */
+    --glass-bg: rgba(9, 9, 11, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-border-hover: rgba(255, 255, 255, 0.2);
+    --glass-highlight: rgba(255, 255, 255, 0.1);
+    
+    /* Spacing & Layout */
+    --max-width: 1200px;
+    --nav-height: 80px;
 }
 
 * {
@@ -19,35 +28,60 @@
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     background-color: var(--bg-dark);
-    /* Inserimento Sfondo Immagine FISSO */
-    background-image: url('loginView.jpg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    
     color: var(--text-main);
-    font-family: 'Manrope', sans-serif;
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     line-height: 1.6;
     overflow-x: hidden;
     position: relative;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-/* Overlay per oscurare la foto e rendere leggibile il testo bianco */
+/* 
+ * 1. FIX: Fixed Background 
+ * Invece di usare background-attachment: fixed sul body (che dà problemi su iOS),
+ * usiamo un div dedicato in position: fixed con z-index basso.
+ */
+.background-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -2;
+    background-image: url('loginView.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    /* Leggero zoom per evitare bordi bianchi sui rimbalzi di scroll di iOS */
+    transform: scale(1.05); 
+}
+
+/* Overlay per migliorare il contrasto */
 .bg-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(9, 9, 11, 0.75); /* Tinta zinc scura */
+    background: linear-gradient(
+        135deg, 
+        rgba(9, 9, 11, 0.85) 0%, 
+        rgba(9, 9, 11, 0.7) 50%, 
+        rgba(9, 9, 11, 0.9) 100%
+    );
     z-index: -1;
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4, .font-heading {
     font-family: 'Outfit', sans-serif;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.02em;
 }
 
 /* --- Navigazione --- */
@@ -57,19 +91,20 @@ h1, h2, h3 {
     width: 100%;
     z-index: 100;
     padding: 1.5rem 0;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 #navbar.scrolled {
     padding: 1rem 0;
-    background: rgba(9, 9, 11, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: rgba(9, 9, 11, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--glass-border);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
 }
 
 .nav-container {
-    max-width: 1200px;
+    max-width: var(--max-width);
     margin: 0 auto;
     padding: 0 2rem;
     display: flex;
@@ -79,52 +114,77 @@ h1, h2, h3 {
 
 .logo {
     font-family: 'Outfit', sans-serif;
-    font-weight: 700;
-    font-size: 1.25rem;
+    font-weight: 800;
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
+    background: linear-gradient(to right, var(--text-main), var(--accent-tan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    cursor: default;
 }
 
-/* --- Bottoni --- */
+/* --- Bottoni Premium --- */
 .btn-outline, .btn-primary, .btn-secondary {
-    padding: 0.75rem 1.5rem;
-    border-radius: 99px;
+    padding: clamp(0.75rem, 2vw, 0.875rem) clamp(1.5rem, 4vw, 2rem);
+    border-radius: 999px;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: clamp(0.9rem, 2vw, 1rem);
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
 
+/* Outline Button (Nav) */
 .btn-outline {
     border: 1px solid var(--glass-border);
     color: var(--text-main);
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .btn-outline:hover {
-    background: var(--glass-highlight);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--glass-border-hover);
+    transform: translateY(-2px);
 }
 
+/* Primary Button (Olive Green) */
 .btn-primary {
-    background: var(--accent-olive);
+    background: linear-gradient(135deg, #9CAD4C 0%, var(--accent-olive) 100%);
     color: var(--bg-dark);
+    box-shadow: 0 4px 15px var(--accent-olive-glow);
+    border: none;
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px -10px rgba(139, 154, 70, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px var(--accent-olive-glow);
+    filter: brightness(1.1);
 }
 
+.btn-primary:active {
+    transform: translateY(-1px);
+}
+
+/* Secondary Button (Glass) */
 .btn-secondary {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     color: var(--text-main);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 }
 
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--glass-border-hover);
+    transform: translateY(-3px);
 }
 
 /* --- Hero Section --- */
@@ -132,59 +192,99 @@ h1, h2, h3 {
     min-height: 100dvh;
     display: flex;
     align-items: center;
-    padding: 8rem 2rem 4rem;
-    max-width: 1200px;
+    padding: calc(var(--nav-height) + 4rem) 2rem 4rem;
+    max-width: var(--max-width);
     margin: 0 auto;
+    position: relative;
 }
 
 .hero-content {
-    max-width: 800px;
+    max-width: 850px;
+    position: relative;
+    z-index: 10;
 }
 
 .badge {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    border-radius: 99px;
-    background: rgba(212, 180, 131, 0.15);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(212, 180, 131, 0.1) 0%, rgba(212, 180, 131, 0.02) 100%);
     color: var(--accent-tan);
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 2rem;
-    border: 1px solid rgba(212, 180, 131, 0.3);
-    backdrop-filter: blur(8px);
+    border: 1px solid rgba(212, 180, 131, 0.2);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.badge i {
+    font-size: 1.1rem;
 }
 
 .hero-title {
-    font-size: clamp(3rem, 8vw, 5.5rem);
-    line-height: 1;
+    font-size: clamp(3rem, 8vw, 6rem);
+    line-height: 1.05;
     margin-bottom: 1.5rem;
-    background: linear-gradient(180deg, #FFFFFF 0%, #D4D4D8 100%);
+    background: linear-gradient(135deg, #FFFFFF 0%, #D4D4D8 50%, var(--accent-tan) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    font-weight: 800;
 }
 
 .hero-subtitle {
-    font-size: 1.25rem;
-    color: #E4E4E7; /* Grigio leggermente più chiaro per contrastare lo sfondo */
-    max-width: 600px;
-    margin-bottom: 2rem;
+    font-size: clamp(1.1rem, 3vw, 1.35rem);
+    color: var(--text-muted);
+    max-width: 650px;
+    margin-bottom: 2.5rem;
+    font-weight: 400;
 }
 
-/* --- Banner Ambasciata --- */
+/* --- Banner Ambasciata Premium --- */
 .embassy-banner {
     display: inline-flex;
     align-items: center;
-    gap: 1.2rem;
-    padding: 1rem 1.5rem;
-    margin-bottom: 2.5rem;
-    border-radius: 16px;
-    max-width: 600px;
+    gap: 1.25rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 3rem;
+    border-radius: 20px;
+    max-width: 650px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.embassy-banner:hover {
+    transform: translateY(-2px);
+}
+
+/* Riflesso interno animato */
+.embassy-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.05), transparent);
+    transform: skewX(-25deg);
+    animation: shine 6s infinite;
+}
+
+@keyframes shine {
+    0% { left: -100%; }
+    20% { left: 200%; }
+    100% { left: 200%; }
 }
 
 .embassy-banner i {
-    font-size: 2.2rem;
+    font-size: 2.5rem;
     color: var(--accent-tan);
+    filter: drop-shadow(0 0 10px var(--accent-tan-glow));
 }
 
 .embassy-text {
@@ -194,27 +294,44 @@ h1, h2, h3 {
 }
 
 .embassy-title {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-main);
 }
 
 .accent-link {
     color: var(--accent-tan);
-    font-weight: 700;
     text-decoration: none;
+    position: relative;
     transition: color 0.2s ease;
-    border-bottom: 1px dotted rgba(212, 180, 131, 0.4);
+}
+
+.accent-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
 }
 
 .accent-link:hover {
-    color: #fff;
-    border-bottom-color: #fff;
+    color: #FFF;
+}
+
+.accent-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
 }
 
 .embassy-subtitle {
     color: var(--text-muted);
     font-size: 0.85rem;
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
 .hero-actions {
@@ -223,29 +340,31 @@ h1, h2, h3 {
     flex-wrap: wrap;
 }
 
-/* --- Bento Grid / Panels (Liquid Glass) --- */
+/* --- Bento Grid (Liquid Glass) --- */
 .glass-panel {
     background: var(--glass-bg);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--glass-border);
     border-radius: 24px;
-    box-shadow: inset 0 1px 0 var(--glass-highlight), 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 1px 0 var(--glass-highlight), 0 20px 40px rgba(0, 0, 0, 0.4);
+    position: relative;
+    overflow: hidden;
 }
 
 .bento-section {
-    max-width: 1200px;
+    max-width: var(--max-width);
     margin: 0 auto 8rem;
     padding: 0 2rem;
 }
 
 .bento-grid {
     display: grid;
-    grid-template-columns: repeat(1, 1fr);
+    grid-template-columns: 1fr;
     gap: 1.5rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 800px) {
     .bento-grid {
         grid-template-columns: repeat(3, 1fr);
     }
@@ -255,120 +374,205 @@ h1, h2, h3 {
 }
 
 .bento-card {
-    padding: 2.5rem;
-    transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+    padding: clamp(2rem, 5vw, 3rem);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Hover Effect: Gradiente radiale sottile */
+.bento-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at top right, rgba(255,255,255,0.06), transparent 50%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
 }
 
 .bento-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(255, 255, 255, 0.25);
-    background: rgba(255, 255, 255, 0.05); /* Schiarisce leggermente il vetro al passaggio del mouse */
+    transform: translateY(-5px);
+    border-color: var(--glass-border-hover);
+    background: rgba(25, 25, 30, 0.65);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
+}
+
+.bento-card:hover::after {
+    opacity: 1;
 }
 
 .card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    background: rgba(212, 180, 131, 0.1);
+    border: 1px solid rgba(212, 180, 131, 0.2);
     font-size: 2rem;
     color: var(--accent-tan);
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.bento-card:hover .card-icon {
+    transform: scale(1.1) rotate(5deg);
+    background: rgba(212, 180, 131, 0.15);
 }
 
 .bento-card h3 {
-    font-size: 1.5rem;
+    font-size: clamp(1.4rem, 3vw, 1.75rem);
     margin-bottom: 1rem;
+    color: var(--text-main);
 }
 
 .bento-card p {
-    color: #D4D4D8;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+}
+
+/* --- Download Section --- */
+#download .footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: clamp(3rem, 8vw, 5rem);
+    background: linear-gradient(180deg, var(--glass-bg) 0%, rgba(139, 154, 70, 0.05) 100%);
+    border: 1px solid var(--glass-border);
+    position: relative;
+}
+
+/* Decorazione per la sezione download */
+#download .footer-content::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    background: var(--accent-olive);
+    filter: blur(100px);
+    opacity: 0.15;
+    border-radius: 50%;
+    z-index: -1;
 }
 
 /* --- Footer --- */
 .footer {
-    max-width: 1200px;
+    max-width: var(--max-width);
     margin: 0 auto;
     padding: 0 2rem 2rem;
 }
 
 .footer-content {
-    padding: 4rem;
+    padding: clamp(3rem, 8vw, 5rem);
     text-align: center;
     margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .footer-content h2 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin-bottom: 1.5rem;
+    background: linear-gradient(to right, #FFF, #A1A1AA);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .footer-content p {
-    color: #D4D4D8;
-    margin-bottom: 2rem;
+    color: var(--text-muted);
+    margin-bottom: 2.5rem;
+    font-size: 1.1rem;
+    max-width: 600px;
 }
 
 .email-link {
-    font-size: 1.5rem;
+    font-size: clamp(1.2rem, 4vw, 2rem);
     font-weight: 700;
     color: var(--accent-tan);
     text-decoration: none;
     font-family: 'Outfit', sans-serif;
-    transition: color 0.2s ease;
+    transition: all 0.3s ease;
+    padding: 1rem 2rem;
+    border-radius: 99px;
+    background: rgba(212, 180, 131, 0.05);
+    border: 1px solid rgba(212, 180, 131, 0.2);
 }
 
 .email-link:hover {
     color: #fff;
+    background: rgba(212, 180, 131, 0.15);
+    border-color: rgba(212, 180, 131, 0.4);
+    transform: scale(1.05);
 }
 
 .footer-bottom {
     text-align: center;
     color: var(--text-muted);
-    font-size: 0.875rem;
-}
-
-/* --- Schermi piccoli --- */
-@media (max-width: 767px) {
-    /*
-     * `background-attachment: fixed` non viene renderizzato correttamente da
-     * alcuni browser mobile. Lo sfondo rimane visibile e scorre con la pagina.
-     */
-    body {
-        background-attachment: scroll;
-        background-position: center top;
-    }
-
-    .nav-container,
-    .bento-section,
-    .footer {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-
-    .hero {
-        padding: 7rem 1rem 3rem;
-    }
-
-    .footer-content {
-        padding: 2.5rem 1.25rem;
-    }
-
-    .footer-content h2 {
-        font-size: 2rem;
-    }
-
-    .email-link {
-        display: inline-block;
-        max-width: 100%;
-        font-size: clamp(1rem, 6vw, 1.5rem);
-        overflow-wrap: anywhere;
-        word-break: break-word;
-    }
+    font-size: 0.9rem;
+    padding-top: 1rem;
 }
 
 /* --- Animazioni Scroll --- */
 .fade-up {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(40px);
     transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .fade-up.visible {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* --- Mobile Specific Fixes --- */
+@media (max-width: 767px) {
+    /* Touch targets più larghi su mobile */
+    .btn-outline, .btn-primary, .btn-secondary {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .hero-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .nav-container,
+    .bento-section,
+    .footer {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+
+    .embassy-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .email-link {
+        width: 100%;
+        padding: 1rem;
+        word-break: break-all;
+    }
+    
+    .bento-card {
+        padding: 1.75rem;
+    }
+}
+
+/* Supporto per PWA e standalone mode iOS */
+@media all and (display-mode: standalone) {
+    #navbar {
+        padding-top: env(safe-area-inset-top);
+    }
 }
