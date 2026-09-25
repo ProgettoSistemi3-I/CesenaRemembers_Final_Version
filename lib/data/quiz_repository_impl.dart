@@ -9,16 +9,23 @@ import '../domain/repositories/i_quiz_repository.dart';
 import 'seeds/historic_places_seed.dart';
 
 class QuizRepositoryImpl implements IQuizRepository {
-  QuizRepositoryImpl({http.Client? httpClient})
-    : _httpClient = httpClient ?? http.Client();
+  QuizRepositoryImpl({http.Client? httpClient, String? baseUrl})
+    : _httpClient = httpClient ?? http.Client(),
+      _baseUrl = (baseUrl ?? _configuredBaseUrl).replaceFirst(RegExp(r'/$'), '');
 
   final http.Client _httpClient;
+  final String _baseUrl;
   static const String _defaultBaseUrl =
       'http://pascal.ispascalcomandini.it:8000';
   static const _fallbackDifficultyLabel = 'quiz_fallback_name';
   static const _requestTimeout = Duration(seconds: 12);
-  static final Map<String, QuizLoadResult> _memoryCache =
+  final Map<String, QuizLoadResult> _memoryCache =
       <String, QuizLoadResult>{};
+
+  static const String _configuredBaseUrl = String.fromEnvironment(
+    'QUIZ_API_BASE_URL',
+    defaultValue: _defaultBaseUrl,
+  );
 
   @override
   Future<QuizLoadResult> getQuizForPoi(
@@ -35,15 +42,10 @@ class QuizRepositoryImpl implements IQuizRepository {
       return cached;
     }
 
-    final baseUrl = const String.fromEnvironment(
-      'QUIZ_API_BASE_URL',
-      defaultValue: _defaultBaseUrl,
-    );
-
     try {
       final response = await _httpClient
           .post(
-            Uri.parse('$baseUrl/api/generate-quiz'),
+            Uri.parse('$_baseUrl/api/generate-quiz'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id': poiId,
@@ -64,8 +66,13 @@ class QuizRepositoryImpl implements IQuizRepository {
       final Map<String, dynamic> data = jsonDecode(response.body);
       final List<dynamic> questionsJson = data['questions'] ?? [];
       final questions = questionsJson
-          .map((q) => QuizQuestion.fromJson(q))
+          .whereType<Map<String, dynamic>>()
+          .map(QuizQuestion.fromJson)
           .toList();
+
+      if (questions.isEmpty) {
+        throw const FormatException('Quiz API returned no questions');
+      }
 
       final result = QuizLoadResult(
         questions: questions,
@@ -87,7 +94,7 @@ class QuizRepositoryImpl implements IQuizRepository {
         fallbackNotice: 'quiz_fallback_desc',
         fallbackDifficultyLabel: _fallbackDifficultyLabel,
       );
-      _memoryCache[cacheKey] = fallbackResult;
+      // A temporary outage must not force local quizzes for the entire session.
       return fallbackResult;
     }
   }
